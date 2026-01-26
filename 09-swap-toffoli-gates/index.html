@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWAP & Toffoli Gates - Quantum Gates Learning</title>
     <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
+        .bloch-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .bloch-panel { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; text-align: center; }
+        .bloch-panel h4 { color: #64ffda; margin-bottom: 10px; }
+        .bloch-canvas { width: 200px; height: 200px; border-radius: 8px; }
         .prereq-box { background: linear-gradient(135deg, rgba(100,255,218,0.1), rgba(78,205,196,0.05)); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
         .prereq-box h3 { color: #64ffda; margin-bottom: 15px; }
         .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #64ffda; }
@@ -73,11 +79,28 @@
             </div>
         </section>
 
-        <section class="section">
-            <h2>SWAP Gate</h2>
-            <p>Exchanges the states of two qubits: |ab⟩ → |ba⟩</p>
+                <section class="section">
+                    <h2>SWAP Gate</h2>
+                    <p>Exchanges the states of two qubits: |ab⟩ → |ba⟩</p>
             
-            <div class="circuit-visual">
+                    <div class="bloch-container">
+                        <div class="bloch-panel">
+                            <h4>Qubit 1</h4>
+                            <div id="swap-bloch1" class="bloch-canvas"></div>
+                            <p id="swap-state1" style="color:#ff6b6b;margin-top:8px;">|0⟩</p>
+                        </div>
+                        <div class="bloch-panel" style="display:flex;align-items:center;padding:20px;">
+                            <button id="swap-visual-btn" onclick="animateSWAP()" style="padding:15px 25px;background:linear-gradient(135deg,#64ffda,#4ecdc4);border:none;border-radius:8px;color:#000;font-weight:bold;cursor:pointer;font-size:16px;">⇄ SWAP</button>
+                        </div>
+                        <div class="bloch-panel">
+                            <h4>Qubit 2</h4>
+                            <div id="swap-bloch2" class="bloch-canvas"></div>
+                            <p id="swap-state2" style="color:#4ecdc4;margin-top:8px;">|1⟩</p>
+                        </div>
+                    </div>
+                    <p style="text-align:center;color:#888;margin-bottom:20px;">Click SWAP to see the qubit states exchange positions on the Bloch spheres</p>
+            
+                    <div class="circuit-visual">
                 <svg width="300" height="100" viewBox="0 0 300 100">
                     <line x1="50" y1="30" x2="250" y2="30" stroke="#64ffda" stroke-width="2"/>
                     <line x1="50" y1="70" x2="250" y2="70" stroke="#64ffda" stroke-width="2"/>
@@ -153,11 +176,36 @@
             </div>
         </section>
 
-        <section class="section">
-            <h2>Toffoli Gate (CCNOT)</h2>
-            <p>The Toffoli gate has 2 control qubits and 1 target. It flips the target only when BOTH controls are |1⟩.</p>
+                <section class="section">
+                    <h2>Toffoli Gate (CCNOT)</h2>
+                    <p>The Toffoli gate has 2 control qubits and 1 target. It flips the target only when BOTH controls are |1⟩.</p>
             
-            <div class="circuit-visual">
+                    <div class="bloch-container">
+                        <div class="bloch-panel">
+                            <h4>Control 1</h4>
+                            <div id="tof-bloch1" class="bloch-canvas"></div>
+                            <p id="tof-state1" style="color:#ff6b6b;margin-top:8px;">|0⟩</p>
+                        </div>
+                        <div class="bloch-panel">
+                            <h4>Control 2</h4>
+                            <div id="tof-bloch2" class="bloch-canvas"></div>
+                            <p id="tof-state2" style="color:#a855f7;margin-top:8px;">|0⟩</p>
+                        </div>
+                        <div class="bloch-panel">
+                            <h4>Target</h4>
+                            <div id="tof-bloch3" class="bloch-canvas"></div>
+                            <p id="tof-state3" style="color:#4ecdc4;margin-top:8px;">|0⟩</p>
+                        </div>
+                    </div>
+                    <div style="text-align:center;margin:15px 0;">
+                        <button onclick="setTofBloch(0,0,0)" style="padding:8px 12px;margin:3px;background:rgba(100,255,218,0.2);border:1px solid #64ffda;border-radius:6px;color:#64ffda;cursor:pointer;">|000⟩</button>
+                        <button onclick="setTofBloch(1,1,0)" style="padding:8px 12px;margin:3px;background:rgba(100,255,218,0.2);border:1px solid #64ffda;border-radius:6px;color:#64ffda;cursor:pointer;">|110⟩</button>
+                        <button onclick="setTofBloch(1,1,1)" style="padding:8px 12px;margin:3px;background:rgba(100,255,218,0.2);border:1px solid #64ffda;border-radius:6px;color:#64ffda;cursor:pointer;">|111⟩</button>
+                        <button onclick="applyToffoliVisual()" style="padding:8px 16px;margin:3px;background:linear-gradient(135deg,#ff6b6b,#ff8e8e);border:none;border-radius:6px;color:#fff;cursor:pointer;font-weight:bold;">Apply Toffoli</button>
+                    </div>
+                    <p id="tof-visual-note" style="text-align:center;color:#888;">Set controls to |1⟩|1⟩ to see the target flip</p>
+            
+                    <div class="circuit-visual">
                 <svg width="350" height="140" viewBox="0 0 350 140">
                     <line x1="50" y1="30" x2="300" y2="30" stroke="#64ffda" stroke-width="2"/>
                     <line x1="50" y1="70" x2="300" y2="70" stroke="#64ffda" stroke-width="2"/>
@@ -263,6 +311,187 @@
     </div>
 
     <script>
+    // SWAP Bloch Sphere Visualization
+    let swapScene1, swapScene2, swapCamera1, swapCamera2, swapRenderer1, swapRenderer2;
+    let swapArrow1, swapArrow2;
+    let swap1Theta = 0, swap1Phi = 0, swap2Theta = Math.PI, swap2Phi = 0;
+    
+    function initSwapBloch() {
+        const container1 = document.getElementById('swap-bloch1');
+        const container2 = document.getElementById('swap-bloch2');
+        if (!container1 || !container2) return;
+        
+        // Scene 1
+        swapScene1 = new THREE.Scene();
+        swapScene1.background = new THREE.Color(0x0a0a0a);
+        swapCamera1 = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+        swapCamera1.position.set(2.5, 2, 2.5);
+        swapRenderer1 = new THREE.WebGLRenderer({ antialias: true });
+        swapRenderer1.setSize(200, 200);
+        container1.appendChild(swapRenderer1.domElement);
+        
+        // Scene 2
+        swapScene2 = new THREE.Scene();
+        swapScene2.background = new THREE.Color(0x0a0a0a);
+        swapCamera2 = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+        swapCamera2.position.set(2.5, 2, 2.5);
+        swapRenderer2 = new THREE.WebGLRenderer({ antialias: true });
+        swapRenderer2.setSize(200, 200);
+        container2.appendChild(swapRenderer2.domElement);
+        
+        [swapScene1, swapScene2].forEach((scene, idx) => {
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            const sphere = new THREE.Mesh(
+                new THREE.SphereGeometry(1, 24, 24),
+                new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })
+            );
+            scene.add(sphere);
+            scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
+            [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
+                const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
+                const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
+                const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
+                sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);scene.add(sprite);
+            });
+        });
+        
+        swapArrow1 = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, 0xff6b6b, 0.12, 0.08);
+        swapArrow2 = new THREE.ArrowHelper(new THREE.Vector3(0,0,-1), new THREE.Vector3(0,0,0), 1, 0x4ecdc4, 0.12, 0.08);
+        swapScene1.add(swapArrow1);
+        swapScene2.add(swapArrow2);
+        
+        const controls1 = new THREE.OrbitControls(swapCamera1, swapRenderer1.domElement);
+        const controls2 = new THREE.OrbitControls(swapCamera2, swapRenderer2.domElement);
+        controls1.enableDamping = true; controls2.enableDamping = true;
+        
+        function animateSwapBloch() {
+            requestAnimationFrame(animateSwapBloch);
+            controls1.update(); controls2.update();
+            swapRenderer1.render(swapScene1, swapCamera1);
+            swapRenderer2.render(swapScene2, swapCamera2);
+        }
+        animateSwapBloch();
+    }
+    
+    let swapAnimating = false;
+    function animateSWAP() {
+        if (swapAnimating) return;
+        swapAnimating = true;
+        const startTheta1 = swap1Theta, startPhi1 = swap1Phi;
+        const startTheta2 = swap2Theta, startPhi2 = swap2Phi;
+        const endTheta1 = startTheta2, endPhi1 = startPhi2;
+        const endTheta2 = startTheta1, endPhi2 = startPhi1;
+        let progress = 0;
+        
+        function step() {
+            progress += 0.03;
+            if (progress >= 1) {
+                progress = 1;
+                swapAnimating = false;
+                swap1Theta = endTheta1; swap1Phi = endPhi1;
+                swap2Theta = endTheta2; swap2Phi = endPhi2;
+            }
+            const t = progress;
+            const theta1 = startTheta1 + (endTheta1 - startTheta1) * t;
+            const phi1 = startPhi1 + (endPhi1 - startPhi1) * t;
+            const theta2 = startTheta2 + (endTheta2 - startTheta2) * t;
+            const phi2 = startPhi2 + (endPhi2 - startPhi2) * t;
+            
+            swapArrow1.setDirection(new THREE.Vector3(Math.sin(theta1)*Math.cos(phi1), Math.sin(theta1)*Math.sin(phi1), Math.cos(theta1)).normalize());
+            swapArrow2.setDirection(new THREE.Vector3(Math.sin(theta2)*Math.cos(phi2), Math.sin(theta2)*Math.sin(phi2), Math.cos(theta2)).normalize());
+            
+            if (progress < 1) requestAnimationFrame(step);
+            else {
+                document.getElementById('swap-state1').textContent = endTheta1 < 0.1 ? '|0⟩' : '|1⟩';
+                document.getElementById('swap-state2').textContent = endTheta2 < 0.1 ? '|0⟩' : '|1⟩';
+            }
+        }
+        step();
+    }
+    
+    window.addEventListener('load', initSwapBloch);
+    
+    // Toffoli Bloch Sphere Visualization
+    let tofScenes = [], tofCameras = [], tofRenderers = [], tofArrows = [];
+    let tofStates = [0, 0, 0]; // theta values for each qubit
+    
+    function initToffoliBloch() {
+        const containers = [document.getElementById('tof-bloch1'), document.getElementById('tof-bloch2'), document.getElementById('tof-bloch3')];
+        if (!containers[0]) return;
+        const colors = [0xff6b6b, 0xa855f7, 0x4ecdc4];
+        
+        containers.forEach((container, idx) => {
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0a);
+            const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+            camera.position.set(2.5, 2, 2.5);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(200, 200);
+            container.appendChild(renderer.domElement);
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })));
+            scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
+            [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
+                const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
+                const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
+                const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
+                sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);scene.add(sprite);
+            });
+            
+            const arrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, colors[idx], 0.12, 0.08);
+            scene.add(arrow);
+            
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            
+            tofScenes.push(scene); tofCameras.push(camera); tofRenderers.push(renderer); tofArrows.push(arrow);
+        });
+        
+        function animateTof() {
+            requestAnimationFrame(animateTof);
+            tofRenderers.forEach((r, i) => r.render(tofScenes[i], tofCameras[i]));
+        }
+        animateTof();
+    }
+    
+    function setTofBloch(c1v, c2v, tv) {
+        tofStates = [c1v * Math.PI, c2v * Math.PI, tv * Math.PI];
+        tofArrows.forEach((arrow, i) => {
+            const theta = tofStates[i];
+            arrow.setDirection(new THREE.Vector3(0, 0, theta < 0.1 ? 1 : -1).normalize());
+        });
+        document.getElementById('tof-state1').textContent = c1v ? '|1⟩' : '|0⟩';
+        document.getElementById('tof-state2').textContent = c2v ? '|1⟩' : '|0⟩';
+        document.getElementById('tof-state3').textContent = tv ? '|1⟩' : '|0⟩';
+        document.getElementById('tof-visual-note').textContent = 'State set to |' + c1v + c2v + tv + '⟩';
+    }
+    
+    function applyToffoliVisual() {
+        const c1 = tofStates[0] > 1 ? 1 : 0;
+        const c2 = tofStates[1] > 1 ? 1 : 0;
+        const t = tofStates[2] > 1 ? 1 : 0;
+        if (c1 === 1 && c2 === 1) {
+            const newT = 1 - t;
+            tofStates[2] = newT * Math.PI;
+            tofArrows[2].setDirection(new THREE.Vector3(0, 0, newT ? -1 : 1).normalize());
+            document.getElementById('tof-state3').textContent = newT ? '|1⟩' : '|0⟩';
+            document.getElementById('tof-visual-note').textContent = 'Both controls |1⟩ - Target FLIPPED!';
+            document.getElementById('tof-visual-note').style.color = '#ff6b6b';
+        } else {
+            document.getElementById('tof-visual-note').textContent = 'Controls not both |1⟩ - No change';
+            document.getElementById('tof-visual-note').style.color = '#888';
+        }
+    }
+    
+    window.addEventListener('load', initToffoliBloch);
+    
     let q1 = 0, q2 = 0;
     let c1 = 0, c2 = 0, t = 0;
 

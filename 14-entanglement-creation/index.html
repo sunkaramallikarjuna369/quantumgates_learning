@@ -5,7 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entanglement Creation - Quantum Gates Learning</title>
     <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
+        .bloch-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; align-items: center; }
+        .bloch-panel { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; text-align: center; }
+        .bloch-panel h4 { color: #64ffda; margin-bottom: 10px; }
+        .bloch-canvas { width: 200px; height: 200px; border-radius: 8px; }
         .bell-state-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -206,35 +212,56 @@
             </div>
         </section>
 
-        <section class="section">
-            <h2>Creating Bell States</h2>
+                <section class="section">
+                    <h2>Creating Bell States</h2>
             
-            <div class="circuit-container">
-                <h3>Bell State Circuit: H followed by CNOT</h3>
-                <svg class="circuit-svg" width="400" height="120" viewBox="0 0 400 120">
-                    <line x1="50" y1="40" x2="350" y2="40" stroke="#64ffda" stroke-width="2"/>
-                    <line x1="50" y1="80" x2="350" y2="80" stroke="#64ffda" stroke-width="2"/>
+                    <div class="bloch-container">
+                        <div class="bloch-panel">
+                            <h4>Qubit 1</h4>
+                            <div id="bell-bloch1" class="bloch-canvas"></div>
+                            <p id="bell-state1" style="color:#ff6b6b;margin-top:8px;">|0⟩</p>
+                        </div>
+                        <div class="bloch-panel" style="background:transparent;padding:10px;">
+                            <div style="display:flex;flex-direction:column;gap:10px;">
+                                <button onclick="bellStep1()" style="padding:10px 16px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:8px;color:#fff;font-weight:bold;cursor:pointer;">Step 1: H</button>
+                                <button onclick="bellStep2()" style="padding:10px 16px;background:linear-gradient(135deg,#ff6b6b,#ff8e8e);border:none;border-radius:8px;color:#fff;font-weight:bold;cursor:pointer;">Step 2: CNOT</button>
+                                <button onclick="resetBell()" style="padding:8px 14px;background:rgba(100,255,218,0.2);border:1px solid #64ffda;border-radius:6px;color:#64ffda;cursor:pointer;">Reset</button>
+                            </div>
+                        </div>
+                        <div class="bloch-panel">
+                            <h4>Qubit 2</h4>
+                            <div id="bell-bloch2" class="bloch-canvas"></div>
+                            <p id="bell-state2" style="color:#4ecdc4;margin-top:8px;">|0⟩</p>
+                        </div>
+                    </div>
+                    <p id="bell-note" style="text-align:center;color:#888;margin:15px 0;">Click Step 1 to apply Hadamard, then Step 2 to apply CNOT and create entanglement</p>
+            
+                    <div class="circuit-container">
+                        <h3>Bell State Circuit: H followed by CNOT</h3>
+                        <svg class="circuit-svg" width="400" height="120" viewBox="0 0 400 120">
+                            <line x1="50" y1="40" x2="350" y2="40" stroke="#64ffda" stroke-width="2"/>
+                            <line x1="50" y1="80" x2="350" y2="80" stroke="#64ffda" stroke-width="2"/>
                     
-                    <text x="30" y="45" fill="#ffd93d" font-size="14">|0⟩</text>
-                    <text x="30" y="85" fill="#ffd93d" font-size="14">|0⟩</text>
+                            <text x="30" y="45" fill="#ffd93d" font-size="14">|0⟩</text>
+                            <text x="30" y="85" fill="#ffd93d" font-size="14">|0⟩</text>
                     
-                    <rect x="100" y="25" width="40" height="30" fill="#667eea" rx="5"/>
-                    <text x="120" y="45" fill="white" text-anchor="middle" font-size="14" font-weight="bold">H</text>
+                            <rect x="100" y="25" width="40" height="30" fill="#667eea" rx="5"/>
+                            <text x="120" y="45" fill="white" text-anchor="middle" font-size="14" font-weight="bold">H</text>
                     
-                    <circle cx="200" cy="40" r="6" fill="#ff6b6b"/>
-                    <line x1="200" y1="46" x2="200" y2="70" stroke="#ff6b6b" stroke-width="2"/>
-                    <circle cx="200" cy="80" r="12" fill="none" stroke="#ff6b6b" stroke-width="2"/>
-                    <line x1="188" y1="80" x2="212" y2="80" stroke="#ff6b6b" stroke-width="2"/>
+                            <circle cx="200" cy="40" r="6" fill="#ff6b6b"/>
+                            <line x1="200" y1="46" x2="200" y2="70" stroke="#ff6b6b" stroke-width="2"/>
+                            <circle cx="200" cy="80" r="12" fill="none" stroke="#ff6b6b" stroke-width="2"/>
+                            <line x1="188" y1="80" x2="212" y2="80" stroke="#ff6b6b" stroke-width="2"/>
                     
-                    <text x="370" y="45" fill="#4ecdc4" font-size="12">|Φ⁺⟩</text>
-                </svg>
+                            <text x="370" y="45" fill="#4ecdc4" font-size="12">|Φ⁺⟩</text>
+                        </svg>
                 
-                <div style="margin-top: 20px;">
-                    <p><strong>Step 1:</strong> Apply H to first qubit: |00⟩ → (|0⟩+|1⟩)|0⟩/√2 = (|00⟩+|10⟩)/√2</p>
-                    <p><strong>Step 2:</strong> Apply CNOT: (|00⟩+|10⟩)/√2 → (|00⟩+|11⟩)/√2 = |Φ⁺⟩</p>
-                </div>
-            </div>
-        </section>
+                        <div style="margin-top: 20px;">
+                            <p><strong>Step 1:</strong> Apply H to first qubit: |00⟩ → (|0⟩+|1⟩)|0⟩/√2 = (|00⟩+|10⟩)/√2</p>
+                            <p><strong>Step 2:</strong> Apply CNOT: (|00⟩+|10⟩)/√2 → (|00⟩+|11⟩)/√2 = |Φ⁺⟩</p>
+                        </div>
+                    </div>
+                </section>
 
         <section class="section">
             <h2>Interactive Bell State Explorer</h2>
@@ -416,6 +443,91 @@
                     break;
             }
         }
+        
+        // Bell State Bloch Sphere Visualization
+        let bellScenes = [], bellCameras = [], bellRenderers = [], bellArrows = [];
+        let bellStep = 0;
+        
+        function initBellBloch() {
+            const containers = [document.getElementById('bell-bloch1'), document.getElementById('bell-bloch2')];
+            if (!containers[0]) return;
+            const colors = [0xff6b6b, 0x4ecdc4];
+            
+            containers.forEach((container, idx) => {
+                const scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x0a0a0a);
+                const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+                camera.position.set(2.5, 2, 2.5);
+                const renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(200, 200);
+                container.appendChild(renderer.domElement);
+                
+                scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+                scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })));
+                scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
+                scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
+                scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
+                scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
+                [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
+                    const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
+                    const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
+                    const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
+                    sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);scene.add(sprite);
+                });
+                
+                const arrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, colors[idx], 0.12, 0.08);
+                scene.add(arrow);
+                
+                const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                
+                bellScenes.push(scene); bellCameras.push(camera); bellRenderers.push(renderer); bellArrows.push(arrow);
+            });
+            
+            function animateBell() {
+                requestAnimationFrame(animateBell);
+                bellRenderers.forEach((r, i) => r.render(bellScenes[i], bellCameras[i]));
+            }
+            animateBell();
+        }
+        
+        function bellStep1() {
+            if (bellStep >= 1) return;
+            bellStep = 1;
+            bellArrows[0].setDirection(new THREE.Vector3(1, 0, 0).normalize());
+            document.getElementById('bell-state1').textContent = '|+⟩ = (|0⟩+|1⟩)/√2';
+            document.getElementById('bell-note').textContent = 'Hadamard applied! Qubit 1 is now in superposition. Click Step 2 for CNOT.';
+            document.getElementById('bell-note').style.color = '#667eea';
+        }
+        
+        function bellStep2() {
+            if (bellStep < 1) {
+                document.getElementById('bell-note').textContent = 'Apply Hadamard first (Step 1)!';
+                document.getElementById('bell-note').style.color = '#ff6b6b';
+                return;
+            }
+            if (bellStep >= 2) return;
+            bellStep = 2;
+            document.getElementById('bell-state1').textContent = 'Entangled';
+            document.getElementById('bell-state2').textContent = 'Entangled';
+            document.getElementById('bell-note').innerHTML = '<span style="color:#64ffda;font-weight:bold;">Bell State |Φ⁺⟩ Created!</span> Qubits are now entangled - measuring one instantly determines the other!';
+            bellArrows[0].material.color.setHex(0xa855f7);
+            bellArrows[1].material.color.setHex(0xa855f7);
+        }
+        
+        function resetBell() {
+            bellStep = 0;
+            bellArrows[0].setDirection(new THREE.Vector3(0, 0, 1).normalize());
+            bellArrows[1].setDirection(new THREE.Vector3(0, 0, 1).normalize());
+            bellArrows[0].material.color.setHex(0xff6b6b);
+            bellArrows[1].material.color.setHex(0x4ecdc4);
+            document.getElementById('bell-state1').textContent = '|0⟩';
+            document.getElementById('bell-state2').textContent = '|0⟩';
+            document.getElementById('bell-note').textContent = 'Click Step 1 to apply Hadamard, then Step 2 to apply CNOT and create entanglement';
+            document.getElementById('bell-note').style.color = '#888';
+        }
+        
+        window.addEventListener('load', initBellBloch);
     </script>
 </body>
 </html>

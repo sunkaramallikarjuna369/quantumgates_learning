@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unitary & Reversibility - Quantum Gates Learning</title>
     <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
+        .bloch-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; align-items: center; }
+        .bloch-panel { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; text-align: center; }
+        .bloch-panel h4 { color: #64ffda; margin-bottom: 10px; }
+        .bloch-canvas { width: 220px; height: 220px; border-radius: 8px; }
+        .arrow-between { font-size: 32px; color: #64ffda; }
         .prereq-box { background: linear-gradient(135deg, rgba(100,255,218,0.1), rgba(78,205,196,0.05)); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
         .prereq-box h3 { color: #64ffda; margin-bottom: 15px; }
         .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #64ffda; }
@@ -90,28 +97,48 @@
             </div>
         </section>
 
-        <section class="section">
-            <h2>Reversibility Visualized</h2>
-            <div class="visual-demo">
-                <h4 style="color:#64ffda;margin-bottom:15px;">Forward Operation</h4>
-                <div class="arrow-flow">
-                    <div class="state-box input-state">|ψ⟩</div>
-                    <span class="arrow">→</span>
-                    <div class="gate-box">U</div>
-                    <span class="arrow">→</span>
-                    <div class="state-box output-state">|ψ'⟩</div>
-                </div>
-                <h4 style="color:#64ffda;margin:20px 0 15px;">Reverse Operation</h4>
-                <div class="arrow-flow">
-                    <div class="state-box output-state">|ψ'⟩</div>
-                    <span class="arrow">→</span>
-                    <div class="gate-box">U†</div>
-                    <span class="arrow">→</span>
-                    <div class="state-box input-state">|ψ⟩</div>
-                </div>
-                <p style="color:#888;margin-top:15px;">Applying U† after U always returns to the original state!</p>
-            </div>
-        </section>
+                <section class="section">
+                    <h2>Reversibility Visualized</h2>
+            
+                    <div class="bloch-container">
+                        <div class="bloch-panel">
+                            <h4>Initial State |ψ⟩</h4>
+                            <div id="rev-bloch1" class="bloch-canvas"></div>
+                        </div>
+                        <div class="bloch-panel" style="background:transparent;padding:10px;">
+                            <div style="display:flex;flex-direction:column;gap:10px;">
+                                <button onclick="applyUnitaryForward()" style="padding:12px 20px;background:linear-gradient(135deg,#64ffda,#4ecdc4);border:none;border-radius:8px;color:#000;font-weight:bold;cursor:pointer;">Apply U →</button>
+                                <button onclick="applyUnitaryReverse()" style="padding:12px 20px;background:linear-gradient(135deg,#ff6b6b,#ff8e8e);border:none;border-radius:8px;color:#fff;font-weight:bold;cursor:pointer;">← Apply U†</button>
+                                <button onclick="resetUnitary()" style="padding:8px 16px;background:rgba(100,255,218,0.2);border:1px solid #64ffda;border-radius:6px;color:#64ffda;cursor:pointer;">Reset</button>
+                            </div>
+                        </div>
+                        <div class="bloch-panel">
+                            <h4>After Gate |ψ'⟩</h4>
+                            <div id="rev-bloch2" class="bloch-canvas"></div>
+                        </div>
+                    </div>
+                    <p id="rev-note" style="text-align:center;color:#888;margin:15px 0;">Click "Apply U" to see the X gate transform the state, then "Apply U†" to reverse it</p>
+            
+                    <div class="visual-demo">
+                        <h4 style="color:#64ffda;margin-bottom:15px;">Forward Operation</h4>
+                        <div class="arrow-flow">
+                            <div class="state-box input-state">|ψ⟩</div>
+                            <span class="arrow">→</span>
+                            <div class="gate-box">U</div>
+                            <span class="arrow">→</span>
+                            <div class="state-box output-state">|ψ'⟩</div>
+                        </div>
+                        <h4 style="color:#64ffda;margin:20px 0 15px;">Reverse Operation</h4>
+                        <div class="arrow-flow">
+                            <div class="state-box output-state">|ψ'⟩</div>
+                            <span class="arrow">→</span>
+                            <div class="gate-box">U†</div>
+                            <span class="arrow">→</span>
+                            <div class="state-box input-state">|ψ⟩</div>
+                        </div>
+                        <p style="color:#888;margin-top:15px;">Applying U† after U always returns to the original state!</p>
+                    </div>
+                </section>
 
         <section class="section">
             <h2>Classical vs Quantum Gates</h2>
@@ -206,5 +233,101 @@
             <a href="../11-universal-gate-sets/index.html" class="btn btn-primary">Next: Universal Gate Sets</a>
         </div>
     </div>
+    
+    <script>
+    let revScenes = [], revCameras = [], revRenderers = [], revArrows = [];
+    let revTheta = Math.PI/4, revPhi = Math.PI/4;
+    let revState = 0; // 0=initial, 1=after U
+    
+    function initRevBloch() {
+        const containers = [document.getElementById('rev-bloch1'), document.getElementById('rev-bloch2')];
+        if (!containers[0]) return;
+        
+        containers.forEach((container, idx) => {
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0a);
+            const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+            camera.position.set(2.5, 2, 2.5);
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(220, 220);
+            container.appendChild(renderer.domElement);
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })));
+            scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
+            [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
+                const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
+                const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
+                const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
+                sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);scene.add(sprite);
+            });
+            
+            const color = idx === 0 ? 0x64ffda : 0xff6b6b;
+            const arrow = new THREE.ArrowHelper(new THREE.Vector3(Math.sin(revTheta)*Math.cos(revPhi), Math.sin(revTheta)*Math.sin(revPhi), Math.cos(revTheta)), new THREE.Vector3(0,0,0), 1, color, 0.12, 0.08);
+            scene.add(arrow);
+            
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            
+            revScenes.push(scene); revCameras.push(camera); revRenderers.push(renderer); revArrows.push(arrow);
+        });
+        
+        function animateRev() {
+            requestAnimationFrame(animateRev);
+            revRenderers.forEach((r, i) => r.render(revScenes[i], revCameras[i]));
+        }
+        animateRev();
+    }
+    
+    function applyUnitaryForward() {
+        if (revState === 1) return;
+        revState = 1;
+        // Apply X gate: flip theta
+        const newTheta = Math.PI - revTheta;
+        const newPhi = -revPhi;
+        animateArrow(revArrows[1], newTheta, newPhi);
+        document.getElementById('rev-note').textContent = 'X gate applied! State rotated π around X-axis. Click U† to reverse.';
+        document.getElementById('rev-note').style.color = '#64ffda';
+    }
+    
+    function applyUnitaryReverse() {
+        if (revState === 0) return;
+        revState = 0;
+        // Apply X† = X (self-inverse)
+        animateArrow(revArrows[1], revTheta, revPhi);
+        document.getElementById('rev-note').textContent = 'X† applied! State returned to original. Reversibility demonstrated!';
+        document.getElementById('rev-note').style.color = '#ff6b6b';
+    }
+    
+    function resetUnitary() {
+        revState = 0;
+        revArrows[1].setDirection(new THREE.Vector3(Math.sin(revTheta)*Math.cos(revPhi), Math.sin(revTheta)*Math.sin(revPhi), Math.cos(revTheta)).normalize());
+        document.getElementById('rev-note').textContent = 'Click "Apply U" to see the X gate transform the state';
+        document.getElementById('rev-note').style.color = '#888';
+    }
+    
+    function animateArrow(arrow, targetTheta, targetPhi) {
+        let progress = 0;
+        const startDir = arrow.line.geometry.attributes.position.array.slice(3, 6);
+        const startTheta = Math.acos(startDir[2] / Math.sqrt(startDir[0]**2 + startDir[1]**2 + startDir[2]**2));
+        const startPhi = Math.atan2(startDir[1], startDir[0]);
+        
+        function step() {
+            progress += 0.05;
+            if (progress > 1) progress = 1;
+            const t = progress;
+            const theta = startTheta + (targetTheta - startTheta) * t;
+            const phi = startPhi + (targetPhi - startPhi) * t;
+            arrow.setDirection(new THREE.Vector3(Math.sin(theta)*Math.cos(phi), Math.sin(theta)*Math.sin(phi), Math.cos(theta)).normalize());
+            if (progress < 1) requestAnimationFrame(step);
+        }
+        step();
+    }
+    
+    window.addEventListener('load', initRevBloch);
+    </script>
 </body>
 </html>

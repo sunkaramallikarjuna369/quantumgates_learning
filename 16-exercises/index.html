@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exercises - Quantum Gates Learning</title>
     <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
+        .bloch-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; align-items: center; }
+        .bloch-panel { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; text-align: center; }
+        .bloch-panel h4 { color: #64ffda; margin-bottom: 10px; }
+        .bloch-canvas { width: 250px; height: 250px; border-radius: 8px; }
+        .gate-btn { padding: 8px 14px; margin: 3px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
         .exercise-card {
             background: rgba(255,255,255,0.03);
             border-radius: 15px;
@@ -318,8 +325,33 @@
             </div>
         </section>
 
-        <section class="section">
-            <h2>Practice Problems</h2>
+                <section class="section">
+                    <h2>Interactive Practice Sandbox</h2>
+            
+                    <div class="bloch-container">
+                        <div class="bloch-panel">
+                            <h4>Practice Gate Sequences</h4>
+                            <div id="practice-bloch" class="bloch-canvas"></div>
+                            <div style="margin-top:15px;">
+                                <button class="gate-btn" onclick="applyPracticeGate('X')" style="background:#ff6b6b;color:#fff;">X</button>
+                                <button class="gate-btn" onclick="applyPracticeGate('Y')" style="background:#4ecdc4;color:#000;">Y</button>
+                                <button class="gate-btn" onclick="applyPracticeGate('Z')" style="background:#ffd93d;color:#000;">Z</button>
+                                <button class="gate-btn" onclick="applyPracticeGate('H')" style="background:#667eea;color:#fff;">H</button>
+                                <button class="gate-btn" onclick="applyPracticeGate('S')" style="background:#a855f7;color:#fff;">S</button>
+                                <button class="gate-btn" onclick="applyPracticeGate('T')" style="background:#f472b6;color:#fff;">T</button>
+                            </div>
+                            <div style="margin-top:10px;">
+                                <button class="gate-btn" onclick="resetPracticeBloch()" style="background:rgba(100,255,218,0.2);color:#64ffda;border:1px solid #64ffda;">Reset to |0⟩</button>
+                                <button class="gate-btn" onclick="setTargetState()" style="background:rgba(255,107,107,0.2);color:#ff6b6b;border:1px solid #ff6b6b;">New Challenge</button>
+                            </div>
+                            <p id="practice-note" style="color:#888;margin-top:10px;font-size:0.9em;">Try to reach the target state using gate sequences!</p>
+                            <p id="practice-target" style="color:#ffd93d;margin-top:5px;font-size:0.9em;">Target: |+⟩ (apply H to |0⟩)</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Practice Problems</h2>
             
             <div class="exercise-card">
                 <h3>Problem 1: Matrix Multiplication</h3>
@@ -462,6 +494,118 @@
             
             document.querySelectorAll('.hint').forEach(h => h.classList.remove('show'));
         }
+        
+        // Practice Bloch Sphere Visualization
+        let practiceScene, practiceCamera, practiceRenderer, practiceArrow, practiceControls;
+        let practiceTheta = 0, practicePhi = 0;
+        let practiceGates = [];
+        let targetIdx = 0;
+        const targets = [
+            { name: '|+⟩', theta: Math.PI/2, phi: 0, hint: 'apply H to |0⟩' },
+            { name: '|1⟩', theta: Math.PI, phi: 0, hint: 'apply X to |0⟩' },
+            { name: '|-⟩', theta: Math.PI/2, phi: Math.PI, hint: 'apply H then Z' },
+            { name: '|i⟩', theta: Math.PI/2, phi: Math.PI/2, hint: 'apply H then S' },
+            { name: '|0⟩', theta: 0, phi: 0, hint: 'already at |0⟩!' }
+        ];
+        
+        function initPracticeBloch() {
+            const container = document.getElementById('practice-bloch');
+            if (!container) return;
+            
+            practiceScene = new THREE.Scene();
+            practiceScene.background = new THREE.Color(0x0a0a0a);
+            practiceCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+            practiceCamera.position.set(2.5, 2, 2.5);
+            practiceRenderer = new THREE.WebGLRenderer({ antialias: true });
+            practiceRenderer.setSize(250, 250);
+            container.appendChild(practiceRenderer.domElement);
+            
+            practiceScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            practiceScene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })));
+            practiceScene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
+            practiceScene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
+            practiceScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
+            practiceScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
+            [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
+                const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
+                const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
+                const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
+                sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);practiceScene.add(sprite);
+            });
+            
+            practiceArrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, 0x64ffda, 0.12, 0.08);
+            practiceScene.add(practiceArrow);
+            
+            practiceControls = new THREE.OrbitControls(practiceCamera, practiceRenderer.domElement);
+            practiceControls.enableDamping = true;
+            
+            function animatePractice() {
+                requestAnimationFrame(animatePractice);
+                practiceControls.update();
+                practiceRenderer.render(practiceScene, practiceCamera);
+            }
+            animatePractice();
+        }
+        
+        function applyPracticeGate(gate) {
+            practiceGates.push(gate);
+            let newTheta = practiceTheta, newPhi = practicePhi;
+            
+            switch(gate) {
+                case 'X': newTheta = Math.PI - practiceTheta; newPhi = -practicePhi; break;
+                case 'Y': newTheta = Math.PI - practiceTheta; newPhi = Math.PI - practicePhi; break;
+                case 'Z': newPhi = practicePhi + Math.PI; break;
+                case 'H':
+                    const x = Math.sin(practiceTheta) * Math.cos(practicePhi);
+                    const z = Math.cos(practiceTheta);
+                    newTheta = Math.acos(x);
+                    newPhi = (z >= 0) ? 0 : Math.PI;
+                    break;
+                case 'S': newPhi = practicePhi + Math.PI/2; break;
+                case 'T': newPhi = practicePhi + Math.PI/4; break;
+            }
+            
+            practiceTheta = newTheta;
+            practicePhi = newPhi;
+            updatePracticeArrow();
+            checkTarget();
+        }
+        
+        function updatePracticeArrow() {
+            const dir = new THREE.Vector3(
+                Math.sin(practiceTheta) * Math.cos(practicePhi),
+                Math.sin(practiceTheta) * Math.sin(practicePhi),
+                Math.cos(practiceTheta)
+            ).normalize();
+            practiceArrow.setDirection(dir);
+        }
+        
+        function checkTarget() {
+            const t = targets[targetIdx];
+            const dist = Math.abs(practiceTheta - t.theta) + Math.abs((practicePhi % (2*Math.PI)) - (t.phi % (2*Math.PI)));
+            if (dist < 0.1) {
+                document.getElementById('practice-note').innerHTML = '<span style="color:#4ecdc4;font-weight:bold;">Target reached!</span> Applied: ' + practiceGates.join(' → ');
+            } else {
+                document.getElementById('practice-note').textContent = 'Applied: ' + practiceGates.join(' → ');
+            }
+        }
+        
+        function resetPracticeBloch() {
+            practiceTheta = 0;
+            practicePhi = 0;
+            practiceGates = [];
+            updatePracticeArrow();
+            document.getElementById('practice-note').textContent = 'Try to reach the target state using gate sequences!';
+        }
+        
+        function setTargetState() {
+            targetIdx = (targetIdx + 1) % targets.length;
+            const t = targets[targetIdx];
+            document.getElementById('practice-target').textContent = 'Target: ' + t.name + ' (' + t.hint + ')';
+            resetPracticeBloch();
+        }
+        
+        window.addEventListener('load', initPracticeBloch);
     </script>
 </body>
 </html>
