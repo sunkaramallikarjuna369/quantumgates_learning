@@ -3,62 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SWAP & Toffoli Gates - Quantum Gates Learning</title>
+    <title>SWAP & Toffoli Gates - Devin's Teaching Style</title>
     <link rel="stylesheet" href="../shared/styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-        .bloch-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
-        .bloch-panel { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; text-align: center; }
-        .bloch-panel h4 { color: #64ffda; margin-bottom: 10px; }
-        .bloch-canvas { width: 200px; height: 200px; border-radius: 8px; }
-        .prereq-box { background: linear-gradient(135deg, rgba(100,255,218,0.1), rgba(78,205,196,0.05)); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
-        .prereq-box h3 { color: #64ffda; margin-bottom: 15px; }
-        .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #64ffda; }
-        .prereq-item h4 { color: #4ecdc4; margin-bottom: 8px; }
-        .circuit-visual { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 30px; margin: 20px 0; text-align: center; }
-        .gate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
-        .gate-panel { background: rgba(100,255,218,0.05); border: 1px solid rgba(100,255,218,0.2); border-radius: 12px; padding: 20px; }
-        .gate-panel h4 { color: #64ffda; text-align: center; margin-bottom: 15px; }
-        .matrix-display { display: flex; justify-content: center; margin: 15px 0; overflow-x: auto; }
-        .matrix-box { display: inline-grid; gap: 2px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px; border: 1px solid rgba(100,255,218,0.3); }
-        .matrix-4x4 { grid-template-columns: repeat(4, 35px); }
-        .matrix-8x8 { grid-template-columns: repeat(8, 28px); }
-        .matrix-box .cell { height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(100,255,218,0.15); color: #fff; font-size: 12px; border-radius: 3px; }
-        .matrix-4x4 .cell { width: 35px; }
-        .matrix-8x8 .cell { width: 28px; font-size: 10px; }
-        .truth-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        .truth-table th, .truth-table td { padding: 10px; text-align: center; border: 1px solid rgba(100,255,218,0.2); font-size: 14px; }
-        .truth-table th { background: rgba(100,255,218,0.1); color: #64ffda; }
-        .truth-table td { background: rgba(0,0,0,0.2); }
-        .truth-table .changed { color: #ff6b6b; font-weight: bold; }
-        .interactive-section { background: linear-gradient(135deg, rgba(100,255,218,0.08), rgba(78,205,196,0.03)); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 25px 0; }
-        .qubit-row { display: flex; align-items: center; gap: 20px; margin: 10px 0; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 10px; flex-wrap: wrap; }
-        .qubit-label { min-width: 80px; color: #64ffda; font-weight: bold; }
-        .state-btns { display: flex; gap: 8px; }
-        .state-btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
-        .state-btn.active { background: linear-gradient(135deg, #64ffda, #4ecdc4); color: #000; }
-        .state-btn:not(.active) { background: rgba(100,255,218,0.2); color: #64ffda; }
-        .apply-btn { padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; background: linear-gradient(135deg, #ff6b6b, #ff8e8e); color: #fff; transition: all 0.3s; margin: 10px; }
-        .apply-btn:hover { transform: scale(1.05); }
-        .result-display { text-align: center; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-top: 20px; }
-        .result-state { font-size: 28px; color: #fff; font-family: monospace; }
-        .decision-guide { background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
-        .decision-guide h3 { color: #ffd93d; margin-bottom: 15px; }
-        .decision-item { display: flex; align-items: flex-start; gap: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 10px 0; }
-        .decision-item .goal { color: #4ecdc4; font-weight: bold; min-width: 200px; }
-        .decision-item .solution { color: #fff; }
-        .decision-item .gate { color: #ff6b6b; font-weight: bold; }
-        .decomposition { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 12px; margin: 15px 0; }
-        .decomp-gate { padding: 10px 15px; background: linear-gradient(135deg, rgba(100,255,218,0.3), rgba(78,205,196,0.2)); border: 1px solid rgba(100,255,218,0.4); border-radius: 8px; color: #64ffda; font-weight: bold; }
-        .decomp-arrow { color: #888; font-size: 20px; }
+        .fourwh-box { background: linear-gradient(135deg, rgba(100,255,218,0.12), rgba(78,205,196,0.06)); border: 2px solid rgba(100,255,218,0.4); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .fourwh-box h3 { color: #64ffda; margin-bottom: 20px; font-size: 1.4em; }
+        .fourwh-item { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 20px; margin: 15px 0; border-left: 5px solid; }
+        .fourwh-item.what { border-color: #ff6b6b; }
+        .fourwh-item.why { border-color: #ffd93d; }
+        .fourwh-item.when { border-color: #4ecdc4; }
+        .fourwh-item.where { border-color: #a855f7; }
+        .fourwh-item.how { border-color: #64ffda; }
+        .fourwh-item h4 { margin-bottom: 12px; font-size: 1.2em; }
+        .fourwh-item.what h4 { color: #ff6b6b; }
+        .fourwh-item.why h4 { color: #ffd93d; }
+        .fourwh-item.when h4 { color: #4ecdc4; }
+        .fourwh-item.where h4 { color: #a855f7; }
+        .fourwh-item.how h4 { color: #64ffda; }
+        .fourwh-item p, .fourwh-item li { color: #ccc; line-height: 1.7; }
+        .prereq-box { background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(168,85,247,0.05)); border: 2px solid rgba(168,85,247,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
+        .prereq-box h3 { color: #a855f7; margin-bottom: 15px; }
+        .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #a855f7; }
+        .prereq-item h4 { color: #c084fc; margin-bottom: 8px; }
+        .matrix-derivation { background: rgba(255,215,0,0.08); border: 2px solid rgba(255,215,0,0.3); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .matrix-derivation h3 { color: #ffd93d; margin-bottom: 20px; }
+        .derivation-step { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 20px; margin: 15px 0; }
+        .derivation-step h4 { color: #4ecdc4; margin-bottom: 12px; }
+        .derivation-step .explanation { color: #ccc; line-height: 1.6; }
+        .derivation-step .formula { background: rgba(100,255,218,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 1.1em; color: #64ffda; text-align: center; }
+        .matrix-visual { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+        .matrix-box { display: inline-grid; gap: 3px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; border: 2px solid rgba(100,255,218,0.3); }
+        .matrix-box.m4 { grid-template-columns: repeat(4, 35px); }
+        .matrix-box.m8 { grid-template-columns: repeat(8, 28px); }
+        .matrix-box .cell { height: 28px; display: flex; align-items: center; justify-content: center; background: rgba(100,255,218,0.15); color: #fff; font-size: 11px; border-radius: 4px; font-family: monospace; }
+        .key-insight { background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,107,107,0.05)); border: 2px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .key-insight h4 { color: #ff6b6b; margin-bottom: 10px; }
+        .key-insight p { color: #ccc; line-height: 1.6; }
+        .gate-card { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 25px; margin: 25px 0; border: 2px solid; }
+        .gate-card.swap-card { border-color: rgba(78,205,196,0.5); }
+        .gate-card.toffoli-card { border-color: rgba(168,85,247,0.5); }
+        .gate-card h3 { margin-bottom: 20px; }
+        .gate-card.swap-card h3 { color: #4ecdc4; }
+        .gate-card.toffoli-card h3 { color: #a855f7; }
+        .simulator { background: rgba(0,0,0,0.5); border-radius: 16px; padding: 25px; margin: 25px 0; border: 2px solid rgba(100,255,218,0.3); }
+        .simulator h3 { color: #64ffda; margin-bottom: 20px; }
+        .qubit-row { display: flex; align-items: center; gap: 20px; margin: 15px 0; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; }
+        .qubit-label { width: 80px; color: #a855f7; font-weight: bold; }
+        .qubit-state { font-family: monospace; font-size: 1.3em; color: #64ffda; min-width: 50px; }
+        .qubit-toggle { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .qubit-toggle.off { background: rgba(100,255,218,0.2); color: #64ffda; }
+        .qubit-toggle.on { background: #64ffda; color: #000; }
+        .gate-btn { padding: 12px 25px; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: bold; transition: all 0.3s; margin: 8px; }
+        .gate-btn:hover { transform: scale(1.05); }
+        .gate-btn.swap { background: linear-gradient(135deg, #4ecdc4, #6ee7de); color: #000; }
+        .gate-btn.toffoli { background: linear-gradient(135deg, #a855f7, #c084fc); color: #fff; }
+        .gate-btn.reset { background: linear-gradient(135deg, #666, #888); color: #fff; }
+        .result-display { text-align: center; margin-top: 20px; padding: 20px; background: rgba(100,255,218,0.1); border-radius: 10px; }
+        .result-display .state { font-size: 1.4em; color: #64ffda; font-family: monospace; }
+        .result-display .info { color: #888; margin-top: 10px; }
+        .truth-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9em; }
+        .truth-table th, .truth-table td { padding: 10px; text-align: center; border: 1px solid rgba(100,255,218,0.3); }
+        .truth-table th { background: rgba(100,255,218,0.2); color: #64ffda; }
+        .truth-table td { background: rgba(0,0,0,0.3); color: #ccc; font-family: monospace; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>SWAP & Toffoli Gates</h1>
-            <p class="subtitle">Multi-Qubit Operations for State Exchange and Classical Logic</p>
+            <p class="subtitle">Exchanging Qubits and Universal Classical Computation</p>
         </header>
 
         <section class="section">
@@ -66,240 +79,157 @@
                 <h3>Prerequisites</h3>
                 <div class="prereq-item">
                     <h4>1. CNOT Gate</h4>
-                    <p>The CNOT flips the target qubit when control is |1⟩. SWAP can be built from 3 CNOTs!</p>
+                    <p>SWAP is built from 3 CNOTs. Toffoli is a doubly-controlled NOT. Understanding CNOT is essential for both gates.</p>
                 </div>
                 <div class="prereq-item">
-                    <h4>2. Multi-Qubit States</h4>
-                    <p>For SWAP: 2 qubits (4 basis states). For Toffoli: 3 qubits (8 basis states).</p>
+                    <h4>2. Reversible Computing</h4>
+                    <p>Classical AND/OR gates lose information (can't recover inputs from output). Toffoli is a reversible AND gate - it preserves all information, enabling reversible classical computing.</p>
                 </div>
                 <div class="prereq-item">
-                    <h4>3. Classical Logic</h4>
-                    <p>Toffoli implements reversible AND gate - essential for classical computation in quantum circuits.</p>
+                    <h4>3. Universal Gate Sets</h4>
+                    <p>Toffoli alone is universal for classical reversible computing. Combined with H, it's universal for quantum computing. SWAP enables qubit routing in circuits.</p>
                 </div>
             </div>
         </section>
 
-                <section class="section">
-                    <h2>SWAP Gate</h2>
-                    <p>Exchanges the states of two qubits: |ab⟩ → |ba⟩</p>
-            
-                    <div class="bloch-container">
-                        <div class="bloch-panel">
-                            <h4>Qubit 1</h4>
-                            <div id="swap-bloch1" class="bloch-canvas"></div>
-                            <p id="swap-state1" style="color:#ff6b6b;margin-top:8px;">|0⟩</p>
-                        </div>
-                        <div class="bloch-panel" style="display:flex;align-items:center;padding:20px;">
-                            <button id="swap-visual-btn" onclick="animateSWAP()" style="padding:15px 25px;background:linear-gradient(135deg,#64ffda,#4ecdc4);border:none;border-radius:8px;color:#000;font-weight:bold;cursor:pointer;font-size:16px;">⇄ SWAP</button>
-                        </div>
-                        <div class="bloch-panel">
-                            <h4>Qubit 2</h4>
-                            <div id="swap-bloch2" class="bloch-canvas"></div>
-                            <p id="swap-state2" style="color:#4ecdc4;margin-top:8px;">|1⟩</p>
-                        </div>
-                    </div>
-                    <p style="text-align:center;color:#888;margin-bottom:20px;">Click SWAP to see the qubit states exchange positions on the Bloch spheres</p>
-            
-                    <div class="circuit-visual">
-                <svg width="300" height="100" viewBox="0 0 300 100">
-                    <line x1="50" y1="30" x2="250" y2="30" stroke="#64ffda" stroke-width="2"/>
-                    <line x1="50" y1="70" x2="250" y2="70" stroke="#64ffda" stroke-width="2"/>
-                    <text x="25" y="35" fill="#64ffda" font-size="12">Q1</text>
-                    <text x="25" y="75" fill="#64ffda" font-size="12">Q2</text>
-                    <line x1="140" y1="30" x2="160" y2="70" stroke="#64ffda" stroke-width="2"/>
-                    <line x1="160" y1="30" x2="140" y2="70" stroke="#64ffda" stroke-width="2"/>
-                    <circle cx="150" cy="30" r="6" fill="#64ffda"/>
-                    <circle cx="150" cy="70" r="6" fill="#64ffda"/>
-                </svg>
-            </div>
-
-            <div class="gate-grid">
-                <div class="gate-panel">
-                    <h4>SWAP Matrix</h4>
-                    <div class="matrix-display">
-                        <div class="matrix-box matrix-4x4">
-                            <div class="cell">1</div><div class="cell">0</div><div class="cell">0</div><div class="cell">0</div>
-                            <div class="cell">0</div><div class="cell">0</div><div class="cell">1</div><div class="cell">0</div>
-                            <div class="cell">0</div><div class="cell">1</div><div class="cell">0</div><div class="cell">0</div>
-                            <div class="cell">0</div><div class="cell">0</div><div class="cell">0</div><div class="cell">1</div>
+        <div class="gate-card swap-card">
+            <h3>SWAP Gate</h3>
+            <div class="fourwh-box" style="margin-top:0;">
+                <div class="fourwh-item what">
+                    <h4>WHAT does SWAP do?</h4>
+                    <p>SWAP exchanges the states of two qubits. SWAP|ab⟩ = |ba⟩. It's symmetric and self-inverse: SWAP² = I.</p>
+                </div>
+                <div class="fourwh-item why">
+                    <h4>WHY is the SWAP matrix a permutation?</h4>
+                    <p><strong>Derivation:</strong> SWAP|00⟩=|00⟩, SWAP|01⟩=|10⟩, SWAP|10⟩=|01⟩, SWAP|11⟩=|11⟩</p>
+                    <div class="matrix-visual">
+                        <span style="color:#888;">SWAP = </span>
+                        <div class="matrix-box m4" style="border-color:rgba(78,205,196,0.5);">
+                            <div class="cell" style="background:rgba(78,205,196,0.2);">1</div><div class="cell" style="background:rgba(78,205,196,0.2);">0</div><div class="cell" style="background:rgba(78,205,196,0.2);">0</div><div class="cell" style="background:rgba(78,205,196,0.2);">0</div>
+                            <div class="cell" style="background:rgba(78,205,196,0.2);">0</div><div class="cell" style="background:rgba(78,205,196,0.2);">0</div><div class="cell" style="background:rgba(78,205,196,0.2);">1</div><div class="cell" style="background:rgba(78,205,196,0.2);">0</div>
+                            <div class="cell" style="background:rgba(78,205,196,0.2);">0</div><div class="cell" style="background:rgba(78,205,196,0.2);">1</div><div class="cell" style="background:rgba(78,205,196,0.2);">0</div><div class="cell" style="background:rgba(78,205,196,0.2);">0</div>
+                            <div class="cell" style="background:rgba(78,205,196,0.2);">0</div><div class="cell" style="background:rgba(78,205,196,0.2);">0</div><div class="cell" style="background:rgba(78,205,196,0.2);">0</div><div class="cell" style="background:rgba(78,205,196,0.2);">1</div>
                         </div>
                     </div>
                 </div>
-                <div class="gate-panel">
-                    <h4>SWAP Truth Table</h4>
-                    <table class="truth-table">
-                        <tr><th>Input</th><th>Output</th></tr>
-                        <tr><td>|00⟩</td><td>|00⟩</td></tr>
-                        <tr><td>|01⟩</td><td class="changed">|10⟩</td></tr>
-                        <tr><td>|10⟩</td><td class="changed">|01⟩</td></tr>
-                        <tr><td>|11⟩</td><td>|11⟩</td></tr>
-                    </table>
+                <div class="fourwh-item how">
+                    <h4>HOW to build SWAP from CNOTs?</h4>
+                    <div class="formula">SWAP = CNOT₁₂ · CNOT₂₁ · CNOT₁₂</div>
+                    <p class="explanation">Three CNOTs with alternating control/target implement SWAP. This is the standard decomposition used in hardware.</p>
                 </div>
             </div>
-
-            <div class="highlight">
-                <h3>SWAP = 3 CNOTs</h3>
-                <div class="decomposition">
-                    <span class="decomp-gate">CNOT₁₂</span>
-                    <span class="decomp-arrow">→</span>
-                    <span class="decomp-gate">CNOT₂₁</span>
-                    <span class="decomp-arrow">→</span>
-                    <span class="decomp-gate">CNOT₁₂</span>
-                </div>
-                <p style="text-align:center;color:#888;">Control-target order: first subscript is control, second is target</p>
+            <div class="key-insight">
+                <h4>Key Insight: SWAP preserves entanglement</h4>
+                <p>SWAP doesn't create or destroy entanglement - it just moves it around. If qubits 1 and 2 are entangled with qubit 3, after SWAP(1,2), qubits 2 and 1 have swapped their entanglement relationships.</p>
             </div>
-        </section>
+        </div>
 
         <section class="section">
-            <h2>Interactive SWAP Simulator</h2>
-            <div class="interactive-section">
+            <div class="simulator">
+                <h3>SWAP Simulator</h3>
                 <div class="qubit-row">
-                    <span class="qubit-label">Qubit 1:</span>
-                    <div class="state-btns">
-                        <button class="state-btn active" id="q1-0" onclick="setQ(1,0)">|0⟩</button>
-                        <button class="state-btn" id="q1-1" onclick="setQ(1,1)">|1⟩</button>
-                    </div>
+                    <span class="qubit-label">Qubit A:</span>
+                    <span class="qubit-state" id="swap-a">|0⟩</span>
+                    <button class="qubit-toggle off" id="swap-a-toggle" onclick="toggleSwap('a')">Toggle</button>
                 </div>
                 <div class="qubit-row">
-                    <span class="qubit-label">Qubit 2:</span>
-                    <div class="state-btns">
-                        <button class="state-btn active" id="q2-0" onclick="setQ(2,0)">|0⟩</button>
-                        <button class="state-btn" id="q2-1" onclick="setQ(2,1)">|1⟩</button>
-                    </div>
+                    <span class="qubit-label">Qubit B:</span>
+                    <span class="qubit-state" id="swap-b">|0⟩</span>
+                    <button class="qubit-toggle off" id="swap-b-toggle" onclick="toggleSwap('b')">Toggle</button>
                 </div>
-                <div style="text-align:center;">
-                    <button class="apply-btn" onclick="applySWAP()">Apply SWAP</button>
+                <div style="text-align:center;margin-top:20px;">
+                    <button class="gate-btn swap" onclick="applySwap()">Apply SWAP</button>
+                    <button class="gate-btn reset" onclick="resetSwap()">Reset</button>
                 </div>
                 <div class="result-display">
-                    <div class="result-state" id="swap-result">|00⟩ → |00⟩</div>
+                    <div class="state" id="swap-result">|00⟩</div>
                 </div>
             </div>
         </section>
 
-                <section class="section">
-                    <h2>Toffoli Gate (CCNOT)</h2>
-                    <p>The Toffoli gate has 2 control qubits and 1 target. It flips the target only when BOTH controls are |1⟩.</p>
-            
-                    <div class="bloch-container">
-                        <div class="bloch-panel">
-                            <h4>Control 1</h4>
-                            <div id="tof-bloch1" class="bloch-canvas"></div>
-                            <p id="tof-state1" style="color:#ff6b6b;margin-top:8px;">|0⟩</p>
-                        </div>
-                        <div class="bloch-panel">
-                            <h4>Control 2</h4>
-                            <div id="tof-bloch2" class="bloch-canvas"></div>
-                            <p id="tof-state2" style="color:#a855f7;margin-top:8px;">|0⟩</p>
-                        </div>
-                        <div class="bloch-panel">
-                            <h4>Target</h4>
-                            <div id="tof-bloch3" class="bloch-canvas"></div>
-                            <p id="tof-state3" style="color:#4ecdc4;margin-top:8px;">|0⟩</p>
+        <div class="gate-card toffoli-card">
+            <h3>Toffoli Gate (CCNOT)</h3>
+            <div class="fourwh-box" style="margin-top:0;">
+                <div class="fourwh-item what">
+                    <h4>WHAT does Toffoli do?</h4>
+                    <p>Toffoli is a doubly-controlled NOT: it flips the target qubit ONLY when BOTH control qubits are |1⟩. Toffoli|abc⟩ = |ab, c⊕(a·b)⟩. It's the quantum AND gate!</p>
+                </div>
+                <div class="fourwh-item why">
+                    <h4>WHY is Toffoli important?</h4>
+                    <p>Toffoli is universal for classical reversible computing - any classical circuit can be built from Toffoli gates. Combined with Hadamard, it's universal for quantum computing. It's also used in quantum arithmetic and error correction.</p>
+                </div>
+                <div class="fourwh-item when">
+                    <h4>WHEN to use Toffoli?</h4>
+                    <p><strong>Arithmetic:</strong> Building adders, multipliers. <strong>Oracles:</strong> Implementing classical functions reversibly. <strong>Error correction:</strong> Syndrome extraction. <strong>Grover's algorithm:</strong> Multi-controlled operations in oracles.</p>
+                </div>
+                <div class="fourwh-item how">
+                    <h4>HOW does the Toffoli matrix work?</h4>
+                    <p>8×8 matrix (3 qubits = 2³ = 8 basis states). Only |110⟩↔|111⟩ are swapped; all others unchanged.</p>
+                    <div class="matrix-visual">
+                        <span style="color:#888;font-size:0.9em;">Toffoli = diag(1,1,1,1,1,1) ⊕ </span>
+                        <div class="matrix-box" style="grid-template-columns:repeat(2,30px);border-color:rgba(168,85,247,0.5);">
+                            <div class="cell" style="background:rgba(168,85,247,0.2);">0</div><div class="cell" style="background:rgba(168,85,247,0.2);">1</div>
+                            <div class="cell" style="background:rgba(168,85,247,0.2);">1</div><div class="cell" style="background:rgba(168,85,247,0.2);">0</div>
                         </div>
                     </div>
-                    <div style="text-align:center;margin:15px 0;">
-                        <button onclick="setTofBloch(0,0,0)" style="padding:8px 12px;margin:3px;background:rgba(100,255,218,0.2);border:1px solid #64ffda;border-radius:6px;color:#64ffda;cursor:pointer;">|000⟩</button>
-                        <button onclick="setTofBloch(1,1,0)" style="padding:8px 12px;margin:3px;background:rgba(100,255,218,0.2);border:1px solid #64ffda;border-radius:6px;color:#64ffda;cursor:pointer;">|110⟩</button>
-                        <button onclick="setTofBloch(1,1,1)" style="padding:8px 12px;margin:3px;background:rgba(100,255,218,0.2);border:1px solid #64ffda;border-radius:6px;color:#64ffda;cursor:pointer;">|111⟩</button>
-                        <button onclick="applyToffoliVisual()" style="padding:8px 16px;margin:3px;background:linear-gradient(135deg,#ff6b6b,#ff8e8e);border:none;border-radius:6px;color:#fff;cursor:pointer;font-weight:bold;">Apply Toffoli</button>
-                    </div>
-                    <p id="tof-visual-note" style="text-align:center;color:#888;">Set controls to |1⟩|1⟩ to see the target flip</p>
+                </div>
+            </div>
             
-                    <div class="circuit-visual">
-                <svg width="350" height="140" viewBox="0 0 350 140">
-                    <line x1="50" y1="30" x2="300" y2="30" stroke="#64ffda" stroke-width="2"/>
-                    <line x1="50" y1="70" x2="300" y2="70" stroke="#64ffda" stroke-width="2"/>
-                    <line x1="50" y1="110" x2="300" y2="110" stroke="#64ffda" stroke-width="2"/>
-                    <text x="20" y="35" fill="#64ffda" font-size="12">Ctrl 1</text>
-                    <text x="20" y="75" fill="#64ffda" font-size="12">Ctrl 2</text>
-                    <text x="20" y="115" fill="#64ffda" font-size="12">Target</text>
-                    <circle cx="175" cy="30" r="8" fill="#64ffda"/>
-                    <circle cx="175" cy="70" r="8" fill="#64ffda"/>
-                    <line x1="175" y1="38" x2="175" y2="92" stroke="#64ffda" stroke-width="2"/>
-                    <circle cx="175" cy="110" r="18" fill="none" stroke="#64ffda" stroke-width="2"/>
-                    <line x1="157" y1="110" x2="193" y2="110" stroke="#64ffda" stroke-width="2"/>
-                    <line x1="175" y1="92" x2="175" y2="128" stroke="#64ffda" stroke-width="2"/>
-                </svg>
+            <h4 style="color:#a855f7;margin-top:20px;">Toffoli Truth Table</h4>
+            <table class="truth-table">
+                <tr><th>Input</th><th>C1</th><th>C2</th><th>T</th><th>Output</th><th>Action</th></tr>
+                <tr><td>|000⟩</td><td>0</td><td>0</td><td>0</td><td>|000⟩</td><td>No flip</td></tr>
+                <tr><td>|001⟩</td><td>0</td><td>0</td><td>1</td><td>|001⟩</td><td>No flip</td></tr>
+                <tr><td>|010⟩</td><td>0</td><td>1</td><td>0</td><td>|010⟩</td><td>No flip</td></tr>
+                <tr><td>|011⟩</td><td>0</td><td>1</td><td>1</td><td>|011⟩</td><td>No flip</td></tr>
+                <tr><td>|100⟩</td><td>1</td><td>0</td><td>0</td><td>|100⟩</td><td>No flip</td></tr>
+                <tr><td>|101⟩</td><td>1</td><td>0</td><td>1</td><td>|101⟩</td><td>No flip</td></tr>
+                <tr><td>|110⟩</td><td>1</td><td>1</td><td>0</td><td>|111⟩</td><td>FLIP!</td></tr>
+                <tr><td>|111⟩</td><td>1</td><td>1</td><td>1</td><td>|110⟩</td><td>FLIP!</td></tr>
+            </table>
+            
+            <div class="key-insight">
+                <h4>Key Insight: Toffoli computes AND reversibly</h4>
+                <p>If target starts as |0⟩: Toffoli|ab0⟩ = |ab, a·b⟩. The target becomes the AND of the controls! This is reversible because we keep the inputs. Classical AND loses information; Toffoli preserves it.</p>
             </div>
-
-            <div class="gate-panel" style="max-width:600px;margin:20px auto;">
-                <h4>Toffoli Truth Table</h4>
-                <table class="truth-table">
-                    <tr><th>C1</th><th>C2</th><th>T (in)</th><th>T (out)</th><th>Action</th></tr>
-                    <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>No change</td></tr>
-                    <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>No change</td></tr>
-                    <tr><td>0</td><td>1</td><td>0</td><td>0</td><td>No change</td></tr>
-                    <tr><td>0</td><td>1</td><td>1</td><td>1</td><td>No change</td></tr>
-                    <tr><td>1</td><td>0</td><td>0</td><td>0</td><td>No change</td></tr>
-                    <tr><td>1</td><td>0</td><td>1</td><td>1</td><td>No change</td></tr>
-                    <tr><td>1</td><td>1</td><td>0</td><td class="changed">1</td><td>Flipped!</td></tr>
-                    <tr><td>1</td><td>1</td><td>1</td><td class="changed">0</td><td>Flipped!</td></tr>
-                </table>
-            </div>
-
-            <div class="highlight">
-                <h3>Toffoli = Reversible AND</h3>
-                <p>If target starts as |0⟩, after Toffoli: target = C1 AND C2</p>
-                <p style="color:#888;margin-top:10px;">This makes Toffoli universal for classical reversible computation!</p>
-            </div>
-        </section>
+        </div>
 
         <section class="section">
-            <h2>Interactive Toffoli Simulator</h2>
-            <div class="interactive-section">
+            <div class="simulator">
+                <h3>Toffoli Simulator</h3>
                 <div class="qubit-row">
                     <span class="qubit-label">Control 1:</span>
-                    <div class="state-btns">
-                        <button class="state-btn active" id="c1-0" onclick="setTof('c1',0)">|0⟩</button>
-                        <button class="state-btn" id="c1-1" onclick="setTof('c1',1)">|1⟩</button>
-                    </div>
+                    <span class="qubit-state" id="tof-c1">|0⟩</span>
+                    <button class="qubit-toggle off" id="tof-c1-toggle" onclick="toggleTof('c1')">Toggle</button>
                 </div>
                 <div class="qubit-row">
                     <span class="qubit-label">Control 2:</span>
-                    <div class="state-btns">
-                        <button class="state-btn active" id="c2-0" onclick="setTof('c2',0)">|0⟩</button>
-                        <button class="state-btn" id="c2-1" onclick="setTof('c2',1)">|1⟩</button>
-                    </div>
+                    <span class="qubit-state" id="tof-c2">|0⟩</span>
+                    <button class="qubit-toggle off" id="tof-c2-toggle" onclick="toggleTof('c2')">Toggle</button>
                 </div>
                 <div class="qubit-row">
                     <span class="qubit-label">Target:</span>
-                    <div class="state-btns">
-                        <button class="state-btn active" id="t-0" onclick="setTof('t',0)">|0⟩</button>
-                        <button class="state-btn" id="t-1" onclick="setTof('t',1)">|1⟩</button>
-                    </div>
+                    <span class="qubit-state" id="tof-t">|0⟩</span>
+                    <button class="qubit-toggle off" id="tof-t-toggle" onclick="toggleTof('t')">Toggle</button>
                 </div>
-                <div style="text-align:center;">
-                    <button class="apply-btn" onclick="applyToffoli()">Apply Toffoli</button>
+                <div style="text-align:center;margin-top:20px;">
+                    <button class="gate-btn toffoli" onclick="applyToffoli()">Apply Toffoli</button>
+                    <button class="gate-btn reset" onclick="resetToffoli()">Reset</button>
                 </div>
                 <div class="result-display">
-                    <div class="result-state" id="toffoli-result">|000⟩ → |000⟩</div>
-                    <p id="toffoli-note" style="color:#888;margin-top:10px;"></p>
+                    <div class="state" id="tof-result">|000⟩</div>
+                    <div class="info" id="tof-info">Both controls must be |1⟩ to flip target</div>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <div class="decision-guide">
-                <h3>When to Use These Gates</h3>
-                <div class="decision-item">
-                    <span class="goal">Exchange two qubit states:</span>
-                    <span class="solution">Use <span class="gate">SWAP</span> gate</span>
-                </div>
-                <div class="decision-item">
-                    <span class="goal">Implement AND gate:</span>
-                    <span class="solution">Use <span class="gate">Toffoli</span> with target = |0⟩</span>
-                </div>
-                <div class="decision-item">
-                    <span class="goal">Implement NAND gate:</span>
-                    <span class="solution">Use <span class="gate">Toffoli</span> with target = |1⟩</span>
-                </div>
-                <div class="decision-item">
-                    <span class="goal">Classical reversible computation:</span>
-                    <span class="solution"><span class="gate">Toffoli</span> is universal for classical logic</span>
-                </div>
-                <div class="decision-item">
-                    <span class="goal">Reorder qubits in circuit:</span>
-                    <span class="solution">Use <span class="gate">SWAP</span> or 3 CNOTs</span>
+            <div class="matrix-derivation">
+                <h3>Decomposing Toffoli into Basic Gates</h3>
+                <div class="derivation-step">
+                    <h4>Toffoli from CNOTs and T gates</h4>
+                    <p class="explanation">Toffoli can be decomposed into 6 CNOTs and several single-qubit gates (H, T, T†). This is important because hardware typically only implements 1- and 2-qubit gates natively.</p>
+                    <div class="formula">Toffoli = (H₃)(CNOT₂₃)(T†₃)(CNOT₁₃)(T₃)(CNOT₂₃)(T†₃)(CNOT₁₃)(T₂T₃)(CNOT₁₂)(T₁T†₂)(CNOT₁₂)(H₃)</div>
                 </div>
             </div>
         </section>
@@ -311,227 +241,65 @@
     </div>
 
     <script>
-    // SWAP Bloch Sphere Visualization
-    let swapScene1, swapScene2, swapCamera1, swapCamera2, swapRenderer1, swapRenderer2;
-    let swapArrow1, swapArrow2;
-    let swap1Theta = 0, swap1Phi = 0, swap2Theta = Math.PI, swap2Phi = 0;
+    let swapA = 0, swapB = 0;
+    let tofC1 = 0, tofC2 = 0, tofT = 0;
     
-    function initSwapBloch() {
-        const container1 = document.getElementById('swap-bloch1');
-        const container2 = document.getElementById('swap-bloch2');
-        if (!container1 || !container2) return;
-        
-        // Scene 1
-        swapScene1 = new THREE.Scene();
-        swapScene1.background = new THREE.Color(0x0a0a0a);
-        swapCamera1 = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
-        swapCamera1.position.set(2.5, 2, 2.5);
-        swapRenderer1 = new THREE.WebGLRenderer({ antialias: true });
-        swapRenderer1.setSize(200, 200);
-        container1.appendChild(swapRenderer1.domElement);
-        
-        // Scene 2
-        swapScene2 = new THREE.Scene();
-        swapScene2.background = new THREE.Color(0x0a0a0a);
-        swapCamera2 = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
-        swapCamera2.position.set(2.5, 2, 2.5);
-        swapRenderer2 = new THREE.WebGLRenderer({ antialias: true });
-        swapRenderer2.setSize(200, 200);
-        container2.appendChild(swapRenderer2.domElement);
-        
-        [swapScene1, swapScene2].forEach((scene, idx) => {
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            const sphere = new THREE.Mesh(
-                new THREE.SphereGeometry(1, 24, 24),
-                new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })
-            );
-            scene.add(sphere);
-            scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
-            scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
-            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
-            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
-            [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
-                const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
-                const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
-                const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
-                sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);scene.add(sprite);
-            });
-        });
-        
-        swapArrow1 = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, 0xff6b6b, 0.12, 0.08);
-        swapArrow2 = new THREE.ArrowHelper(new THREE.Vector3(0,0,-1), new THREE.Vector3(0,0,0), 1, 0x4ecdc4, 0.12, 0.08);
-        swapScene1.add(swapArrow1);
-        swapScene2.add(swapArrow2);
-        
-        const controls1 = new THREE.OrbitControls(swapCamera1, swapRenderer1.domElement);
-        const controls2 = new THREE.OrbitControls(swapCamera2, swapRenderer2.domElement);
-        controls1.enableDamping = true; controls2.enableDamping = true;
-        
-        function animateSwapBloch() {
-            requestAnimationFrame(animateSwapBloch);
-            controls1.update(); controls2.update();
-            swapRenderer1.render(swapScene1, swapCamera1);
-            swapRenderer2.render(swapScene2, swapCamera2);
-        }
-        animateSwapBloch();
+    function updateSwapDisplay() {
+        document.getElementById('swap-a').textContent = '|' + swapA + '⟩';
+        document.getElementById('swap-b').textContent = '|' + swapB + '⟩';
+        document.getElementById('swap-a-toggle').className = 'qubit-toggle ' + (swapA ? 'on' : 'off');
+        document.getElementById('swap-b-toggle').className = 'qubit-toggle ' + (swapB ? 'on' : 'off');
+        document.getElementById('swap-result').textContent = '|' + swapA + swapB + '⟩';
     }
     
-    let swapAnimating = false;
-    function animateSWAP() {
-        if (swapAnimating) return;
-        swapAnimating = true;
-        const startTheta1 = swap1Theta, startPhi1 = swap1Phi;
-        const startTheta2 = swap2Theta, startPhi2 = swap2Phi;
-        const endTheta1 = startTheta2, endPhi1 = startPhi2;
-        const endTheta2 = startTheta1, endPhi2 = startPhi1;
-        let progress = 0;
-        
-        function step() {
-            progress += 0.03;
-            if (progress >= 1) {
-                progress = 1;
-                swapAnimating = false;
-                swap1Theta = endTheta1; swap1Phi = endPhi1;
-                swap2Theta = endTheta2; swap2Phi = endPhi2;
-            }
-            const t = progress;
-            const theta1 = startTheta1 + (endTheta1 - startTheta1) * t;
-            const phi1 = startPhi1 + (endPhi1 - startPhi1) * t;
-            const theta2 = startTheta2 + (endTheta2 - startTheta2) * t;
-            const phi2 = startPhi2 + (endPhi2 - startPhi2) * t;
-            
-            swapArrow1.setDirection(new THREE.Vector3(Math.sin(theta1)*Math.cos(phi1), Math.sin(theta1)*Math.sin(phi1), Math.cos(theta1)).normalize());
-            swapArrow2.setDirection(new THREE.Vector3(Math.sin(theta2)*Math.cos(phi2), Math.sin(theta2)*Math.sin(phi2), Math.cos(theta2)).normalize());
-            
-            if (progress < 1) requestAnimationFrame(step);
-            else {
-                document.getElementById('swap-state1').textContent = endTheta1 < 0.1 ? '|0⟩' : '|1⟩';
-                document.getElementById('swap-state2').textContent = endTheta2 < 0.1 ? '|0⟩' : '|1⟩';
-            }
-        }
-        step();
+    function toggleSwap(q) {
+        if (q === 'a') swapA = 1 - swapA;
+        else swapB = 1 - swapB;
+        updateSwapDisplay();
     }
     
-    window.addEventListener('load', initSwapBloch);
-    
-    // Toffoli Bloch Sphere Visualization
-    let tofScenes = [], tofCameras = [], tofRenderers = [], tofArrows = [];
-    let tofStates = [0, 0, 0]; // theta values for each qubit
-    
-    function initToffoliBloch() {
-        const containers = [document.getElementById('tof-bloch1'), document.getElementById('tof-bloch2'), document.getElementById('tof-bloch3')];
-        if (!containers[0]) return;
-        const colors = [0xff6b6b, 0xa855f7, 0x4ecdc4];
-        
-        containers.forEach((container, idx) => {
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x0a0a0a);
-            const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
-            camera.position.set(2.5, 2, 2.5);
-            const renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(200, 200);
-            container.appendChild(renderer.domElement);
-            
-            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-            scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })));
-            scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
-            scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
-            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
-            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
-            [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
-                const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
-                const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
-                const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
-                sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);scene.add(sprite);
-            });
-            
-            const arrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, colors[idx], 0.12, 0.08);
-            scene.add(arrow);
-            
-            const controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            
-            tofScenes.push(scene); tofCameras.push(camera); tofRenderers.push(renderer); tofArrows.push(arrow);
-        });
-        
-        function animateTof() {
-            requestAnimationFrame(animateTof);
-            tofRenderers.forEach((r, i) => r.render(tofScenes[i], tofCameras[i]));
-        }
-        animateTof();
+    function applySwap() {
+        var temp = swapA;
+        swapA = swapB;
+        swapB = temp;
+        updateSwapDisplay();
     }
     
-    function setTofBloch(c1v, c2v, tv) {
-        tofStates = [c1v * Math.PI, c2v * Math.PI, tv * Math.PI];
-        tofArrows.forEach((arrow, i) => {
-            const theta = tofStates[i];
-            arrow.setDirection(new THREE.Vector3(0, 0, theta < 0.1 ? 1 : -1).normalize());
-        });
-        document.getElementById('tof-state1').textContent = c1v ? '|1⟩' : '|0⟩';
-        document.getElementById('tof-state2').textContent = c2v ? '|1⟩' : '|0⟩';
-        document.getElementById('tof-state3').textContent = tv ? '|1⟩' : '|0⟩';
-        document.getElementById('tof-visual-note').textContent = 'State set to |' + c1v + c2v + tv + '⟩';
+    function resetSwap() {
+        swapA = 0; swapB = 0;
+        updateSwapDisplay();
     }
     
-    function applyToffoliVisual() {
-        const c1 = tofStates[0] > 1 ? 1 : 0;
-        const c2 = tofStates[1] > 1 ? 1 : 0;
-        const t = tofStates[2] > 1 ? 1 : 0;
-        if (c1 === 1 && c2 === 1) {
-            const newT = 1 - t;
-            tofStates[2] = newT * Math.PI;
-            tofArrows[2].setDirection(new THREE.Vector3(0, 0, newT ? -1 : 1).normalize());
-            document.getElementById('tof-state3').textContent = newT ? '|1⟩' : '|0⟩';
-            document.getElementById('tof-visual-note').textContent = 'Both controls |1⟩ - Target FLIPPED!';
-            document.getElementById('tof-visual-note').style.color = '#ff6b6b';
-        } else {
-            document.getElementById('tof-visual-note').textContent = 'Controls not both |1⟩ - No change';
-            document.getElementById('tof-visual-note').style.color = '#888';
-        }
+    function updateTofDisplay() {
+        document.getElementById('tof-c1').textContent = '|' + tofC1 + '⟩';
+        document.getElementById('tof-c2').textContent = '|' + tofC2 + '⟩';
+        document.getElementById('tof-t').textContent = '|' + tofT + '⟩';
+        document.getElementById('tof-c1-toggle').className = 'qubit-toggle ' + (tofC1 ? 'on' : 'off');
+        document.getElementById('tof-c2-toggle').className = 'qubit-toggle ' + (tofC2 ? 'on' : 'off');
+        document.getElementById('tof-t-toggle').className = 'qubit-toggle ' + (tofT ? 'on' : 'off');
+        document.getElementById('tof-result').textContent = '|' + tofC1 + tofC2 + tofT + '⟩';
+        var info = (tofC1 && tofC2) ? 'Both controls are |1⟩ - target will flip!' : 'Controls not both |1⟩ - no flip';
+        document.getElementById('tof-info').textContent = info;
     }
     
-    window.addEventListener('load', initToffoliBloch);
+    function toggleTof(q) {
+        if (q === 'c1') tofC1 = 1 - tofC1;
+        else if (q === 'c2') tofC2 = 1 - tofC2;
+        else tofT = 1 - tofT;
+        updateTofDisplay();
+    }
     
-    let q1 = 0, q2 = 0;
-    let c1 = 0, c2 = 0, t = 0;
-
-    function setQ(q, v) {
-        if(q === 1) { q1 = v; document.getElementById('q1-0').classList.toggle('active', v===0); document.getElementById('q1-1').classList.toggle('active', v===1); }
-        else { q2 = v; document.getElementById('q2-0').classList.toggle('active', v===0); document.getElementById('q2-1').classList.toggle('active', v===1); }
-        document.getElementById('swap-result').textContent = '|' + q1 + q2 + '⟩ → ?';
-    }
-
-    function applySWAP() {
-        const newQ1 = q2, newQ2 = q1;
-        document.getElementById('swap-result').textContent = '|' + q1 + q2 + '⟩ → |' + newQ1 + newQ2 + '⟩';
-        q1 = newQ1; q2 = newQ2;
-        document.getElementById('q1-0').classList.toggle('active', q1===0);
-        document.getElementById('q1-1').classList.toggle('active', q1===1);
-        document.getElementById('q2-0').classList.toggle('active', q2===0);
-        document.getElementById('q2-1').classList.toggle('active', q2===1);
-    }
-
-    function setTof(which, v) {
-        if(which === 'c1') { c1 = v; document.getElementById('c1-0').classList.toggle('active', v===0); document.getElementById('c1-1').classList.toggle('active', v===1); }
-        else if(which === 'c2') { c2 = v; document.getElementById('c2-0').classList.toggle('active', v===0); document.getElementById('c2-1').classList.toggle('active', v===1); }
-        else { t = v; document.getElementById('t-0').classList.toggle('active', v===0); document.getElementById('t-1').classList.toggle('active', v===1); }
-        document.getElementById('toffoli-result').textContent = '|' + c1 + c2 + t + '⟩ → ?';
-        document.getElementById('toffoli-note').textContent = '';
-    }
-
     function applyToffoli() {
-        const oldT = t;
-        const newT = (c1 === 1 && c2 === 1) ? (1 - t) : t;
-        document.getElementById('toffoli-result').textContent = '|' + c1 + c2 + oldT + '⟩ → |' + c1 + c2 + newT + '⟩';
-        if(c1 === 1 && c2 === 1) {
-            document.getElementById('toffoli-note').textContent = 'Both controls are |1⟩, so target was flipped!';
-        } else {
-            document.getElementById('toffoli-note').textContent = 'At least one control is |0⟩, so target unchanged.';
-        }
-        t = newT;
-        document.getElementById('t-0').classList.toggle('active', t===0);
-        document.getElementById('t-1').classList.toggle('active', t===1);
+        if (tofC1 && tofC2) tofT = 1 - tofT;
+        updateTofDisplay();
     }
+    
+    function resetToffoli() {
+        tofC1 = 0; tofC2 = 0; tofT = 0;
+        updateTofDisplay();
+    }
+    
+    window.addEventListener('load', function() { updateSwapDisplay(); updateTofDisplay(); });
     </script>
 </body>
 </html>
