@@ -6,311 +6,198 @@
     <title>Unitary & Reversibility - Quantum Gates Learning</title>
     <link rel="stylesheet" href="../shared/styles.css">
     <style>
-        .property-showcase {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            margin: 30px 0;
-        }
-        .property-panel {
-            background: rgba(255,255,255,0.03);
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid rgba(100,255,218,0.2);
-        }
-        .property-panel h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-        .equation-box {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 15px 0;
-            text-align: center;
-        }
-        .equation-box .main-eq {
-            font-size: 1.8em;
-            color: #ffd93d;
-            margin-bottom: 10px;
-        }
-        .comparison-visual {
-            display: flex;
-            justify-content: center;
-            gap: 50px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-        .comparison-item {
-            text-align: center;
-            padding: 20px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 15px;
-            min-width: 200px;
-        }
-        .comparison-item h4 {
-            margin-bottom: 15px;
-        }
-        .comparison-item.classical {
-            border: 2px solid #ff6b6b;
-        }
-        .comparison-item.quantum {
-            border: 2px solid #64ffda;
-        }
-        .flow-diagram {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        .flow-box {
-            padding: 15px 25px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 10px;
-            font-weight: bold;
-        }
-        .flow-arrow {
-            font-size: 2em;
-            color: #ffd93d;
-        }
-        @media (max-width: 768px) {
-            .property-showcase {
-                grid-template-columns: 1fr;
-            }
-        }
+        .prereq-box { background: linear-gradient(135deg, rgba(100,255,218,0.1), rgba(78,205,196,0.05)); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
+        .prereq-box h3 { color: #64ffda; margin-bottom: 15px; }
+        .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #64ffda; }
+        .prereq-item h4 { color: #4ecdc4; margin-bottom: 8px; }
+        .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 20px 0; }
+        .concept-card { background: rgba(100,255,218,0.05); border: 1px solid rgba(100,255,218,0.2); border-radius: 12px; padding: 20px; }
+        .concept-card h4 { color: #64ffda; margin-bottom: 12px; }
+        .formula-box { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 8px; text-align: center; margin: 15px 0; }
+        .formula { font-size: 20px; color: #64ffda; font-family: monospace; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .comparison-table th, .comparison-table td { padding: 15px; text-align: center; border: 1px solid rgba(100,255,218,0.2); }
+        .comparison-table th { background: rgba(100,255,218,0.1); color: #64ffda; }
+        .comparison-table td { background: rgba(0,0,0,0.2); }
+        .reversible { color: #64ffda; }
+        .irreversible { color: #ff6b6b; }
+        .visual-demo { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 25px; margin: 20px 0; text-align: center; }
+        .arrow-flow { display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; margin: 15px 0; }
+        .state-box { padding: 15px 25px; border-radius: 8px; font-family: monospace; font-size: 18px; }
+        .input-state { background: rgba(255,107,107,0.2); border: 1px solid rgba(255,107,107,0.4); color: #ff6b6b; }
+        .output-state { background: rgba(78,205,196,0.2); border: 1px solid rgba(78,205,196,0.4); color: #4ecdc4; }
+        .gate-box { background: linear-gradient(135deg, rgba(100,255,218,0.3), rgba(78,205,196,0.2)); border: 2px solid rgba(100,255,218,0.5); padding: 15px 30px; border-radius: 8px; font-size: 24px; font-weight: bold; color: #64ffda; }
+        .arrow { font-size: 24px; color: #64ffda; }
+        .decision-guide { background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .decision-guide h3 { color: #ffd93d; margin-bottom: 15px; }
+        .decision-item { display: flex; align-items: flex-start; gap: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 10px 0; }
+        .decision-item .goal { color: #4ecdc4; font-weight: bold; min-width: 180px; }
+        .decision-item .solution { color: #fff; }
+        .property-list { list-style: none; padding: 0; }
+        .property-list li { padding: 10px 15px; margin: 8px 0; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 3px solid #64ffda; }
+        .property-list li strong { color: #64ffda; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Unitary & Reversibility</h1>
-            <p class="subtitle">Fundamental Properties of Quantum Operations</p>
+            <h1>Unitary Operations & Reversibility</h1>
+            <p class="subtitle">Why Quantum Gates Must Be Reversible</p>
         </header>
 
         <section class="section">
-            <h2>What Makes a Gate "Quantum"?</h2>
-            <p>
-                All quantum gates must be <strong>unitary operators</strong>. This is not just a mathematical 
-                convenience—it's a fundamental requirement from quantum mechanics that ensures probability 
-                conservation and reversibility.
-            </p>
-            
-            <div class="key-point">
-                <h3>The Unitary Condition</h3>
-                <div class="equation-box">
-                    <div class="main-eq">U†U = UU† = I</div>
-                    <p>A matrix U is unitary if its conjugate transpose equals its inverse</p>
+            <div class="prereq-box">
+                <h3>Prerequisites</h3>
+                <div class="prereq-item">
+                    <h4>1. Matrix Multiplication</h4>
+                    <p>Gates are matrices that multiply state vectors. The result is a new state: |ψ'⟩ = U|ψ⟩</p>
+                </div>
+                <div class="prereq-item">
+                    <h4>2. Conjugate Transpose (†)</h4>
+                    <p>U† (U-dagger) is the conjugate transpose: transpose the matrix and take complex conjugate of each element.</p>
+                </div>
+                <div class="prereq-item">
+                    <h4>3. Identity Matrix</h4>
+                    <p>I is the identity matrix. When U·U† = I, applying U then U† returns to the original state.</p>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <h2>Why Unitarity?</h2>
-            
-            <div class="property-showcase">
-                <div class="property-panel">
-                    <h3>1. Probability Conservation</h3>
-                    <p>
-                        The total probability of all outcomes must always equal 1.
-                        Unitary operations preserve the norm of state vectors.
-                    </p>
-                    <div class="equation-box">
-                        <div class="formula">||U|ψ⟩||² = ||ψ⟩||² = 1</div>
-                    </div>
-                    <p>
-                        If probabilities could increase or decrease, we'd violate 
-                        the fundamental rules of probability theory.
-                    </p>
-                </div>
-                
-                <div class="property-panel">
-                    <h3>2. Reversibility</h3>
-                    <p>
-                        Every quantum operation can be undone. The inverse of a 
-                        unitary matrix is simply its conjugate transpose.
-                    </p>
-                    <div class="equation-box">
-                        <div class="formula">U⁻¹ = U†</div>
-                    </div>
-                    <p>
-                        This means quantum computation is fundamentally reversible 
-                        (until measurement).
-                    </p>
-                </div>
-                
-                <div class="property-panel">
-                    <h3>3. Inner Product Preservation</h3>
-                    <p>
-                        Unitary operations preserve the "angle" between states, 
-                        maintaining distinguishability.
-                    </p>
-                    <div class="equation-box">
-                        <div class="formula">⟨Uψ|Uφ⟩ = ⟨ψ|φ⟩</div>
-                    </div>
-                    <p>
-                        Orthogonal states remain orthogonal after any unitary transformation.
-                    </p>
-                </div>
-                
-                <div class="property-panel">
-                    <h3>4. Deterministic Evolution</h3>
-                    <p>
-                        Between measurements, quantum states evolve deterministically 
-                        according to unitary operations.
-                    </p>
-                    <div class="equation-box">
-                        <div class="formula">|ψ(t)⟩ = U(t)|ψ(0)⟩</div>
-                    </div>
-                    <p>
-                        The Schrödinger equation guarantees unitary time evolution.
-                    </p>
-                </div>
+            <h2>What Makes a Gate Unitary?</h2>
+            <div class="formula-box">
+                <div class="formula">U†U = UU† = I</div>
+                <p style="color:#888;margin-top:10px;">A matrix is unitary if its conjugate transpose equals its inverse</p>
             </div>
-        </section>
-
-        <section class="section">
-            <h2>Classical vs Quantum: Reversibility</h2>
-            
-            <div class="comparison-visual">
-                <div class="comparison-item classical">
-                    <h4 style="color: #ff6b6b;">Classical (Irreversible)</h4>
-                    <div class="flow-diagram" style="flex-direction: column; gap: 10px;">
-                        <div>AND Gate:</div>
-                        <div>0,0 → 0</div>
-                        <div>0,1 → 0</div>
-                        <div>1,0 → 0</div>
-                        <div>1,1 → 1</div>
-                    </div>
-                    <p style="margin-top: 15px; font-size: 0.9em;">
-                        Given output 0, we can't determine the input!
-                        Information is lost.
-                    </p>
-                </div>
-                
-                <div class="comparison-item quantum">
-                    <h4 style="color: #64ffda;">Quantum (Reversible)</h4>
-                    <div class="flow-diagram" style="flex-direction: column; gap: 10px;">
-                        <div>CNOT Gate:</div>
-                        <div>|00⟩ → |00⟩</div>
-                        <div>|01⟩ → |01⟩</div>
-                        <div>|10⟩ → |11⟩</div>
-                        <div>|11⟩ → |10⟩</div>
-                    </div>
-                    <p style="margin-top: 15px; font-size: 0.9em;">
-                        Every output uniquely determines the input.
-                        No information is lost!
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Properties of Unitary Matrices</h2>
             
             <div class="concept-grid">
-                <div class="gate-card">
-                    <h3>Determinant</h3>
-                    <div class="formula">|det(U)| = 1</div>
-                    <p>The determinant has magnitude 1 (often det(U) = e^(iθ)).</p>
+                <div class="concept-card">
+                    <h4>Preserves Probability</h4>
+                    <p>Unitary operations preserve the total probability: |α|² + |β|² = 1 before AND after the gate.</p>
                 </div>
-                
-                <div class="gate-card">
-                    <h3>Eigenvalues</h3>
-                    <div class="formula">|λ| = 1</div>
-                    <p>All eigenvalues lie on the unit circle in the complex plane.</p>
+                <div class="concept-card">
+                    <h4>Preserves Inner Products</h4>
+                    <p>The "angle" between states is preserved. Orthogonal states remain orthogonal.</p>
                 </div>
-                
-                <div class="gate-card">
-                    <h3>Columns/Rows</h3>
-                    <div class="formula">Orthonormal</div>
-                    <p>Columns (and rows) form an orthonormal basis.</p>
+                <div class="concept-card">
+                    <h4>Always Reversible</h4>
+                    <p>Every unitary U has an inverse U†. You can always undo any quantum operation!</p>
                 </div>
-                
-                <div class="gate-card">
-                    <h3>Composition</h3>
-                    <div class="formula">U₁U₂ is unitary</div>
-                    <p>Product of unitary matrices is unitary.</p>
+                <div class="concept-card">
+                    <h4>No Information Loss</h4>
+                    <p>Unlike classical gates (AND, OR), quantum gates never destroy information.</p>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <h2>Checking Unitarity</h2>
-            
-            <div class="example">
-                <h3>Example: Is H unitary?</h3>
-                <p>Hadamard gate: H = (1/√2)[[1,1],[1,-1]]</p>
-                
-                <div class="equation-box">
-                    <p>H†H = (1/2)[[1,1],[1,-1]][[1,1],[1,-1]]</p>
-                    <p>= (1/2)[[2,0],[0,2]] = [[1,0],[0,1]] = I ✓</p>
+            <h2>Reversibility Visualized</h2>
+            <div class="visual-demo">
+                <h4 style="color:#64ffda;margin-bottom:15px;">Forward Operation</h4>
+                <div class="arrow-flow">
+                    <div class="state-box input-state">|ψ⟩</div>
+                    <span class="arrow">→</span>
+                    <div class="gate-box">U</div>
+                    <span class="arrow">→</span>
+                    <div class="state-box output-state">|ψ'⟩</div>
                 </div>
-                
-                <p>Since H†H = I, the Hadamard gate is unitary!</p>
-            </div>
-            
-            <div class="example">
-                <h3>Example: Is [[1,1],[0,1]] unitary?</h3>
-                
-                <div class="equation-box">
-                    <p>M†M = [[1,0],[1,1]][[1,1],[0,1]] = [[1,1],[1,2]] ≠ I ✗</p>
+                <h4 style="color:#64ffda;margin:20px 0 15px;">Reverse Operation</h4>
+                <div class="arrow-flow">
+                    <div class="state-box output-state">|ψ'⟩</div>
+                    <span class="arrow">→</span>
+                    <div class="gate-box">U†</div>
+                    <span class="arrow">→</span>
+                    <div class="state-box input-state">|ψ⟩</div>
                 </div>
-                
-                <p>This matrix is NOT unitary—it cannot be a quantum gate!</p>
+                <p style="color:#888;margin-top:15px;">Applying U† after U always returns to the original state!</p>
             </div>
         </section>
 
         <section class="section">
-            <h2>The Role of Measurement</h2>
+            <h2>Classical vs Quantum Gates</h2>
+            <table class="comparison-table">
+                <tr>
+                    <th>Property</th>
+                    <th>Classical Gates</th>
+                    <th>Quantum Gates</th>
+                </tr>
+                <tr>
+                    <td>Reversibility</td>
+                    <td class="irreversible">Often irreversible (AND, OR)</td>
+                    <td class="reversible">Always reversible</td>
+                </tr>
+                <tr>
+                    <td>Information</td>
+                    <td class="irreversible">Can lose information</td>
+                    <td class="reversible">Never loses information</td>
+                </tr>
+                <tr>
+                    <td>Inputs = Outputs?</td>
+                    <td class="irreversible">Often fewer outputs</td>
+                    <td class="reversible">Always same number</td>
+                </tr>
+                <tr>
+                    <td>Example</td>
+                    <td>AND: 2 inputs → 1 output</td>
+                    <td>CNOT: 2 inputs → 2 outputs</td>
+                </tr>
+            </table>
             
+            <div class="example">
+                <h3>Why AND is Irreversible</h3>
+                <p>AND(0,0) = 0, AND(0,1) = 0, AND(1,0) = 0 → Three different inputs give same output!</p>
+                <p style="color:#ff6b6b;margin-top:10px;">If output is 0, you can't tell which input it was. Information is lost!</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Common Unitary Properties</h2>
+            <ul class="property-list">
+                <li><strong>Self-inverse gates:</strong> H² = I, X² = I, Y² = I, Z² = I (applying twice = identity)</li>
+                <li><strong>Hermitian gates:</strong> H† = H, X† = X, Y† = Y, Z† = Z (equal to own conjugate transpose)</li>
+                <li><strong>Phase gates:</strong> S† = S⁻¹, T† = T⁻¹ (inverse is conjugate transpose)</li>
+                <li><strong>Rotation gates:</strong> Rx(θ)† = Rx(-θ), Ry(θ)† = Ry(-θ), Rz(θ)† = Rz(-θ)</li>
+                <li><strong>CNOT:</strong> CNOT† = CNOT (self-inverse!)</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <div class="decision-guide">
+                <h3>Practical Implications</h3>
+                <div class="decision-item">
+                    <span class="goal">Undo a gate:</span>
+                    <span class="solution">Apply U† (conjugate transpose)</span>
+                </div>
+                <div class="decision-item">
+                    <span class="goal">Undo H, X, Y, Z:</span>
+                    <span class="solution">Apply the same gate again (self-inverse)</span>
+                </div>
+                <div class="decision-item">
+                    <span class="goal">Undo S gate:</span>
+                    <span class="solution">Apply S† (or S three times: S⁴ = I)</span>
+                </div>
+                <div class="decision-item">
+                    <span class="goal">Undo rotation Rx(θ):</span>
+                    <span class="solution">Apply Rx(-θ) - rotate in opposite direction</span>
+                </div>
+                <div class="decision-item">
+                    <span class="goal">Check if matrix is unitary:</span>
+                    <span class="solution">Verify U†U = I (multiply and check)</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Why Unitarity Matters</h2>
             <div class="highlight">
-                <h3>Measurement Breaks Reversibility</h3>
-                <p>
-                    While unitary evolution is reversible, <strong>measurement is not</strong>. 
-                    When we measure a qubit:
-                </p>
-                <ul>
-                    <li>The superposition collapses to a definite state</li>
-                    <li>Information about the original state is lost</li>
-                    <li>This is the only irreversible operation in quantum mechanics</li>
+                <h3>Quantum Mechanics Requires It</h3>
+                <p>The Schrödinger equation guarantees that quantum evolution is unitary. This is a fundamental law of physics!</p>
+                <ul style="margin-left:20px;margin-top:10px;color:#888;">
+                    <li>Probability must be conserved (can't create or destroy probability)</li>
+                    <li>Quantum information is never truly lost (even in black holes - controversial!)</li>
+                    <li>Enables quantum error correction (errors can be reversed)</li>
+                    <li>Makes quantum algorithms work (interference patterns preserved)</li>
                 </ul>
-            </div>
-            
-            <div class="flow-diagram">
-                <div class="flow-box">|ψ⟩ = α|0⟩ + β|1⟩</div>
-                <div class="flow-arrow">→ Measure →</div>
-                <div class="flow-box" style="background: linear-gradient(135deg, #ff6b6b, #ff8e8e);">|0⟩ or |1⟩</div>
-            </div>
-            <p style="text-align: center; opacity: 0.8;">
-                After measurement, we cannot recover α and β
-            </p>
-        </section>
-
-        <section class="section">
-            <h2>Key Takeaways</h2>
-            
-            <div class="concept-grid">
-                <div class="gate-card">
-                    <h3>All Gates Unitary</h3>
-                    <p>Every quantum gate must satisfy U†U = I. No exceptions!</p>
-                </div>
-                
-                <div class="gate-card">
-                    <h3>Probability Safe</h3>
-                    <p>Unitarity guarantees probabilities always sum to 1.</p>
-                </div>
-                
-                <div class="gate-card">
-                    <h3>Always Reversible</h3>
-                    <p>Any quantum circuit can be run backwards (until measurement).</p>
-                </div>
-                
-                <div class="gate-card">
-                    <h3>No Cloning</h3>
-                    <p>Unitarity implies we cannot copy unknown quantum states.</p>
-                </div>
             </div>
         </section>
 
