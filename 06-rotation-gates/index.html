@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotation Gates - Quantum Gates Learning</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        .rotation-demo {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .rotation-panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(100,255,218,0.2);
+            text-align: center;
+        }
+        .rotation-panel h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .rotation-canvas {
+            height: 250px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .angle-control {
+            margin-top: 15px;
+        }
+        .angle-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.1);
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .angle-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+        }
+        .angle-value {
+            font-size: 1.5em;
+            color: #ffd93d;
+            margin-top: 10px;
+        }
+        .axis-indicator {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .axis-x { background: #ff6b6b; }
+        .axis-y { background: #4ecdc4; }
+        .axis-z { background: #ffd93d; color: #000; }
+        .formula-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .formula-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(100,255,218,0.2);
+        }
+        .formula-card h3 {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .interactive-section {
+            background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .combined-control {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            align-items: start;
+        }
+        .control-panel {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .control-group {
+            margin-bottom: 20px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .preset-btn {
+            padding: 8px 15px;
+            background: rgba(100,255,218,0.2);
+            border: 1px solid var(--primary-color);
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .preset-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+        }
+        @media (max-width: 768px) {
+            .rotation-demo, .formula-grid {
+                grid-template-columns: 1fr;
+            }
+            .combined-control {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Rotation Gates</h1>
+            <p class="subtitle">Rx, Ry, Rz - Parametric Rotations on the Bloch Sphere</p>
+        </header>
+
+        <section class="section">
+            <h2>Overview</h2>
+            <p>
+                Rotation gates are parametric single-qubit gates that rotate the qubit state around 
+                a specific axis of the Bloch sphere by a given angle θ. These gates form the foundation 
+                for implementing arbitrary single-qubit operations.
+            </p>
+            
+            <div class="key-point">
+                <h3>The Three Rotation Axes</h3>
+                <p>
+                    <span class="axis-indicator axis-x">X</span> Rx(θ) - Rotation around X-axis (bit flip direction)
+                </p>
+                <p>
+                    <span class="axis-indicator axis-y">Y</span> Ry(θ) - Rotation around Y-axis (combines bit and phase)
+                </p>
+                <p>
+                    <span class="axis-indicator axis-z">Z</span> Rz(θ) - Rotation around Z-axis (phase rotation)
+                </p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Interactive Rotation Visualization</h2>
+            <p>Adjust the sliders to see how rotation gates transform qubit states:</p>
+            
+            <div class="rotation-demo">
+                <div class="rotation-panel">
+                    <h3><span class="axis-indicator axis-x">X</span> Rx(θ)</h3>
+                    <div id="rx-canvas" class="rotation-canvas"></div>
+                    <div class="angle-control">
+                        <input type="range" class="angle-slider" id="rx-slider" min="0" max="360" value="0">
+                        <div class="angle-value">θ = <span id="rx-value">0</span>°</div>
+                    </div>
+                </div>
+                
+                <div class="rotation-panel">
+                    <h3><span class="axis-indicator axis-y">Y</span> Ry(θ)</h3>
+                    <div id="ry-canvas" class="rotation-canvas"></div>
+                    <div class="angle-control">
+                        <input type="range" class="angle-slider" id="ry-slider" min="0" max="360" value="0">
+                        <div class="angle-value">θ = <span id="ry-value">0</span>°</div>
+                    </div>
+                </div>
+                
+                <div class="rotation-panel">
+                    <h3><span class="axis-indicator axis-z">Z</span> Rz(θ)</h3>
+                    <div id="rz-canvas" class="rotation-canvas"></div>
+                    <div class="angle-control">
+                        <input type="range" class="angle-slider" id="rz-slider" min="0" max="360" value="0">
+                        <div class="angle-value">θ = <span id="rz-value">0</span>°</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Matrix Representations</h2>
+            
+            <div class="formula-grid">
+                <div class="formula-card">
+                    <h3><span class="axis-indicator axis-x">X</span> Rx(θ)</h3>
+                    <div class="matrix">
+                        <div class="matrix-grid matrix-2x2">
+                            <div class="matrix-cell">cos(θ/2)</div>
+                            <div class="matrix-cell">-i·sin(θ/2)</div>
+                            <div class="matrix-cell">-i·sin(θ/2)</div>
+                            <div class="matrix-cell">cos(θ/2)</div>
+                        </div>
+                    </div>
+                    <div class="formula" style="margin-top: 15px;">
+                        Rx(θ) = e<sup>-iθX/2</sup>
+                    </div>
+                </div>
+                
+                <div class="formula-card">
+                    <h3><span class="axis-indicator axis-y">Y</span> Ry(θ)</h3>
+                    <div class="matrix">
+                        <div class="matrix-grid matrix-2x2">
+                            <div class="matrix-cell">cos(θ/2)</div>
+                            <div class="matrix-cell">-sin(θ/2)</div>
+                            <div class="matrix-cell">sin(θ/2)</div>
+                            <div class="matrix-cell">cos(θ/2)</div>
+                        </div>
+                    </div>
+                    <div class="formula" style="margin-top: 15px;">
+                        Ry(θ) = e<sup>-iθY/2</sup>
+                    </div>
+                </div>
+                
+                <div class="formula-card">
+                    <h3><span class="axis-indicator axis-z">Z</span> Rz(θ)</h3>
+                    <div class="matrix">
+                        <div class="matrix-grid matrix-2x2">
+                            <div class="matrix-cell">e<sup>-iθ/2</sup></div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">e<sup>iθ/2</sup></div>
+                        </div>
+                    </div>
+                    <div class="formula" style="margin-top: 15px;">
+                        Rz(θ) = e<sup>-iθZ/2</sup>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section interactive-section">
+            <h2>Combined Rotation Explorer</h2>
+            <p>Explore how combining rotations creates complex state transformations:</p>
+            
+            <div class="combined-control">
+                <div class="control-panel">
+                    <div class="control-group">
+                        <label>Rx angle (α):</label>
+                        <input type="range" class="angle-slider" id="combined-rx" min="0" max="360" value="0">
+                        <span id="combined-rx-val">0°</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Ry angle (β):</label>
+                        <input type="range" class="angle-slider" id="combined-ry" min="0" max="360" value="0">
+                        <span id="combined-ry-val">0°</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Rz angle (γ):</label>
+                        <input type="range" class="angle-slider" id="combined-rz" min="0" max="360" value="0">
+                        <span id="combined-rz-val">0°</span>
+                    </div>
+                    
+                    <div class="preset-buttons">
+                        <button class="preset-btn" onclick="setPreset(180, 0, 0)">X Gate</button>
+                        <button class="preset-btn" onclick="setPreset(0, 180, 0)">Y Gate</button>
+                        <button class="preset-btn" onclick="setPreset(0, 0, 180)">Z Gate</button>
+                        <button class="preset-btn" onclick="setPreset(0, 90, 0)">|0⟩→|+⟩</button>
+                        <button class="preset-btn" onclick="setPreset(0, 0, 0)">Reset</button>
+                    </div>
+                </div>
+                
+                <div id="combined-canvas" style="height: 400px; border-radius: 15px; overflow: hidden;"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Special Angle Values</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Angle θ</th>
+                        <th>Rx(θ)</th>
+                        <th>Ry(θ)</th>
+                        <th>Rz(θ)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>I (Identity)</td>
+                        <td>I (Identity)</td>
+                        <td>I (Identity)</td>
+                    </tr>
+                    <tr>
+                        <td>π/2 (90°)</td>
+                        <td>√X</td>
+                        <td>√Y</td>
+                        <td>S (Phase)</td>
+                    </tr>
+                    <tr>
+                        <td>π (180°)</td>
+                        <td>X (Pauli-X)</td>
+                        <td>Y (Pauli-Y)</td>
+                        <td>Z (Pauli-Z)</td>
+                    </tr>
+                    <tr>
+                        <td>π/4 (45°)</td>
+                        <td>√(√X)</td>
+                        <td>√(√Y)</td>
+                        <td>T (π/8)</td>
+                    </tr>
+                    <tr>
+                        <td>2π (360°)</td>
+                        <td>-I (global phase)</td>
+                        <td>-I (global phase)</td>
+                        <td>-I (global phase)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="section">
+            <h2>Euler Decomposition</h2>
+            <div class="highlight">
+                <h3>Any Single-Qubit Gate</h3>
+                <p>
+                    Any single-qubit unitary can be decomposed into three rotations:
+                </p>
+                <div class="formula" style="font-size: 1.3em; margin: 20px 0;">
+                    U(θ, φ, λ) = Rz(φ) · Ry(θ) · Rz(λ)
+                </div>
+                <p>
+                    This is known as the <strong>ZYZ decomposition</strong>. Alternative decompositions 
+                    include XYX, ZXZ, and others.
+                </p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Key Properties</h2>
+            
+            <div class="concept-grid">
+                <div class="gate-card">
+                    <h3>Periodicity</h3>
+                    <div class="formula">R(θ + 4π) = R(θ)</div>
+                    <p>Rotation gates have period 4π (not 2π!) due to spinor nature.</p>
+                </div>
+                
+                <div class="gate-card">
+                    <h3>Inverse</h3>
+                    <div class="formula">R(θ)⁻¹ = R(-θ)</div>
+                    <p>The inverse of a rotation is rotation by the negative angle.</p>
+                </div>
+                
+                <div class="gate-card">
+                    <h3>Composition</h3>
+                    <div class="formula">R(α)R(β) = R(α+β)</div>
+                    <p>Rotations around the same axis compose by adding angles.</p>
+                </div>
+                
+                <div class="gate-card">
+                    <h3>Non-Commutativity</h3>
+                    <div class="formula">Rx·Ry ≠ Ry·Rx</div>
+                    <p>Rotations around different axes do NOT commute.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="nav-buttons">
+            <a href="../05-hadamard-gate/index.html" class="btn">Previous: Hadamard Gate</a>
+            <a href="../07-multiple-qubit-gates/index.html" class="btn btn-primary">Next: Multiple-Qubit Gates</a>
+        </div>
+    </div>
+
+    <script>
+        // Create individual rotation visualizations
+        function createRotationViz(containerId, axis, sliderId, valueId) {
+            const container = document.getElementById(containerId);
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0a);
+            
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / 250, 0.1, 1000);
+            camera.position.set(2, 1.5, 2);
+            
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, 250);
+            container.appendChild(renderer.domElement);
+            
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            
+            scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+            
+            // Sphere
+            const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
+            const sphereMat = new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.15 });
+            scene.add(new THREE.Mesh(sphereGeo, sphereMat));
+            
+            // Axes
+            const axisColors = { x: 0xff6b6b, y: 0x4ecdc4, z: 0xffd93d };
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, axisColors.x, 0.08, 0.04));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, axisColors.y, 0.08, 0.04));
+            scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, axisColors.z, 0.08, 0.04));
+            
+            // Rotation ring
+            const ringGeo = new THREE.TorusGeometry(0.7, 0.02, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({ color: axisColors[axis], transparent: true, opacity: 0.5 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            if (axis === 'x') ring.rotation.y = Math.PI / 2;
+            else if (axis === 'y') ring.rotation.x = Math.PI / 2;
+            scene.add(ring);
+            
+            // State vector (starts at |0⟩)
+            let theta = 0; // Bloch theta
+            let phi = 0;   // Bloch phi
+            
+            const stateArrow = new THREE.ArrowHelper(
+                new THREE.Vector3(0, 0, 1),
+                new THREE.Vector3(0, 0, 0),
+                1, 0xff6b6b, 0.12, 0.08
+            );
+            scene.add(stateArrow);
+            
+            // Trail
+            const trailPoints = [];
+            const trailGeo = new THREE.BufferGeometry();
+            const trailMat = new THREE.PointsMaterial({ color: 0xffd93d, size: 0.02 });
+            const trail = new THREE.Points(trailGeo, trailMat);
+            scene.add(trail);
+            
+            function updateState(angle) {
+                const rad = angle * Math.PI / 180;
+                let x, y, z;
+                
+                // Apply rotation to |0⟩ state
+                if (axis === 'x') {
+                    // Rx rotates around X axis
+                    x = 0;
+                    y = -Math.sin(rad);
+                    z = Math.cos(rad);
+                } else if (axis === 'y') {
+                    // Ry rotates around Y axis
+                    x = Math.sin(rad);
+                    y = 0;
+                    z = Math.cos(rad);
+                } else {
+                    // Rz rotates around Z axis (phase only, |0⟩ stays at |0⟩)
+                    // For visualization, show rotation of |+⟩ state
+                    x = Math.cos(rad);
+                    y = Math.sin(rad);
+                    z = 0;
+                }
+                
+                stateArrow.setDirection(new THREE.Vector3(x, y, z).normalize());
+                
+                // Add trail
+                trailPoints.push(x, y, z);
+                if (trailPoints.length > 300) trailPoints.splice(0, 3);
+                trailGeo.setAttribute('position', new THREE.Float32BufferAttribute(trailPoints, 3));
+            }
+            
+            // Slider event
+            const slider = document.getElementById(sliderId);
+            const valueSpan = document.getElementById(valueId);
+            
+            slider.addEventListener('input', (e) => {
+                const angle = parseInt(e.target.value);
+                valueSpan.textContent = angle;
+                updateState(angle);
+            });
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+        
+        // Create the three rotation visualizations
+        createRotationViz('rx-canvas', 'x', 'rx-slider', 'rx-value');
+        createRotationViz('ry-canvas', 'y', 'ry-slider', 'ry-value');
+        createRotationViz('rz-canvas', 'z', 'rz-slider', 'rz-value');
+        
+        // Combined rotation visualization
+        const combinedContainer = document.getElementById('combined-canvas');
+        const combinedScene = new THREE.Scene();
+        combinedScene.background = new THREE.Color(0x0a0a0a);
+        
+        const combinedCamera = new THREE.PerspectiveCamera(75, combinedContainer.clientWidth / 400, 0.1, 1000);
+        combinedCamera.position.set(2.5, 2, 2.5);
+        
+        const combinedRenderer = new THREE.WebGLRenderer({ antialias: true });
+        combinedRenderer.setSize(combinedContainer.clientWidth, 400);
+        combinedContainer.appendChild(combinedRenderer.domElement);
+        
+        const combinedControls = new THREE.OrbitControls(combinedCamera, combinedRenderer.domElement);
+        combinedControls.enableDamping = true;
+        
+        combinedScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        
+        // Sphere
+        combinedScene.add(new THREE.Mesh(
+            new THREE.SphereGeometry(1, 32, 32),
+            new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.15 })
+        ));
+        
+        // Axes
+        combinedScene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.4, 0xff6b6b, 0.1, 0.05));
+        combinedScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.4, 0x4ecdc4, 0.1, 0.05));
+        combinedScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.4, 0xffd93d, 0.1, 0.05));
+        
+        // Initial state arrow
+        const initialArrow = new THREE.ArrowHelper(
+            new THREE.Vector3(0, 0, 1),
+            new THREE.Vector3(0, 0, 0),
+            1, 0x4ecdc4, 0.12, 0.08
+        );
+        combinedScene.add(initialArrow);
+        
+        // Final state arrow
+        const finalArrow = new THREE.ArrowHelper(
+            new THREE.Vector3(0, 0, 1),
+            new THREE.Vector3(0, 0, 0),
+            1, 0xff6b6b, 0.15, 0.1
+        );
+        combinedScene.add(finalArrow);
+        
+        // Rotation matrices
+        function Rx(theta) {
+            const c = Math.cos(theta / 2);
+            const s = Math.sin(theta / 2);
+            return [
+                [c, -s],
+                [s, c]
+            ];
+        }
+        
+        function Ry(theta) {
+            const c = Math.cos(theta / 2);
+            const s = Math.sin(theta / 2);
+            return [
+                [c, -s],
+                [s, c]
+            ];
+        }
+        
+        function updateCombinedState() {
+            const rxAngle = parseInt(document.getElementById('combined-rx').value) * Math.PI / 180;
+            const ryAngle = parseInt(document.getElementById('combined-ry').value) * Math.PI / 180;
+            const rzAngle = parseInt(document.getElementById('combined-rz').value) * Math.PI / 180;
+            
+            document.getElementById('combined-rx-val').textContent = Math.round(rxAngle * 180 / Math.PI) + '°';
+            document.getElementById('combined-ry-val').textContent = Math.round(ryAngle * 180 / Math.PI) + '°';
+            document.getElementById('combined-rz-val').textContent = Math.round(rzAngle * 180 / Math.PI) + '°';
+            
+            // Start with |0⟩ state on Bloch sphere (0, 0, 1)
+            let x = 0, y = 0, z = 1;
+            
+            // Apply Rx
+            const newY1 = y * Math.cos(rxAngle) - z * Math.sin(rxAngle);
+            const newZ1 = y * Math.sin(rxAngle) + z * Math.cos(rxAngle);
+            y = newY1; z = newZ1;
+            
+            // Apply Ry
+            const newX2 = x * Math.cos(ryAngle) + z * Math.sin(ryAngle);
+            const newZ2 = -x * Math.sin(ryAngle) + z * Math.cos(ryAngle);
+            x = newX2; z = newZ2;
+            
+            // Apply Rz
+            const newX3 = x * Math.cos(rzAngle) - y * Math.sin(rzAngle);
+            const newY3 = x * Math.sin(rzAngle) + y * Math.cos(rzAngle);
+            x = newX3; y = newY3;
+            
+            finalArrow.setDirection(new THREE.Vector3(x, y, z).normalize());
+        }
+        
+        document.getElementById('combined-rx').addEventListener('input', updateCombinedState);
+        document.getElementById('combined-ry').addEventListener('input', updateCombinedState);
+        document.getElementById('combined-rz').addEventListener('input', updateCombinedState);
+        
+        function setPreset(rx, ry, rz) {
+            document.getElementById('combined-rx').value = rx;
+            document.getElementById('combined-ry').value = ry;
+            document.getElementById('combined-rz').value = rz;
+            updateCombinedState();
+        }
+        
+        function animateCombined() {
+            requestAnimationFrame(animateCombined);
+            combinedControls.update();
+            combinedRenderer.render(combinedScene, combinedCamera);
+        }
+        animateCombined();
+        
+        window.addEventListener('resize', () => {
+            combinedCamera.aspect = combinedContainer.clientWidth / 400;
+            combinedCamera.updateProjectionMatrix();
+            combinedRenderer.setSize(combinedContainer.clientWidth, 400);
+        });
+    </script>
+</body>
+</html>

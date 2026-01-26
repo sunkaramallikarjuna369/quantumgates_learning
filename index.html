@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Gates - Interactive Learning Platform</title>
+    <link rel="stylesheet" href="shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        #canvas-container {
+            width: 100%;
+            height: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: #0a0a0a;
+            margin: 30px 0;
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Quantum Gates</h1>
+            <p class="subtitle">Interactive Learning Platform for Quantum Computing</p>
+            <p style="margin-top: 15px; font-size: 1.1em;">Master quantum gates through 3D visualizations and hands-on Python programming</p>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">16</div>
+                    <div class="stat-label">Concepts</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">20+</div>
+                    <div class="stat-label">Gates Covered</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Exercises</div>
+                </div>
+            </div>
+        </header>
+
+        <section class="section">
+            <h2>Welcome to Quantum Gates Learning</h2>
+            <p>
+                Quantum gates are the building blocks of quantum computation - they manipulate qubit states 
+                in a way analogous to how logic gates act on classical bits. However, quantum gates differ 
+                fundamentally in that they are <strong>unitary operations</strong> on complex vector spaces.
+            </p>
+            
+            <div id="canvas-container"></div>
+            
+            <div class="key-point">
+                <h3>What You'll Learn</h3>
+                <ul>
+                    <li>Single-qubit gates: Pauli (X, Y, Z), Hadamard, Phase, and Rotation gates</li>
+                    <li>Multi-qubit gates: CNOT, CZ, SWAP, and Toffoli gates</li>
+                    <li>Unitary properties and reversibility of quantum operations</li>
+                    <li>Universal gate sets for quantum computation</li>
+                    <li>Gate decomposition and quantum circuit design</li>
+                    <li>Bloch sphere visualization of gate actions</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>All Concepts</h2>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h3>1. Introduction</h3>
+                    <p>Fundamentals of quantum gates and unitary operations</p>
+                    <a href="01-introduction/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>2. Single-Qubit Gates</h3>
+                    <p>General form and Bloch sphere rotations</p>
+                    <a href="02-single-qubit-gates/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>3. Pauli Gates</h3>
+                    <p>X, Y, Z gates and their properties</p>
+                    <a href="03-pauli-gates/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>4. Identity & Phase Gates</h3>
+                    <p>I, S, and T gates for phase manipulation</p>
+                    <a href="04-identity-phase-gates/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>5. Hadamard Gate</h3>
+                    <p>Creating superposition states</p>
+                    <a href="05-hadamard-gate/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>6. Rotation Gates</h3>
+                    <p>Rx, Ry, Rz parametric rotations</p>
+                    <a href="06-rotation-gates/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>7. Multiple-Qubit Gates</h3>
+                    <p>Tensor products and multi-qubit operations</p>
+                    <a href="07-multiple-qubit-gates/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>8. Controlled Gates</h3>
+                    <p>CNOT, CZ, and conditional operations</p>
+                    <a href="08-controlled-gates/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>9. SWAP & Toffoli Gates</h3>
+                    <p>State swapping and 3-qubit operations</p>
+                    <a href="09-swap-toffoli-gates/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>10. Unitary & Reversibility</h3>
+                    <p>Properties of quantum gate operations</p>
+                    <a href="10-unitary-reversibility/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>11. Universal Gate Sets</h3>
+                    <p>Building any quantum operation</p>
+                    <a href="11-universal-gate-sets/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>12. Gate Decomposition</h3>
+                    <p>Breaking down complex unitaries</p>
+                    <a href="12-gate-decomposition/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>13. Bloch Sphere Visualization</h3>
+                    <p>Geometric view of gate actions</p>
+                    <a href="13-bloch-sphere-visualization/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>14. Entanglement Creation</h3>
+                    <p>Creating Bell states with gates</p>
+                    <a href="14-entanglement-creation/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card">
+                    <h3>15. Summary</h3>
+                    <p>Complete reference and key takeaways</p>
+                    <a href="15-summary/index.html">Explore</a>
+                </div>
+                
+                <div class="concept-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h3>16. Exercises</h3>
+                    <p>Test your understanding with interactive problems</p>
+                    <a href="16-exercises/index.html" style="color: white;">Start Practicing</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Learning Path</h2>
+            <div class="highlight">
+                <h3>Recommended Study Order</h3>
+                <ol>
+                    <li><strong>Foundations (1-2):</strong> Introduction and single-qubit gate basics</li>
+                    <li><strong>Core Gates (3-6):</strong> Pauli, Phase, Hadamard, and Rotation gates</li>
+                    <li><strong>Multi-Qubit (7-9):</strong> Tensor products, controlled gates, SWAP, Toffoli</li>
+                    <li><strong>Theory (10-12):</strong> Unitarity, universal sets, decomposition</li>
+                    <li><strong>Applications (13-14):</strong> Visualization and entanglement</li>
+                    <li><strong>Review (15-16):</strong> Summary and practice exercises</li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Getting Started</h2>
+            <p>Each concept module includes:</p>
+            <ul>
+                <li><strong>Interactive 3D Visualizations:</strong> See gate actions on the Bloch sphere</li>
+                <li><strong>Mathematical Explanations:</strong> Understand the matrix representations</li>
+                <li><strong>Python Programs:</strong> Hands-on coding with NumPy and Qiskit</li>
+                <li><strong>Practical Examples:</strong> Real quantum circuit applications</li>
+            </ul>
+            
+            <div class="nav-buttons" style="margin-top: 30px;">
+                <a href="01-introduction/index.html" class="btn btn-primary">Start Learning</a>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a0a);
+        
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(3, 2, 3);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+        
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        
+        const pointLight = new THREE.PointLight(0xffffff, 0.8);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+        
+        // Bloch sphere
+        const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+        const sphereMaterial = new THREE.MeshPhongMaterial({
+            color: 0x64ffda,
+            transparent: true,
+            opacity: 0.15
+        });
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        scene.add(sphere);
+        
+        // Wireframe
+        const wireframeGeometry = new THREE.SphereGeometry(1, 16, 16);
+        const wireframeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x64ffda,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.2
+        });
+        const wireframe = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+        scene.add(wireframe);
+        
+        // Axes
+        const axisLength = 1.3;
+        const xAxis = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 0), axisLength, 0xff6b6b, 0.1, 0.05);
+        const yAxis = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), axisLength, 0x4ecdc4, 0.1, 0.05);
+        const zAxis = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0), axisLength, 0xffd93d, 0.1, 0.05);
+        scene.add(xAxis, yAxis, zAxis);
+        
+        // State vector
+        let stateVector = new THREE.ArrowHelper(
+            new THREE.Vector3(0, 0, 1).normalize(),
+            new THREE.Vector3(0, 0, 0),
+            1,
+            0xff6b6b,
+            0.15,
+            0.1
+        );
+        scene.add(stateVector);
+        
+        // Gate visualization - rotating ring
+        const ringGeometry = new THREE.TorusGeometry(0.3, 0.02, 16, 100);
+        const ringMaterial = new THREE.MeshBasicMaterial({ color: 0x64ffda });
+        const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+        ring.position.set(0, 0, 0);
+        scene.add(ring);
+        
+        let time = 0;
+        let gateIndex = 0;
+        const gates = ['X', 'Y', 'Z', 'H'];
+        
+        function applyGate(gate, theta, phi) {
+            let newTheta = theta;
+            let newPhi = phi;
+            
+            switch(gate) {
+                case 'X':
+                    newTheta = Math.PI - theta;
+                    newPhi = -phi;
+                    break;
+                case 'Y':
+                    newTheta = Math.PI - theta;
+                    newPhi = Math.PI - phi;
+                    break;
+                case 'Z':
+                    newPhi = phi + Math.PI;
+                    break;
+                case 'H':
+                    const x = Math.sin(theta) * Math.cos(phi);
+                    const z = Math.cos(theta);
+                    newTheta = Math.acos(x);
+                    newPhi = Math.atan2(Math.sin(theta) * Math.sin(phi), z);
+                    break;
+            }
+            return { theta: newTheta, phi: newPhi };
+        }
+        
+        let currentTheta = 0;
+        let currentPhi = 0;
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            time += 0.02;
+            
+            // Smooth rotation of state vector
+            currentTheta = Math.PI / 4 + Math.sin(time * 0.5) * Math.PI / 4;
+            currentPhi = time;
+            
+            const x = Math.sin(currentTheta) * Math.cos(currentPhi);
+            const y = Math.sin(currentTheta) * Math.sin(currentPhi);
+            const z = Math.cos(currentTheta);
+            
+            stateVector.setDirection(new THREE.Vector3(x, y, z).normalize());
+            
+            // Rotate ring to show gate action
+            ring.rotation.x = time * 2;
+            ring.rotation.y = time;
+            
+            // Pulse effect
+            const scale = 1 + Math.sin(time * 3) * 0.02;
+            sphere.scale.set(scale, scale, scale);
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    </script>
+</body>
+</html>

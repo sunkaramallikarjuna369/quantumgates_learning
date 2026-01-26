@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercises - Quantum Gates Learning</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <style>
+        .exercise-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary-color);
+        }
+        .exercise-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .exercise-card .difficulty {
+            font-size: 0.8em;
+            padding: 3px 10px;
+            border-radius: 15px;
+            background: rgba(100,255,218,0.2);
+        }
+        .exercise-card .difficulty.easy { background: rgba(78,205,196,0.3); }
+        .exercise-card .difficulty.medium { background: rgba(255,215,61,0.3); }
+        .exercise-card .difficulty.hard { background: rgba(255,107,107,0.3); }
+        .question {
+            font-size: 1.1em;
+            margin: 15px 0;
+        }
+        .options {
+            display: grid;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .option {
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .option:hover {
+            background: rgba(100,255,218,0.1);
+            border-color: rgba(100,255,218,0.3);
+        }
+        .option.selected {
+            border-color: var(--primary-color);
+            background: rgba(100,255,218,0.15);
+        }
+        .option.correct {
+            border-color: #4ecdc4;
+            background: rgba(78,205,196,0.2);
+        }
+        .option.incorrect {
+            border-color: #ff6b6b;
+            background: rgba(255,107,107,0.2);
+        }
+        .check-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+        .check-btn:hover {
+            transform: scale(1.05);
+        }
+        .check-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+        .feedback.show { display: block; }
+        .feedback.correct {
+            background: rgba(78,205,196,0.2);
+            border: 1px solid #4ecdc4;
+        }
+        .feedback.incorrect {
+            background: rgba(255,107,107,0.2);
+            border: 1px solid #ff6b6b;
+        }
+        .hint-btn {
+            padding: 8px 15px;
+            background: rgba(255,215,61,0.2);
+            border: 1px solid #ffd93d;
+            border-radius: 5px;
+            color: #ffd93d;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .hint {
+            padding: 15px;
+            background: rgba(255,215,61,0.1);
+            border-radius: 10px;
+            margin-top: 10px;
+            display: none;
+        }
+        .hint.show { display: block; }
+        .score-card {
+            background: linear-gradient(135deg, rgba(102,126,234,0.3), rgba(118,75,162,0.3));
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .score-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .score-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffd93d;
+        }
+        .calculation-exercise {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .calculation-exercise input {
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(100,255,218,0.3);
+            border-radius: 5px;
+            color: white;
+            font-size: 1em;
+            width: 100px;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Exercises</h1>
+            <p class="subtitle">Test Your Understanding of Quantum Gates</p>
+        </header>
+
+        <div class="score-card">
+            <h2>Your Score</h2>
+            <div class="score-display"><span id="score">0</span> / <span id="total">10</span></div>
+            <button class="check-btn" onclick="resetAll()" style="margin-top: 15px;">Reset All</button>
+        </div>
+
+        <section class="section">
+            <h2>Multiple Choice Questions</h2>
+            
+            <div class="exercise-card" id="q1">
+                <h3>Question 1 <span class="difficulty easy">Easy</span></h3>
+                <div class="question">
+                    What does the Pauli-X gate do to a qubit in state |0⟩?
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(1, 0)">A) Leaves it unchanged</div>
+                    <div class="option" onclick="selectOption(1, 1)">B) Transforms it to |1⟩</div>
+                    <div class="option" onclick="selectOption(1, 2)">C) Creates a superposition</div>
+                    <div class="option" onclick="selectOption(1, 3)">D) Adds a phase of -1</div>
+                </div>
+                <button class="check-btn" onclick="checkAnswer(1)">Check Answer</button>
+                <div class="feedback" id="feedback1"></div>
+            </div>
+
+            <div class="exercise-card" id="q2">
+                <h3>Question 2 <span class="difficulty easy">Easy</span></h3>
+                <div class="question">
+                    Which gate creates an equal superposition from |0⟩?
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(2, 0)">A) Pauli-Z</div>
+                    <div class="option" onclick="selectOption(2, 1)">B) Pauli-X</div>
+                    <div class="option" onclick="selectOption(2, 2)">C) Hadamard</div>
+                    <div class="option" onclick="selectOption(2, 3)">D) Phase (S)</div>
+                </div>
+                <button class="check-btn" onclick="checkAnswer(2)">Check Answer</button>
+                <div class="feedback" id="feedback2"></div>
+            </div>
+
+            <div class="exercise-card" id="q3">
+                <h3>Question 3 <span class="difficulty medium">Medium</span></h3>
+                <div class="question">
+                    What is the result of applying H twice to any qubit state?
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(3, 0)">A) The original state</div>
+                    <div class="option" onclick="selectOption(3, 1)">B) The |+⟩ state</div>
+                    <div class="option" onclick="selectOption(3, 2)">C) The |-⟩ state</div>
+                    <div class="option" onclick="selectOption(3, 3)">D) The |0⟩ state</div>
+                </div>
+                <button class="check-btn" onclick="checkAnswer(3)">Check Answer</button>
+                <button class="hint-btn" onclick="showHint(3)">Show Hint</button>
+                <div class="hint" id="hint3">H² = I (Identity). Applying H twice returns the original state.</div>
+                <div class="feedback" id="feedback3"></div>
+            </div>
+
+            <div class="exercise-card" id="q4">
+                <h3>Question 4 <span class="difficulty medium">Medium</span></h3>
+                <div class="question">
+                    How many CNOT gates are needed to implement a SWAP gate?
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(4, 0)">A) 1</div>
+                    <div class="option" onclick="selectOption(4, 1)">B) 2</div>
+                    <div class="option" onclick="selectOption(4, 2)">C) 3</div>
+                    <div class="option" onclick="selectOption(4, 3)">D) 4</div>
+                </div>
+                <button class="check-btn" onclick="checkAnswer(4)">Check Answer</button>
+                <div class="feedback" id="feedback4"></div>
+            </div>
+
+            <div class="exercise-card" id="q5">
+                <h3>Question 5 <span class="difficulty medium">Medium</span></h3>
+                <div class="question">
+                    What property must all quantum gates satisfy?
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(5, 0)">A) Hermitian (U = U†)</div>
+                    <div class="option" onclick="selectOption(5, 1)">B) Unitary (U†U = I)</div>
+                    <div class="option" onclick="selectOption(5, 2)">C) Symmetric (U = Uᵀ)</div>
+                    <div class="option" onclick="selectOption(5, 3)">D) Diagonal</div>
+                </div>
+                <button class="check-btn" onclick="checkAnswer(5)">Check Answer</button>
+                <div class="feedback" id="feedback5"></div>
+            </div>
+
+            <div class="exercise-card" id="q6">
+                <h3>Question 6 <span class="difficulty hard">Hard</span></h3>
+                <div class="question">
+                    Which gate set is universal for quantum computation?
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(6, 0)">A) {H, S, CNOT} only</div>
+                    <div class="option" onclick="selectOption(6, 1)">B) {X, Y, Z} only</div>
+                    <div class="option" onclick="selectOption(6, 2)">C) {H, S, CNOT, T}</div>
+                    <div class="option" onclick="selectOption(6, 3)">D) {H, X} only</div>
+                </div>
+                <button class="check-btn" onclick="checkAnswer(6)">Check Answer</button>
+                <button class="hint-btn" onclick="showHint(6)">Show Hint</button>
+                <div class="hint" id="hint6">Clifford gates alone (H, S, CNOT) can be efficiently simulated classically. Adding T makes it universal.</div>
+                <div class="feedback" id="feedback6"></div>
+            </div>
+
+            <div class="exercise-card" id="q7">
+                <h3>Question 7 <span class="difficulty hard">Hard</span></h3>
+                <div class="question">
+                    What is the Bell state |Φ⁺⟩?
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(7, 0)">A) (|00⟩ + |11⟩)/√2</div>
+                    <div class="option" onclick="selectOption(7, 1)">B) (|01⟩ + |10⟩)/√2</div>
+                    <div class="option" onclick="selectOption(7, 2)">C) (|00⟩ - |11⟩)/√2</div>
+                    <div class="option" onclick="selectOption(7, 3)">D) |00⟩ + |01⟩ + |10⟩ + |11⟩</div>
+                </div>
+                <button class="check-btn" onclick="checkAnswer(7)">Check Answer</button>
+                <div class="feedback" id="feedback7"></div>
+            </div>
+
+            <div class="exercise-card" id="q8">
+                <h3>Question 8 <span class="difficulty medium">Medium</span></h3>
+                <div class="question">
+                    What is the relationship between S and Z gates?
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(8, 0)">A) S = Z</div>
+                    <div class="option" onclick="selectOption(8, 1)">B) S² = Z</div>
+                    <div class="option" onclick="selectOption(8, 2)">C) S = Z²</div>
+                    <div class="option" onclick="selectOption(8, 3)">D) S + Z = I</div>
+                </div>
+                <button class="check-btn" onclick="checkAnswer(8)">Check Answer</button>
+                <div class="feedback" id="feedback8"></div>
+            </div>
+
+            <div class="exercise-card" id="q9">
+                <h3>Question 9 <span class="difficulty hard">Hard</span></h3>
+                <div class="question">
+                    According to the Euler decomposition, any single-qubit gate can be written as:
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(9, 0)">A) Rx(α) · Ry(β) · Rx(γ)</div>
+                    <div class="option" onclick="selectOption(9, 1)">B) Rz(α) · Ry(β) · Rz(γ)</div>
+                    <div class="option" onclick="selectOption(9, 2)">C) H · Rz(θ) · H</div>
+                    <div class="option" onclick="selectOption(9, 3)">D) X · Y · Z</div>
+                </div>
+                <button class="check-btn" onclick="checkAnswer(9)">Check Answer</button>
+                <div class="feedback" id="feedback9"></div>
+            </div>
+
+            <div class="exercise-card" id="q10">
+                <h3>Question 10 <span class="difficulty hard">Hard</span></h3>
+                <div class="question">
+                    What circuit creates a Bell state from |00⟩?
+                </div>
+                <div class="options">
+                    <div class="option" onclick="selectOption(10, 0)">A) CNOT only</div>
+                    <div class="option" onclick="selectOption(10, 1)">B) H on first qubit, then CNOT</div>
+                    <div class="option" onclick="selectOption(10, 2)">C) H on both qubits</div>
+                    <div class="option" onclick="selectOption(10, 3)">D) SWAP then H</div>
+                </div>
+                <button class="check-btn" onclick="checkAnswer(10)">Check Answer</button>
+                <div class="feedback" id="feedback10"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Practice Problems</h2>
+            
+            <div class="exercise-card">
+                <h3>Problem 1: Matrix Multiplication</h3>
+                <div class="question">
+                    Calculate X·Z (Pauli-X times Pauli-Z). What is the result?
+                </div>
+                <div class="calculation-exercise">
+                    <p>X = [[0,1],[1,0]], Z = [[1,0],[0,-1]]</p>
+                    <p>X·Z = ?</p>
+                </div>
+                <button class="hint-btn" onclick="showHint('p1')">Show Solution</button>
+                <div class="hint" id="hintp1">
+                    X·Z = [[0,1],[1,0]] · [[1,0],[0,-1]] = [[0,-1],[1,0]] = iY<br>
+                    This shows XZ = iY (up to global phase, XZ ∝ Y)
+                </div>
+            </div>
+
+            <div class="exercise-card">
+                <h3>Problem 2: State Evolution</h3>
+                <div class="question">
+                    Starting with |0⟩, apply H then Z. What is the final state?
+                </div>
+                <div class="calculation-exercise">
+                    <p>|0⟩ → H → ? → Z → ?</p>
+                </div>
+                <button class="hint-btn" onclick="showHint('p2')">Show Solution</button>
+                <div class="hint" id="hintp2">
+                    |0⟩ → H → |+⟩ = (|0⟩+|1⟩)/√2<br>
+                    |+⟩ → Z → (|0⟩-|1⟩)/√2 = |-⟩<br>
+                    Final state: |-⟩
+                </div>
+            </div>
+
+            <div class="exercise-card">
+                <h3>Problem 3: Entanglement Check</h3>
+                <div class="question">
+                    Is the state (|00⟩ + |01⟩)/√2 entangled?
+                </div>
+                <button class="hint-btn" onclick="showHint('p3')">Show Solution</button>
+                <div class="hint" id="hintp3">
+                    (|00⟩ + |01⟩)/√2 = |0⟩ ⊗ (|0⟩+|1⟩)/√2 = |0⟩ ⊗ |+⟩<br>
+                    This is a PRODUCT state, NOT entangled!<br>
+                    It can be written as a tensor product of individual qubit states.
+                </div>
+            </div>
+        </section>
+
+        <div class="nav-buttons">
+            <a href="../15-summary/index.html" class="btn">Previous: Summary</a>
+            <a href="../index.html" class="btn btn-primary">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const answers = {
+            1: 1, // B
+            2: 2, // C
+            3: 0, // A
+            4: 2, // C
+            5: 1, // B
+            6: 2, // C
+            7: 0, // A
+            8: 1, // B
+            9: 1, // B
+            10: 1 // B
+        };
+        
+        const explanations = {
+            1: "The Pauli-X gate is the quantum NOT gate. It flips |0⟩ to |1⟩ and |1⟩ to |0⟩.",
+            2: "The Hadamard gate transforms |0⟩ to (|0⟩+|1⟩)/√2, creating an equal superposition.",
+            3: "H² = I (Identity). Applying Hadamard twice returns the original state.",
+            4: "SWAP = CNOT₁₂ · CNOT₂₁ · CNOT₁₂. Three CNOT gates are needed.",
+            5: "All quantum gates must be unitary (U†U = I) to preserve probability.",
+            6: "Clifford + T = {H, S, CNOT, T} is universal. Clifford alone is classically simulable.",
+            7: "|Φ⁺⟩ = (|00⟩ + |11⟩)/√2 is the most common Bell state.",
+            8: "S² = Z. The S gate is a π/2 phase rotation, and Z is a π phase rotation.",
+            9: "Euler decomposition: U = Rz(α) · Ry(β) · Rz(γ) for any single-qubit gate.",
+            10: "Bell state creation: Apply H to first qubit, then CNOT with first as control."
+        };
+        
+        let selected = {};
+        let answered = {};
+        let score = 0;
+        
+        function selectOption(q, opt) {
+            if (answered[q]) return;
+            
+            const options = document.querySelectorAll(`#q${q} .option`);
+            options.forEach((o, i) => {
+                o.classList.remove('selected');
+                if (i === opt) o.classList.add('selected');
+            });
+            selected[q] = opt;
+        }
+        
+        function checkAnswer(q) {
+            if (answered[q] || selected[q] === undefined) return;
+            
+            answered[q] = true;
+            const correct = selected[q] === answers[q];
+            
+            const options = document.querySelectorAll(`#q${q} .option`);
+            options.forEach((o, i) => {
+                if (i === answers[q]) o.classList.add('correct');
+                else if (i === selected[q]) o.classList.add('incorrect');
+            });
+            
+            const feedback = document.getElementById(`feedback${q}`);
+            feedback.classList.add('show');
+            feedback.classList.add(correct ? 'correct' : 'incorrect');
+            feedback.innerHTML = correct 
+                ? `<strong>Correct!</strong> ${explanations[q]}`
+                : `<strong>Incorrect.</strong> ${explanations[q]}`;
+            
+            if (correct) {
+                score++;
+                document.getElementById('score').textContent = score;
+            }
+        }
+        
+        function showHint(id) {
+            const hint = document.getElementById(`hint${id}`);
+            hint.classList.toggle('show');
+        }
+        
+        function resetAll() {
+            score = 0;
+            selected = {};
+            answered = {};
+            document.getElementById('score').textContent = '0';
+            
+            for (let q = 1; q <= 10; q++) {
+                const options = document.querySelectorAll(`#q${q} .option`);
+                options.forEach(o => {
+                    o.classList.remove('selected', 'correct', 'incorrect');
+                });
+                const feedback = document.getElementById(`feedback${q}`);
+                feedback.classList.remove('show', 'correct', 'incorrect');
+            }
+            
+            document.querySelectorAll('.hint').forEach(h => h.classList.remove('show'));
+        }
+    </script>
+</body>
+</html>

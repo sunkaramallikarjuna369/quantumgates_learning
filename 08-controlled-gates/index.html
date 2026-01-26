@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlled Gates - Quantum Gates Learning</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        .circuit-demo {
+            background: #0a0a0a;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .gate-comparison {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin: 30px 0;
+        }
+        .gate-panel {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(100,255,218,0.2);
+        }
+        .gate-panel h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .truth-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .truth-table th, .truth-table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid rgba(100,255,218,0.2);
+        }
+        .truth-table th {
+            background: rgba(100,255,218,0.1);
+            color: var(--primary-color);
+        }
+        .truth-table .changed {
+            background: rgba(255,107,107,0.2);
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        .interactive-circuit {
+            background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+            border-radius: 20px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .circuit-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .qubit-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .qubit-toggle label {
+            color: var(--primary-color);
+        }
+        .toggle-btn {
+            width: 60px;
+            height: 30px;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--primary-color);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            background: var(--primary-color);
+        }
+        .toggle-btn::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active::after {
+            left: 32px;
+        }
+        .state-display {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        .state-box {
+            text-align: center;
+            padding: 20px 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .state-box .label {
+            font-size: 0.9em;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+        .state-box .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .arrow-indicator {
+            font-size: 2em;
+            color: #ffd93d;
+        }
+        @media (max-width: 768px) {
+            .gate-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Controlled Gates</h1>
+            <p class="subtitle">CNOT, CZ, and Controlled-U Operations</p>
+        </header>
+
+        <section class="section">
+            <h2>Overview</h2>
+            <p>
+                Controlled gates are two-qubit gates where one qubit (the <strong>control</strong>) 
+                determines whether an operation is applied to another qubit (the <strong>target</strong>).
+                These gates are essential for creating entanglement and implementing quantum algorithms.
+            </p>
+            
+            <div class="key-point">
+                <h3>The Control Mechanism</h3>
+                <p>
+                    If the control qubit is |0⟩, nothing happens to the target.<br>
+                    If the control qubit is |1⟩, the gate U is applied to the target.
+                </p>
+                <div class="formula" style="margin-top: 15px;">
+                    CU|c⟩|t⟩ = |c⟩ ⊗ U<sup>c</sup>|t⟩
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>CNOT Gate (Controlled-X)</h2>
+            <p>
+                The CNOT (Controlled-NOT) gate is the most important two-qubit gate. 
+                It flips the target qubit if and only if the control qubit is |1⟩.
+            </p>
+            
+            <div class="gate-comparison">
+                <div class="gate-panel">
+                    <h3>Circuit Symbol</h3>
+                    <div class="circuit-demo">
+                        <svg width="200" height="120" viewBox="0 0 200 120">
+                            <!-- Wires -->
+                            <line x1="20" y1="40" x2="180" y2="40" stroke="#64ffda" stroke-width="2"/>
+                            <line x1="20" y1="80" x2="180" y2="80" stroke="#64ffda" stroke-width="2"/>
+                            
+                            <!-- Labels -->
+                            <text x="10" y="45" fill="#64ffda" font-size="12">ctrl</text>
+                            <text x="10" y="85" fill="#64ffda" font-size="12">tgt</text>
+                            
+                            <!-- CNOT -->
+                            <line x1="100" y1="40" x2="100" y2="80" stroke="#ff6b6b" stroke-width="3"/>
+                            <circle cx="100" cy="40" r="8" fill="#ff6b6b"/>
+                            <circle cx="100" cy="80" r="15" fill="none" stroke="#ff6b6b" stroke-width="3"/>
+                            <line x1="85" y1="80" x2="115" y2="80" stroke="#ff6b6b" stroke-width="3"/>
+                            <line x1="100" y1="65" x2="100" y2="95" stroke="#ff6b6b" stroke-width="3"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="gate-panel">
+                    <h3>Matrix Representation</h3>
+                    <div class="matrix" style="margin: 20px 0;">
+                        <p>CNOT =</p>
+                        <div class="matrix-grid matrix-4x4">
+                            <div class="matrix-cell">1</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">1</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">1</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">1</div>
+                            <div class="matrix-cell">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Truth Table</h3>
+            <table class="truth-table">
+                <thead>
+                    <tr>
+                        <th colspan="2">Input</th>
+                        <th colspan="2">Output</th>
+                        <th>Action</th>
+                    </tr>
+                    <tr>
+                        <th>Control</th>
+                        <th>Target</th>
+                        <th>Control</th>
+                        <th>Target</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>No change</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>No change</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td class="changed">1</td>
+                        <td>Target flipped!</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td class="changed">0</td>
+                        <td>Target flipped!</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="section interactive-circuit">
+            <h2>Interactive CNOT Simulator</h2>
+            <p>Toggle the input qubits to see how CNOT transforms them:</p>
+            
+            <div class="circuit-controls">
+                <div class="qubit-toggle">
+                    <label>Control:</label>
+                    <div class="toggle-btn" id="control-toggle" onclick="toggleControl()"></div>
+                    <span id="control-value">|0⟩</span>
+                </div>
+                <div class="qubit-toggle">
+                    <label>Target:</label>
+                    <div class="toggle-btn" id="target-toggle" onclick="toggleTarget()"></div>
+                    <span id="target-value">|0⟩</span>
+                </div>
+            </div>
+            
+            <div class="state-display">
+                <div class="state-box">
+                    <div class="label">Input State</div>
+                    <div class="value" id="input-state">|00⟩</div>
+                </div>
+                <div class="arrow-indicator">→ CNOT →</div>
+                <div class="state-box">
+                    <div class="label">Output State</div>
+                    <div class="value" id="output-state">|00⟩</div>
+                </div>
+            </div>
+            
+            <div class="circuit-demo" id="cnot-circuit">
+                <svg width="400" height="150" viewBox="0 0 400 150">
+                    <!-- Wires -->
+                    <line x1="50" y1="50" x2="350" y2="50" stroke="#64ffda" stroke-width="2"/>
+                    <line x1="50" y1="100" x2="350" y2="100" stroke="#64ffda" stroke-width="2"/>
+                    
+                    <!-- Input labels -->
+                    <text x="30" y="55" fill="#64ffda" font-size="14" id="svg-ctrl-in">|0⟩</text>
+                    <text x="30" y="105" fill="#64ffda" font-size="14" id="svg-tgt-in">|0⟩</text>
+                    
+                    <!-- CNOT gate -->
+                    <line x1="200" y1="50" x2="200" y2="100" stroke="#ff6b6b" stroke-width="3"/>
+                    <circle cx="200" cy="50" r="10" fill="#ff6b6b" id="ctrl-dot"/>
+                    <circle cx="200" cy="100" r="18" fill="none" stroke="#ff6b6b" stroke-width="3"/>
+                    <line x1="182" y1="100" x2="218" y2="100" stroke="#ff6b6b" stroke-width="3"/>
+                    <line x1="200" y1="82" x2="200" y2="118" stroke="#ff6b6b" stroke-width="3"/>
+                    
+                    <!-- Output labels -->
+                    <text x="360" y="55" fill="#64ffda" font-size="14" id="svg-ctrl-out">|0⟩</text>
+                    <text x="360" y="105" fill="#64ffda" font-size="14" id="svg-tgt-out">|0⟩</text>
+                </svg>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>CZ Gate (Controlled-Z)</h2>
+            <p>
+                The CZ (Controlled-Z) gate applies a Z gate to the target when the control is |1⟩.
+                Unlike CNOT, CZ is symmetric - either qubit can be considered the control!
+            </p>
+            
+            <div class="gate-comparison">
+                <div class="gate-panel">
+                    <h3>Circuit Symbol</h3>
+                    <div class="circuit-demo">
+                        <svg width="200" height="120" viewBox="0 0 200 120">
+                            <!-- Wires -->
+                            <line x1="20" y1="40" x2="180" y2="40" stroke="#64ffda" stroke-width="2"/>
+                            <line x1="20" y1="80" x2="180" y2="80" stroke="#64ffda" stroke-width="2"/>
+                            
+                            <!-- CZ (two dots connected) -->
+                            <line x1="100" y1="40" x2="100" y2="80" stroke="#4ecdc4" stroke-width="3"/>
+                            <circle cx="100" cy="40" r="8" fill="#4ecdc4"/>
+                            <circle cx="100" cy="80" r="8" fill="#4ecdc4"/>
+                        </svg>
+                    </div>
+                    <p style="text-align: center; margin-top: 10px; opacity: 0.8;">
+                        Symmetric - both qubits shown as control dots
+                    </p>
+                </div>
+                
+                <div class="gate-panel">
+                    <h3>Matrix Representation</h3>
+                    <div class="matrix" style="margin: 20px 0;">
+                        <p>CZ =</p>
+                        <div class="matrix-grid matrix-4x4">
+                            <div class="matrix-cell">1</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">1</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">1</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">0</div>
+                            <div class="matrix-cell">-1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="highlight">
+                <h3>CZ Action</h3>
+                <p>CZ adds a phase of -1 only when BOTH qubits are |1⟩:</p>
+                <ul>
+                    <li>|00⟩ → |00⟩</li>
+                    <li>|01⟩ → |01⟩</li>
+                    <li>|10⟩ → |10⟩</li>
+                    <li>|11⟩ → <span style="color: #ff6b6b;">-</span>|11⟩</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Creating Entanglement with CNOT</h2>
+            <p>
+                CNOT is the key gate for creating entanglement. Combined with Hadamard, 
+                it creates Bell states - maximally entangled two-qubit states.
+            </p>
+            
+            <div class="circuit-demo">
+                <svg width="100%" height="180" viewBox="0 0 500 180">
+                    <!-- Wires -->
+                    <line x1="50" y1="60" x2="450" y2="60" stroke="#64ffda" stroke-width="2"/>
+                    <line x1="50" y1="120" x2="450" y2="120" stroke="#64ffda" stroke-width="2"/>
+                    
+                    <!-- Input labels -->
+                    <text x="30" y="65" fill="#64ffda" font-size="14">|0⟩</text>
+                    <text x="30" y="125" fill="#64ffda" font-size="14">|0⟩</text>
+                    
+                    <!-- Hadamard on first qubit -->
+                    <rect x="100" y="35" width="50" height="50" rx="8" fill="url(#bellGrad)" stroke="#64ffda" stroke-width="2"/>
+                    <text x="125" y="67" fill="white" font-size="18" font-weight="bold" text-anchor="middle">H</text>
+                    
+                    <!-- State after H -->
+                    <text x="175" y="45" fill="#ffd93d" font-size="12">|+⟩</text>
+                    <text x="175" y="135" fill="#ffd93d" font-size="12">|0⟩</text>
+                    
+                    <!-- CNOT -->
+                    <line x1="250" y1="60" x2="250" y2="120" stroke="#ff6b6b" stroke-width="3"/>
+                    <circle cx="250" cy="60" r="10" fill="#ff6b6b"/>
+                    <circle cx="250" cy="120" r="18" fill="none" stroke="#ff6b6b" stroke-width="3"/>
+                    <line x1="232" y1="120" x2="268" y2="120" stroke="#ff6b6b" stroke-width="3"/>
+                    <line x1="250" y1="102" x2="250" y2="138" stroke="#ff6b6b" stroke-width="3"/>
+                    
+                    <!-- Output: Bell state -->
+                    <text x="320" y="90" fill="#64ffda" font-size="16" font-weight="bold">|Φ⁺⟩ = (|00⟩ + |11⟩)/√2</text>
+                    
+                    <defs>
+                        <linearGradient id="bellGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#667eea"/>
+                            <stop offset="100%" style="stop-color:#764ba2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            
+            <div class="example">
+                <h3>Step-by-Step Bell State Creation</h3>
+                <ol>
+                    <li><strong>Start:</strong> |00⟩</li>
+                    <li><strong>After H on first qubit:</strong> (|0⟩ + |1⟩)/√2 ⊗ |0⟩ = (|00⟩ + |10⟩)/√2</li>
+                    <li><strong>After CNOT:</strong> (|00⟩ + |11⟩)/√2 = |Φ⁺⟩ (Bell state!)</li>
+                </ol>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Key Properties</h2>
+            
+            <div class="concept-grid">
+                <div class="gate-card">
+                    <h3>Self-Inverse</h3>
+                    <div class="formula">CNOT² = I</div>
+                    <p>Applying CNOT twice returns to the original state.</p>
+                </div>
+                
+                <div class="gate-card">
+                    <h3>Entangling Power</h3>
+                    <div class="formula">H ⊗ I → CNOT</div>
+                    <p>Creates maximally entangled Bell states from product states.</p>
+                </div>
+                
+                <div class="gate-card">
+                    <h3>Universal</h3>
+                    <div class="formula">{CNOT, H, T}</div>
+                    <p>CNOT + single-qubit gates form a universal gate set.</p>
+                </div>
+                
+                <div class="gate-card">
+                    <h3>CZ Symmetry</h3>
+                    <div class="formula">CZ = CZ<sup>T</sup></div>
+                    <p>CZ is symmetric - control and target are interchangeable.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="nav-buttons">
+            <a href="../07-multiple-qubit-gates/index.html" class="btn">Previous: Multiple-Qubit Gates</a>
+            <a href="../09-swap-toffoli-gates/index.html" class="btn btn-primary">Next: SWAP & Toffoli Gates</a>
+        </div>
+    </div>
+
+    <script>
+        let controlState = 0;
+        let targetState = 0;
+        
+        function toggleControl() {
+            controlState = 1 - controlState;
+            updateDisplay();
+        }
+        
+        function toggleTarget() {
+            targetState = 1 - targetState;
+            updateDisplay();
+        }
+        
+        function updateDisplay() {
+            // Update toggle buttons
+            document.getElementById('control-toggle').classList.toggle('active', controlState === 1);
+            document.getElementById('target-toggle').classList.toggle('active', targetState === 1);
+            
+            // Update value displays
+            document.getElementById('control-value').textContent = `|${controlState}⟩`;
+            document.getElementById('target-value').textContent = `|${targetState}⟩`;
+            
+            // Calculate output
+            let outputControl = controlState;
+            let outputTarget = controlState === 1 ? (1 - targetState) : targetState;
+            
+            // Update state displays
+            document.getElementById('input-state').textContent = `|${controlState}${targetState}⟩`;
+            document.getElementById('output-state').textContent = `|${outputControl}${outputTarget}⟩`;
+            
+            // Update SVG labels
+            document.getElementById('svg-ctrl-in').textContent = `|${controlState}⟩`;
+            document.getElementById('svg-tgt-in').textContent = `|${targetState}⟩`;
+            document.getElementById('svg-ctrl-out').textContent = `|${outputControl}⟩`;
+            document.getElementById('svg-tgt-out').textContent = `|${outputTarget}⟩`;
+            
+            // Highlight control dot when active
+            const ctrlDot = document.getElementById('ctrl-dot');
+            ctrlDot.setAttribute('fill', controlState === 1 ? '#ffd93d' : '#ff6b6b');
+        }
+    </script>
+</body>
+</html>
