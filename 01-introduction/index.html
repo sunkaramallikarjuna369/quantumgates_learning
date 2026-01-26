@@ -291,7 +291,10 @@
         {pos: [0, 0, 1.4], text: '|0⟩', color: '#ffd93d'},
         {pos: [0, 0, -1.4], text: '|1⟩', color: '#ff6b6b'},
         {pos: [1.4, 0, 0], text: '|+⟩', color: '#64ffda'},
-        {pos: [-1.4, 0, 0], text: '|-⟩', color: '#a855f7'}
+        {pos: [-1.4, 0, 0], text: '|-⟩', color: '#a855f7'},
+        {pos: [1.5, 0, 0], text: 'X', color: '#ff6b6b', offset: [0, -0.3, 0]},
+        {pos: [0, 1.5, 0], text: 'Y', color: '#4ecdc4'},
+        {pos: [0, 0, 1.5], text: 'Z', color: '#ffd93d', offset: [0.3, 0, 0]}
     ];
     
     labels.forEach(l => {
@@ -304,7 +307,10 @@
         ctx.fillText(l.text, 32, 24);
         const texture = new THREE.CanvasTexture(canvas);
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map: texture, transparent: true}));
-        sprite.position.set(l.pos[0], l.pos[1], l.pos[2]);
+        const ox = l.offset ? l.offset[0] : 0;
+        const oy = l.offset ? l.offset[1] : 0;
+        const oz = l.offset ? l.offset[2] : 0;
+        sprite.position.set(l.pos[0] + ox, l.pos[1] + oy, l.pos[2] + oz);
         sprite.scale.set(0.5, 0.25, 1);
         scene.add(sprite);
     });
