@@ -6,96 +6,83 @@
     <title>Universal Gate Sets - Quantum Gates Learning</title>
     <link rel="stylesheet" href="../shared/styles.css">
     <style>
-        .gate-set-card {
-            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            border: 1px solid rgba(100,255,218,0.3);
-        }
-        .gate-set-card h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .gate-set-card .gates {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin: 15px 0;
-        }
-        .gate-badge {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-        .approximation-demo {
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-        }
-        .theorem-box {
-            background: rgba(255,215,61,0.1);
-            border-left: 4px solid #ffd93d;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 0 10px 10px 0;
-        }
-        .theorem-box h4 {
-            color: #ffd93d;
-            margin-bottom: 10px;
-        }
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        .comparison-table th, .comparison-table td {
-            padding: 15px;
-            text-align: center;
-            border: 1px solid rgba(100,255,218,0.2);
-        }
-        .comparison-table th {
-            background: rgba(100,255,218,0.1);
-            color: var(--primary-color);
-        }
-        .check {
-            color: #4ecdc4;
-            font-size: 1.5em;
-        }
-        .cross {
-            color: #ff6b6b;
-            font-size: 1.5em;
-        }
+        .prereq-box { background: linear-gradient(135deg, rgba(100,255,218,0.1), rgba(78,205,196,0.05)); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
+        .prereq-box h3 { color: #64ffda; margin-bottom: 15px; }
+        .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #64ffda; }
+        .prereq-item h4 { color: #4ecdc4; margin-bottom: 8px; }
+        .gate-set-card { background: rgba(100,255,218,0.05); border: 1px solid rgba(100,255,218,0.2); border-radius: 12px; padding: 20px; margin: 15px 0; }
+        .gate-set-card h4 { color: #64ffda; margin-bottom: 12px; }
+        .gate-list { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+        .gate-chip { padding: 8px 16px; background: linear-gradient(135deg, rgba(100,255,218,0.3), rgba(78,205,196,0.2)); border: 1px solid rgba(100,255,218,0.4); border-radius: 20px; color: #64ffda; font-weight: bold; font-size: 14px; }
+        .universal-badge { display: inline-block; padding: 4px 12px; background: linear-gradient(135deg, #ffd93d, #ffed4a); color: #000; border-radius: 12px; font-size: 12px; font-weight: bold; margin-left: 10px; }
+        .not-universal { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); }
+        .concept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 20px 0; }
+        .concept-card { background: rgba(100,255,218,0.05); border: 1px solid rgba(100,255,218,0.2); border-radius: 12px; padding: 20px; }
+        .concept-card h4 { color: #64ffda; margin-bottom: 12px; }
+        .hierarchy { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 25px; margin: 20px 0; }
+        .hierarchy-level { display: flex; align-items: center; gap: 15px; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .level-1 { background: rgba(255,215,61,0.2); border-left: 4px solid #ffd93d; }
+        .level-2 { background: rgba(100,255,218,0.15); border-left: 4px solid #64ffda; margin-left: 30px; }
+        .level-3 { background: rgba(168,85,247,0.15); border-left: 4px solid #a855f7; margin-left: 60px; }
+        .level-name { font-weight: bold; min-width: 150px; }
+        .level-1 .level-name { color: #ffd93d; }
+        .level-2 .level-name { color: #64ffda; }
+        .level-3 .level-name { color: #a855f7; }
+        .decision-guide { background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .decision-guide h3 { color: #ffd93d; margin-bottom: 15px; }
+        .decision-item { display: flex; align-items: flex-start; gap: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 10px 0; }
+        .decision-item .goal { color: #4ecdc4; font-weight: bold; min-width: 200px; }
+        .decision-item .solution { color: #fff; }
+        .decision-item .gate { color: #ff6b6b; font-weight: bold; }
+        .approximation-visual { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; margin: 15px 0; text-align: center; }
+        .approx-equation { font-size: 18px; color: #64ffda; font-family: monospace; margin: 15px 0; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Universal Gate Sets</h1>
-            <p class="subtitle">Building Any Quantum Operation from Simple Gates</p>
+            <p class="subtitle">Building Any Quantum Operation from Basic Gates</p>
         </header>
 
         <section class="section">
-            <h2>What is Universality?</h2>
-            <p>
-                A <strong>universal gate set</strong> is a finite collection of quantum gates that can 
-                approximate any unitary operation to arbitrary precision. This is analogous to how 
-                NAND gates are universal for classical computing.
-            </p>
+            <div class="prereq-box">
+                <h3>Prerequisites</h3>
+                <div class="prereq-item">
+                    <h4>1. Single-Qubit Gates</h4>
+                    <p>You should know H, X, Y, Z, S, T gates and rotation gates Rx, Ry, Rz.</p>
+                </div>
+                <div class="prereq-item">
+                    <h4>2. Two-Qubit Gates</h4>
+                    <p>CNOT is the key two-qubit gate for universality. It creates entanglement.</p>
+                </div>
+                <div class="prereq-item">
+                    <h4>3. Gate Composition</h4>
+                    <p>Gates can be combined in sequence. The order matters! UV ≠ VU in general.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>What is a Universal Gate Set?</h2>
+            <div class="highlight">
+                <p>A <strong>universal gate set</strong> is a finite set of gates that can approximate ANY quantum operation to arbitrary precision.</p>
+                <p style="color:#888;margin-top:10px;">Think of it like having a small set of LEGO bricks that can build anything!</p>
+            </div>
             
-            <div class="key-point">
-                <h3>The Power of Universality</h3>
-                <p>
-                    With a universal gate set, we can implement ANY quantum algorithm using only 
-                    gates from that set. This is crucial for building practical quantum computers, 
-                    which can only implement a limited set of physical operations.
-                </p>
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h4>Exact vs Approximate</h4>
+                    <p>Some gates can be built exactly (like X from H and Z). Others can only be approximated to any desired accuracy.</p>
+                </div>
+                <div class="concept-card">
+                    <h4>Finite Set</h4>
+                    <p>Remarkably, just 2-3 gates are enough! You don't need infinitely many different gates.</p>
+                </div>
+                <div class="concept-card">
+                    <h4>Solovay-Kitaev Theorem</h4>
+                    <p>Any gate can be approximated with O(log^c(1/ε)) gates from a universal set, where ε is the error.</p>
+                </div>
             </div>
         </section>
 
@@ -103,175 +90,117 @@
             <h2>Common Universal Gate Sets</h2>
             
             <div class="gate-set-card">
-                <h3>🏆 Clifford + T (Most Common)</h3>
-                <div class="gates">
-                    <span class="gate-badge">H</span>
-                    <span class="gate-badge">S</span>
-                    <span class="gate-badge">CNOT</span>
-                    <span class="gate-badge">T</span>
+                <h4>{H, T, CNOT} <span class="universal-badge">UNIVERSAL</span></h4>
+                <div class="gate-list">
+                    <span class="gate-chip">H</span>
+                    <span class="gate-chip">T</span>
+                    <span class="gate-chip">CNOT</span>
                 </div>
-                <p>
-                    The most widely used universal gate set. Clifford gates (H, S, CNOT) alone 
-                    can be efficiently simulated classically, but adding T makes it universal.
-                </p>
+                <p style="color:#888;margin-top:10px;">The most common universal set. H creates superposition, T adds non-Clifford magic, CNOT entangles.</p>
             </div>
             
             <div class="gate-set-card">
-                <h3>CNOT + Single-Qubit Gates</h3>
-                <div class="gates">
-                    <span class="gate-badge">CNOT</span>
-                    <span class="gate-badge">Rx(θ)</span>
-                    <span class="gate-badge">Ry(θ)</span>
-                    <span class="gate-badge">Rz(θ)</span>
+                <h4>{H, S, CNOT} <span class="universal-badge not-universal">NOT UNIVERSAL</span></h4>
+                <div class="gate-list">
+                    <span class="gate-chip">H</span>
+                    <span class="gate-chip">S</span>
+                    <span class="gate-chip">CNOT</span>
                 </div>
-                <p>
-                    CNOT combined with arbitrary single-qubit rotations. This is universal 
-                    because any single-qubit gate can be decomposed into rotations.
-                </p>
+                <p style="color:#ff6b6b;margin-top:10px;">This is the Clifford group - NOT universal! Can be efficiently simulated classically.</p>
             </div>
             
             <div class="gate-set-card">
-                <h3>Toffoli + H</h3>
-                <div class="gates">
-                    <span class="gate-badge">Toffoli</span>
-                    <span class="gate-badge">H</span>
+                <h4>{Rx, Ry, CNOT} <span class="universal-badge">UNIVERSAL</span></h4>
+                <div class="gate-list">
+                    <span class="gate-chip">Rx(θ)</span>
+                    <span class="gate-chip">Ry(θ)</span>
+                    <span class="gate-chip">CNOT</span>
                 </div>
-                <p>
-                    A minimal universal set! Toffoli is universal for classical computing, 
-                    and adding Hadamard enables quantum superposition.
-                </p>
+                <p style="color:#888;margin-top:10px;">Continuous rotation gates give exact universality (no approximation needed for single-qubit gates).</p>
             </div>
             
             <div class="gate-set-card">
-                <h3>√SWAP + Single-Qubit</h3>
-                <div class="gates">
-                    <span class="gate-badge">√SWAP</span>
-                    <span class="gate-badge">Any single-qubit</span>
+                <h4>{Toffoli, H} <span class="universal-badge">UNIVERSAL</span></h4>
+                <div class="gate-list">
+                    <span class="gate-chip">Toffoli</span>
+                    <span class="gate-chip">H</span>
                 </div>
-                <p>
-                    The square root of SWAP, combined with single-qubit gates. 
-                    Used in some physical implementations.
-                </p>
+                <p style="color:#888;margin-top:10px;">Toffoli alone is universal for classical computation. Adding H makes it quantum universal!</p>
             </div>
         </section>
 
         <section class="section">
-            <h2>The Solovay-Kitaev Theorem</h2>
-            
-            <div class="theorem-box">
-                <h4>Solovay-Kitaev Theorem</h4>
-                <p>
-                    Any single-qubit gate can be approximated to precision ε using 
-                    O(log<sup>c</sup>(1/ε)) gates from a universal set, where c ≈ 2.
-                </p>
-            </div>
-            
-            <p>
-                This theorem is remarkable because it says we only need a <strong>polylogarithmic</strong> 
-                number of gates to achieve any desired precision. For example:
-            </p>
-            
-            <ul>
-                <li>ε = 0.01 (1% error): ~50 gates</li>
-                <li>ε = 0.001 (0.1% error): ~100 gates</li>
-                <li>ε = 0.0001 (0.01% error): ~150 gates</li>
-            </ul>
-        </section>
-
-        <section class="section">
-            <h2>Why These Specific Gates?</h2>
-            
-            <div class="approximation-demo">
-                <h3>The Role of Each Gate</h3>
-                
-                <div class="concept-grid">
-                    <div class="gate-card">
-                        <h3>H (Hadamard)</h3>
-                        <p>Creates superposition. Transforms between computational and Hadamard bases.</p>
-                    </div>
-                    
-                    <div class="gate-card">
-                        <h3>T (π/8 gate)</h3>
-                        <p>Provides the "magic" - enables non-Clifford operations essential for universality.</p>
-                    </div>
-                    
-                    <div class="gate-card">
-                        <h3>CNOT</h3>
-                        <p>Creates entanglement between qubits. Essential for multi-qubit operations.</p>
-                    </div>
-                    
-                    <div class="gate-card">
-                        <h3>S (Phase)</h3>
-                        <p>Adds phase rotations. Part of the Clifford group.</p>
-                    </div>
+            <h2>The Clifford Hierarchy</h2>
+            <div class="hierarchy">
+                <div class="hierarchy-level level-1">
+                    <span class="level-name">Pauli Group</span>
+                    <span style="color:#888;">{I, X, Y, Z} - Basic operations</span>
                 </div>
+                <div class="hierarchy-level level-2">
+                    <span class="level-name">Clifford Group</span>
+                    <span style="color:#888;">{H, S, CNOT} - Maps Paulis to Paulis</span>
+                </div>
+                <div class="hierarchy-level level-3">
+                    <span class="level-name">+ T Gate</span>
+                    <span style="color:#888;">Breaks out of Clifford → Universal!</span>
+                </div>
+            </div>
+            <div class="key-point">
+                <p>The T gate is special because it's the simplest gate that takes you <strong>outside</strong> the efficiently-simulable Clifford group!</p>
             </div>
         </section>
 
         <section class="section">
-            <h2>Clifford vs Universal</h2>
-            
-            <table class="comparison-table">
-                <thead>
-                    <tr>
-                        <th>Property</th>
-                        <th>Clifford Gates Only</th>
-                        <th>Clifford + T</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Gates included</td>
-                        <td>H, S, CNOT</td>
-                        <td>H, S, CNOT, T</td>
-                    </tr>
-                    <tr>
-                        <td>Classical simulation</td>
-                        <td><span class="check">✓</span> Efficient</td>
-                        <td><span class="cross">✗</span> Exponential</td>
-                    </tr>
-                    <tr>
-                        <td>Universal</td>
-                        <td><span class="cross">✗</span> No</td>
-                        <td><span class="check">✓</span> Yes</td>
-                    </tr>
-                    <tr>
-                        <td>Quantum advantage</td>
-                        <td><span class="cross">✗</span> No</td>
-                        <td><span class="check">✓</span> Yes</td>
-                    </tr>
-                    <tr>
-                        <td>Error correction</td>
-                        <td><span class="check">✓</span> Transversal</td>
-                        <td>Requires magic states</td>
-                    </tr>
-                </tbody>
-            </table>
+            <h2>Building Gates from Universal Sets</h2>
+            <div class="approximation-visual">
+                <h4 style="color:#64ffda;margin-bottom:15px;">Example: Building S from H and T</h4>
+                <div class="approx-equation">S = T · T = T²</div>
+                <p style="color:#888;">Two T gates equal one S gate (since T⁴ = Z and T² = S)</p>
+            </div>
+            <div class="approximation-visual">
+                <h4 style="color:#64ffda;margin-bottom:15px;">Example: Building Z from T</h4>
+                <div class="approx-equation">Z = T⁴</div>
+                <p style="color:#888;">Four T gates equal one Z gate</p>
+            </div>
+            <div class="approximation-visual">
+                <h4 style="color:#64ffda;margin-bottom:15px;">Example: Building X from H and Z</h4>
+                <div class="approx-equation">X = H · Z · H</div>
+                <p style="color:#888;">Hadamard swaps X and Z bases</p>
+            </div>
         </section>
 
         <section class="section">
-            <h2>Key Takeaways</h2>
-            
-            <div class="concept-grid">
-                <div class="gate-card">
-                    <h3>Finite → Infinite</h3>
-                    <p>A finite set of gates can approximate infinitely many unitaries.</p>
+            <div class="decision-guide">
+                <h3>Choosing a Universal Set</h3>
+                <div class="decision-item">
+                    <span class="goal">Hardware with discrete gates:</span>
+                    <span class="solution">Use <span class="gate">{H, T, CNOT}</span> - standard for fault-tolerant QC</span>
                 </div>
-                
-                <div class="gate-card">
-                    <h3>Efficient Approximation</h3>
-                    <p>Solovay-Kitaev: O(log²(1/ε)) gates for precision ε.</p>
+                <div class="decision-item">
+                    <span class="goal">Hardware with continuous control:</span>
+                    <span class="solution">Use <span class="gate">{Rx, Ry, CNOT}</span> - no approximation overhead</span>
                 </div>
-                
-                <div class="gate-card">
-                    <h3>T is Special</h3>
-                    <p>The T gate provides the "non-Clifford magic" needed for universality.</p>
+                <div class="decision-item">
+                    <span class="goal">Minimize T gate count:</span>
+                    <span class="solution">T gates are expensive in fault-tolerant QC - optimize for fewer T gates</span>
                 </div>
-                
-                <div class="gate-card">
-                    <h3>Physical Relevance</h3>
-                    <p>Real quantum computers implement universal sets natively.</p>
+                <div class="decision-item">
+                    <span class="goal">Classical reversible logic:</span>
+                    <span class="solution">Use <span class="gate">Toffoli</span> alone (universal for classical)</span>
                 </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Why This Matters</h2>
+            <div class="highlight">
+                <h3>Practical Implications</h3>
+                <ul style="margin-left:20px;color:#888;">
+                    <li><strong>Compiler design:</strong> Quantum compilers decompose arbitrary gates into universal sets</li>
+                    <li><strong>Error correction:</strong> Fault-tolerant gates are limited - universality ensures we can still compute anything</li>
+                    <li><strong>Hardware constraints:</strong> Physical qubits may only support certain native gates</li>
+                    <li><strong>Algorithm optimization:</strong> Minimizing gate count (especially T gates) improves performance</li>
+                </ul>
             </div>
         </section>
 
