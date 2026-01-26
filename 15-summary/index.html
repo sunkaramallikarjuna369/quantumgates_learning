@@ -3,326 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Summary - Quantum Gates Learning</title>
+    <title>Complete Reference - Devin's Teaching Style</title>
     <link rel="stylesheet" href="../shared/styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-        .bloch-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; align-items: center; }
-        .bloch-panel { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; text-align: center; }
-        .bloch-panel h4 { color: #64ffda; margin-bottom: 10px; }
-        .bloch-canvas { width: 300px; height: 300px; border-radius: 8px; }
-        .gate-btn { padding: 8px 14px; margin: 3px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
-        .summary-section {
-            background: rgba(255,255,255,0.03);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            border-left: 4px solid var(--primary-color);
-        }
-        .summary-section h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-        .gate-reference {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .gate-ref-card {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-        }
-        .gate-ref-card h4 {
-            color: #ffd93d;
-            margin-bottom: 10px;
-        }
-        .gate-ref-card .matrix {
-            font-family: monospace;
-            font-size: 0.85em;
-            background: rgba(0,0,0,0.3);
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .concept-map {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 30px 0;
-        }
-        .concept-box {
-            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-        }
-        .concept-box h4 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-        .formula-list {
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .formula-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(100,255,218,0.1);
-        }
-        .formula-item:last-child {
-            border-bottom: none;
-        }
-        .formula-item .name {
-            color: #64ffda;
-            font-weight: bold;
-        }
-        .formula-item .formula {
-            color: #ffd93d;
-            font-family: monospace;
-        }
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-        .quick-link {
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 10px;
-            text-align: center;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        .quick-link:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(102,126,234,0.3);
-        }
-        @media (max-width: 768px) {
-            .concept-map {
-                grid-template-columns: 1fr;
-            }
-            .quick-links {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
+        .fourwh-box { background: linear-gradient(135deg, rgba(100,255,218,0.12), rgba(78,205,196,0.06)); border: 2px solid rgba(100,255,218,0.4); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .fourwh-box h3 { color: #64ffda; margin-bottom: 20px; font-size: 1.4em; }
+        .gate-ref { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 25px; margin: 20px 0; border-left: 5px solid; }
+        .gate-ref h3 { margin-bottom: 15px; font-size: 1.3em; }
+        .gate-ref.pauli { border-color: #ff6b6b; }
+        .gate-ref.pauli h3 { color: #ff6b6b; }
+        .gate-ref.phase { border-color: #a855f7; }
+        .gate-ref.phase h3 { color: #a855f7; }
+        .gate-ref.rotation { border-color: #4ecdc4; }
+        .gate-ref.rotation h3 { color: #4ecdc4; }
+        .gate-ref.multi { border-color: #ffd93d; }
+        .gate-ref.multi h3 { color: #ffd93d; }
+        .gate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 15px 0; }
+        .gate-card { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 20px; }
+        .gate-card h4 { color: #64ffda; margin-bottom: 10px; font-size: 1.1em; }
+        .gate-card .matrix { font-family: monospace; background: rgba(100,255,218,0.1); padding: 12px; border-radius: 8px; margin: 10px 0; text-align: center; color: #fff; font-size: 0.95em; }
+        .gate-card .action { color: #ccc; font-size: 0.9em; line-height: 1.5; }
+        .gate-card .bloch { color: #a855f7; font-size: 0.85em; margin-top: 8px; }
+        .quick-ref { background: rgba(255,215,0,0.08); border: 2px solid rgba(255,215,0,0.3); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .quick-ref h3 { color: #ffd93d; margin-bottom: 20px; }
+        .ref-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .ref-table th, .ref-table td { padding: 12px; text-align: center; border: 1px solid rgba(100,255,218,0.3); }
+        .ref-table th { background: rgba(100,255,218,0.2); color: #64ffda; }
+        .ref-table td { background: rgba(0,0,0,0.3); color: #ccc; font-family: monospace; }
+        .key-insight { background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,107,107,0.05)); border: 2px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .key-insight h4 { color: #ff6b6b; margin-bottom: 10px; }
+        .key-insight p { color: #ccc; line-height: 1.6; }
+        .formula-box { background: rgba(100,255,218,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 1.1em; color: #64ffda; text-align: center; }
+        .section-divider { border: none; border-top: 2px solid rgba(100,255,218,0.2); margin: 40px 0; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Summary</h1>
-            <p class="subtitle">Complete Reference Guide to Quantum Gates</p>
+            <h1>Complete Quantum Gates Reference</h1>
+            <p class="subtitle">Everything You Need in One Place</p>
         </header>
 
         <section class="section">
-            <h2>Quick Navigation</h2>
-            <div class="quick-links">
-                <a href="../01-introduction/index.html" class="quick-link">Introduction</a>
-                <a href="../02-single-qubit-gates/index.html" class="quick-link">Single-Qubit</a>
-                <a href="../03-pauli-gates/index.html" class="quick-link">Pauli Gates</a>
-                <a href="../04-identity-phase-gates/index.html" class="quick-link">Phase Gates</a>
-                <a href="../05-hadamard-gate/index.html" class="quick-link">Hadamard</a>
-                <a href="../06-rotation-gates/index.html" class="quick-link">Rotations</a>
-                <a href="../07-multiple-qubit-gates/index.html" class="quick-link">Multi-Qubit</a>
-                <a href="../08-controlled-gates/index.html" class="quick-link">Controlled</a>
-                <a href="../09-swap-toffoli-gates/index.html" class="quick-link">SWAP/Toffoli</a>
-                <a href="../10-unitary-reversibility/index.html" class="quick-link">Unitarity</a>
-                <a href="../11-universal-gate-sets/index.html" class="quick-link">Universal Sets</a>
-                <a href="../12-gate-decomposition/index.html" class="quick-link">Decomposition</a>
-                <a href="../13-bloch-sphere-visualization/index.html" class="quick-link">Bloch Sphere</a>
-                <a href="../14-entanglement-creation/index.html" class="quick-link">Entanglement</a>
-                <a href="../16-exercises/index.html" class="quick-link">Exercises</a>
-                <a href="../index.html" class="quick-link">Home</a>
+            <div class="fourwh-box">
+                <h3>Quick Navigation</h3>
+                <p style="color:#ccc;">This page summarizes ALL quantum gates with their matrices, actions, and Bloch sphere interpretations. Use it as a reference while learning or building quantum circuits.</p>
             </div>
         </section>
 
-        <section class="section">
-            <h2>Single-Qubit Gates Reference</h2>
-            
-            <div class="gate-reference">
-                <div class="gate-ref-card">
-                    <h4>Pauli-X (NOT)</h4>
-                    <div class="matrix">[0 1]<br>[1 0]</div>
-                    <p>Bit flip: |0⟩↔|1⟩</p>
+        <div class="gate-ref pauli">
+            <h3>Pauli Gates (X, Y, Z)</h3>
+            <p style="color:#888;margin-bottom:15px;">The fundamental single-qubit gates. Each is a 180° rotation around its axis.</p>
+            <div class="gate-grid">
+                <div class="gate-card">
+                    <h4>X Gate (NOT / Bit Flip)</h4>
+                    <div class="matrix">[[0, 1], [1, 0]]</div>
+                    <div class="action"><strong>Action:</strong> |0⟩ ↔ |1⟩ (swaps amplitudes)</div>
+                    <div class="bloch">Bloch: 180° rotation around X-axis</div>
                 </div>
-                
-                <div class="gate-ref-card">
-                    <h4>Pauli-Y</h4>
-                    <div class="matrix">[0 -i]<br>[i  0]</div>
-                    <p>Bit + phase flip</p>
+                <div class="gate-card">
+                    <h4>Y Gate</h4>
+                    <div class="matrix">[[0, -i], [i, 0]]</div>
+                    <div class="action"><strong>Action:</strong> |0⟩ → i|1⟩, |1⟩ → -i|0⟩</div>
+                    <div class="bloch">Bloch: 180° rotation around Y-axis</div>
                 </div>
-                
-                <div class="gate-ref-card">
-                    <h4>Pauli-Z</h4>
-                    <div class="matrix">[1  0]<br>[0 -1]</div>
-                    <p>Phase flip: |1⟩→-|1⟩</p>
-                </div>
-                
-                <div class="gate-ref-card">
-                    <h4>Hadamard (H)</h4>
-                    <div class="matrix">[1  1]/√2<br>[1 -1]/√2</div>
-                    <p>Creates superposition</p>
-                </div>
-                
-                <div class="gate-ref-card">
-                    <h4>Phase (S)</h4>
-                    <div class="matrix">[1 0]<br>[0 i]</div>
-                    <p>π/2 phase: S² = Z</p>
-                </div>
-                
-                <div class="gate-ref-card">
-                    <h4>T Gate</h4>
-                    <div class="matrix">[1 0]<br>[0 e^(iπ/4)]</div>
-                    <p>π/4 phase: T² = S</p>
+                <div class="gate-card">
+                    <h4>Z Gate (Phase Flip)</h4>
+                    <div class="matrix">[[1, 0], [0, -1]]</div>
+                    <div class="action"><strong>Action:</strong> |0⟩ → |0⟩, |1⟩ → -|1⟩</div>
+                    <div class="bloch">Bloch: 180° rotation around Z-axis</div>
                 </div>
             </div>
-        </section>
+            <div class="key-insight">
+                <h4>Key Property</h4>
+                <p>All Pauli gates are self-inverse: X² = Y² = Z² = I. They also anticommute: XY = -YX, etc.</p>
+            </div>
+        </div>
 
-        <section class="section">
-            <h2>Multi-Qubit Gates Reference</h2>
-            
-            <div class="gate-reference">
-                <div class="gate-ref-card">
-                    <h4>CNOT</h4>
-                    <div class="matrix">Flips target if<br>control = |1⟩</div>
-                    <p>Creates entanglement</p>
+        <div class="gate-ref phase">
+            <h3>Phase Gates (I, S, T)</h3>
+            <p style="color:#888;margin-bottom:15px;">Gates that add phase to the |1⟩ component without changing probabilities.</p>
+            <div class="gate-grid">
+                <div class="gate-card">
+                    <h4>I Gate (Identity)</h4>
+                    <div class="matrix">[[1, 0], [0, 1]]</div>
+                    <div class="action"><strong>Action:</strong> Does nothing (placeholder)</div>
+                    <div class="bloch">Bloch: No rotation</div>
                 </div>
-                
-                <div class="gate-ref-card">
-                    <h4>CZ</h4>
-                    <div class="matrix">Phase flip if<br>both = |1⟩</div>
-                    <p>Symmetric controlled-Z</p>
+                <div class="gate-card">
+                    <h4>S Gate (√Z)</h4>
+                    <div class="matrix">[[1, 0], [0, i]]</div>
+                    <div class="action"><strong>Action:</strong> |1⟩ → i|1⟩ (90° phase)</div>
+                    <div class="bloch">Bloch: 90° rotation around Z-axis</div>
                 </div>
-                
-                <div class="gate-ref-card">
+                <div class="gate-card">
+                    <h4>T Gate (π/8)</h4>
+                    <div class="matrix">[[1, 0], [0, e^(iπ/4)]]</div>
+                    <div class="action"><strong>Action:</strong> |1⟩ → e^(iπ/4)|1⟩ (45° phase)</div>
+                    <div class="bloch">Bloch: 45° rotation around Z-axis</div>
+                </div>
+            </div>
+            <div class="key-insight">
+                <h4>Key Property</h4>
+                <p>S = T², Z = S². The T gate is crucial for universal quantum computing - it's the non-Clifford gate that enables quantum advantage.</p>
+            </div>
+        </div>
+
+        <div class="gate-ref rotation">
+            <h3>Hadamard & Rotation Gates</h3>
+            <p style="color:#888;margin-bottom:15px;">Gates for creating superposition and arbitrary rotations.</p>
+            <div class="gate-grid">
+                <div class="gate-card">
+                    <h4>H Gate (Hadamard)</h4>
+                    <div class="matrix">(1/√2)[[1, 1], [1, -1]]</div>
+                    <div class="action"><strong>Action:</strong> |0⟩ → |+⟩, |1⟩ → |-⟩</div>
+                    <div class="bloch">Bloch: 180° around (X+Z)/√2 axis</div>
+                </div>
+                <div class="gate-card">
+                    <h4>Rx(θ) - X Rotation</h4>
+                    <div class="matrix">[[cos(θ/2), -i·sin(θ/2)], [-i·sin(θ/2), cos(θ/2)]]</div>
+                    <div class="action"><strong>Action:</strong> Rotates θ around X-axis</div>
+                    <div class="bloch">Bloch: θ rotation around X-axis</div>
+                </div>
+                <div class="gate-card">
+                    <h4>Ry(θ) - Y Rotation</h4>
+                    <div class="matrix">[[cos(θ/2), -sin(θ/2)], [sin(θ/2), cos(θ/2)]]</div>
+                    <div class="action"><strong>Action:</strong> Rotates θ around Y-axis</div>
+                    <div class="bloch">Bloch: θ rotation around Y-axis</div>
+                </div>
+                <div class="gate-card">
+                    <h4>Rz(θ) - Z Rotation</h4>
+                    <div class="matrix">[[e^(-iθ/2), 0], [0, e^(iθ/2)]]</div>
+                    <div class="action"><strong>Action:</strong> Adds relative phase θ</div>
+                    <div class="bloch">Bloch: θ rotation around Z-axis</div>
+                </div>
+            </div>
+            <div class="key-insight">
+                <h4>Key Property</h4>
+                <p>Any single-qubit gate can be decomposed as U = e^(iα)Rz(β)Ry(γ)Rz(δ) (Euler decomposition). H is self-inverse: H² = I.</p>
+            </div>
+        </div>
+
+        <div class="gate-ref multi">
+            <h3>Multi-Qubit Gates</h3>
+            <p style="color:#888;margin-bottom:15px;">Gates that operate on 2+ qubits and create entanglement.</p>
+            <div class="gate-grid">
+                <div class="gate-card">
+                    <h4>CNOT (CX)</h4>
+                    <div class="matrix">[[1,0,0,0], [0,1,0,0], [0,0,0,1], [0,0,1,0]]</div>
+                    <div class="action"><strong>Action:</strong> Flips target if control is |1⟩</div>
+                    <div class="bloch">Creates entanglement with H</div>
+                </div>
+                <div class="gate-card">
+                    <h4>CZ (Controlled-Z)</h4>
+                    <div class="matrix">diag(1, 1, 1, -1)</div>
+                    <div class="action"><strong>Action:</strong> Phase flip on |11⟩ only</div>
+                    <div class="bloch">Symmetric: control/target interchangeable</div>
+                </div>
+                <div class="gate-card">
                     <h4>SWAP</h4>
-                    <div class="matrix">Exchanges<br>two qubits</div>
-                    <p>= 3 CNOTs</p>
+                    <div class="matrix">[[1,0,0,0], [0,0,1,0], [0,1,0,0], [0,0,0,1]]</div>
+                    <div class="action"><strong>Action:</strong> |ab⟩ → |ba⟩</div>
+                    <div class="bloch">SWAP = 3 CNOTs</div>
                 </div>
-                
-                <div class="gate-ref-card">
+                <div class="gate-card">
                     <h4>Toffoli (CCNOT)</h4>
-                    <div class="matrix">Flips target if<br>both controls = |1⟩</div>
-                    <p>Universal for classical</p>
+                    <div class="matrix">8×8 matrix, flips target if both controls are |1⟩</div>
+                    <div class="action"><strong>Action:</strong> |abc⟩ → |ab, c⊕(a·b)⟩</div>
+                    <div class="bloch">Universal for classical computing</div>
                 </div>
             </div>
-        </section>
+        </div>
 
-                <section class="section">
-                    <h2>Key Concepts</h2>
-            
-                    <div class="bloch-container">
-                        <div class="bloch-panel">
-                            <h4>Interactive Gate Reference</h4>
-                            <div id="summary-bloch" class="bloch-canvas"></div>
-                            <div style="margin-top:15px;">
-                                <button class="gate-btn" onclick="applySummaryGate('X')" style="background:#ff6b6b;color:#fff;">X</button>
-                                <button class="gate-btn" onclick="applySummaryGate('Y')" style="background:#4ecdc4;color:#000;">Y</button>
-                                <button class="gate-btn" onclick="applySummaryGate('Z')" style="background:#ffd93d;color:#000;">Z</button>
-                                <button class="gate-btn" onclick="applySummaryGate('H')" style="background:#667eea;color:#fff;">H</button>
-                                <button class="gate-btn" onclick="applySummaryGate('S')" style="background:#a855f7;color:#fff;">S</button>
-                                <button class="gate-btn" onclick="applySummaryGate('T')" style="background:#f472b6;color:#fff;">T</button>
-                                <button class="gate-btn" onclick="resetSummaryBloch()" style="background:rgba(100,255,218,0.2);color:#64ffda;border:1px solid #64ffda;">Reset</button>
-                            </div>
-                            <p id="summary-note" style="color:#888;margin-top:10px;font-size:0.9em;">Click any gate to see its effect on the Bloch sphere</p>
-                        </div>
-                    </div>
-            
-                    <div class="concept-map">
-                        <div class="concept-box">
-                            <h4>Unitarity</h4>
-                            <p>U†U = I</p>
-                            <p>Preserves probability</p>
-                            <p>All gates reversible</p>
-                        </div>
+        <hr class="section-divider">
+
+        <section class="section">
+            <div class="quick-ref">
+                <h3>Quick Reference Tables</h3>
                 
-                        <div class="concept-box">
-                            <h4>Bloch Sphere</h4>
-                            <p>|ψ⟩ = cos(θ/2)|0⟩ + e^(iφ)sin(θ/2)|1⟩</p>
-                            <p>Gates = rotations</p>
-                        </div>
+                <h4 style="color:#4ecdc4;margin:20px 0 10px 0;">Single-Qubit Gate Effects on Basis States</h4>
+                <table class="ref-table">
+                    <tr><th>Gate</th><th>|0⟩ →</th><th>|1⟩ →</th></tr>
+                    <tr><td>X</td><td>|1⟩</td><td>|0⟩</td></tr>
+                    <tr><td>Y</td><td>i|1⟩</td><td>-i|0⟩</td></tr>
+                    <tr><td>Z</td><td>|0⟩</td><td>-|1⟩</td></tr>
+                    <tr><td>H</td><td>(|0⟩+|1⟩)/√2</td><td>(|0⟩-|1⟩)/√2</td></tr>
+                    <tr><td>S</td><td>|0⟩</td><td>i|1⟩</td></tr>
+                    <tr><td>T</td><td>|0⟩</td><td>e^(iπ/4)|1⟩</td></tr>
+                </table>
                 
-                        <div class="concept-box">
-                            <h4>Entanglement</h4>
-                            <p>Non-separable states</p>
-                            <p>Bell states: H + CNOT</p>
-                            <p>Quantum correlations</p>
-                        </div>
-                    </div>
-                </section>
-
-        <section class="section">
-            <h2>Important Formulas</h2>
-            
-            <div class="formula-list">
-                <div class="formula-item">
-                    <span class="name">Euler Decomposition</span>
-                    <span class="formula">U = Rz(α) · Ry(β) · Rz(γ)</span>
-                </div>
-                <div class="formula-item">
-                    <span class="name">Rotation Gates</span>
-                    <span class="formula">Rn(θ) = cos(θ/2)I - i·sin(θ/2)·n·σ</span>
-                </div>
-                <div class="formula-item">
-                    <span class="name">Bell State</span>
-                    <span class="formula">|Φ⁺⟩ = (|00⟩ + |11⟩)/√2</span>
-                </div>
-                <div class="formula-item">
-                    <span class="name">SWAP Decomposition</span>
-                    <span class="formula">SWAP = CNOT₁₂ · CNOT₂₁ · CNOT₁₂</span>
-                </div>
-                <div class="formula-item">
-                    <span class="name">CZ from CNOT</span>
-                    <span class="formula">CZ = (I⊗H) · CNOT · (I⊗H)</span>
-                </div>
-                <div class="formula-item">
-                    <span class="name">X from H and Z</span>
-                    <span class="formula">X = H · Z · H</span>
-                </div>
+                <h4 style="color:#4ecdc4;margin:20px 0 10px 0;">CNOT Truth Table</h4>
+                <table class="ref-table">
+                    <tr><th>Input</th><th>Output</th><th>Explanation</th></tr>
+                    <tr><td>|00⟩</td><td>|00⟩</td><td>Control=0, no flip</td></tr>
+                    <tr><td>|01⟩</td><td>|01⟩</td><td>Control=0, no flip</td></tr>
+                    <tr><td>|10⟩</td><td>|11⟩</td><td>Control=1, flip target</td></tr>
+                    <tr><td>|11⟩</td><td>|10⟩</td><td>Control=1, flip target</td></tr>
+                </table>
+                
+                <h4 style="color:#4ecdc4;margin:20px 0 10px 0;">Bell States</h4>
+                <table class="ref-table">
+                    <tr><th>State</th><th>Formula</th><th>Creation</th></tr>
+                    <tr><td>|Φ⁺⟩</td><td>(|00⟩+|11⟩)/√2</td><td>H → CNOT</td></tr>
+                    <tr><td>|Φ⁻⟩</td><td>(|00⟩-|11⟩)/√2</td><td>H → CNOT → Z</td></tr>
+                    <tr><td>|Ψ⁺⟩</td><td>(|01⟩+|10⟩)/√2</td><td>H → CNOT → X₂</td></tr>
+                    <tr><td>|Ψ⁻⟩</td><td>(|01⟩-|10⟩)/√2</td><td>H → CNOT → Z → X₂</td></tr>
+                </table>
             </div>
         </section>
 
         <section class="section">
-            <h2>Universal Gate Sets</h2>
-            
-            <div class="summary-section">
-                <h3>Common Universal Sets</h3>
-                <ul>
-                    <li><strong>Clifford + T:</strong> {H, S, CNOT, T} - Most common</li>
-                    <li><strong>CNOT + Rotations:</strong> {CNOT, Rx, Ry, Rz}</li>
-                    <li><strong>Toffoli + H:</strong> Minimal universal set</li>
-                </ul>
-                <p style="margin-top: 15px;">
-                    <strong>Solovay-Kitaev:</strong> Any gate can be approximated with O(log²(1/ε)) gates.
-                </p>
+            <div class="key-insight">
+                <h4>Universal Gate Sets</h4>
+                <p><strong>{H, T, CNOT}:</strong> Standard for fault-tolerant QC. <strong>{Rx, Ry, CNOT}:</strong> For variational algorithms. <strong>{H, Toffoli}:</strong> For reversible computing. Any of these can approximate any quantum computation!</p>
             </div>
         </section>
 
         <section class="section">
-            <h2>Key Takeaways</h2>
-            
-            <div class="highlight">
-                <ol>
-                    <li><strong>Quantum gates are unitary matrices</strong> - They preserve probability and are reversible.</li>
-                    <li><strong>Single-qubit gates are rotations</strong> on the Bloch sphere.</li>
-                    <li><strong>Pauli gates (X, Y, Z)</strong> are π rotations around their respective axes.</li>
-                    <li><strong>Hadamard creates superposition</strong> - The gateway to quantum parallelism.</li>
-                    <li><strong>CNOT creates entanglement</strong> - Essential for quantum advantage.</li>
-                    <li><strong>Universal gate sets</strong> can approximate any quantum operation.</li>
-                    <li><strong>Gate decomposition</strong> breaks complex operations into simple gates.</li>
-                    <li><strong>Bell states</strong> are maximally entangled and enable quantum protocols.</li>
-                </ol>
-            </div>
+            <h3>Essential Formulas</h3>
+            <div class="formula-box">Bloch: |ψ⟩ = cos(θ/2)|0⟩ + e^(iφ)sin(θ/2)|1⟩</div>
+            <div class="formula-box">Euler: U = e^(iα)Rz(β)Ry(γ)Rz(δ)</div>
+            <div class="formula-box">Tensor: |ψ⟩⊗|φ⟩ = [ψ₀φ₀, ψ₀φ₁, ψ₁φ₀, ψ₁φ₁]ᵀ</div>
+            <div class="formula-box">Unitarity: U†U = UU† = I</div>
         </section>
 
         <div class="nav-buttons">
@@ -330,105 +232,5 @@
             <a href="../16-exercises/index.html" class="btn btn-primary">Next: Exercises</a>
         </div>
     </div>
-    
-    <script>
-    let summaryScene, summaryCamera, summaryRenderer, summaryArrow, summaryControls;
-    let summaryTheta = 0, summaryPhi = 0;
-    let gateSeq = [];
-    
-    function initSummaryBloch() {
-        const container = document.getElementById('summary-bloch');
-        if (!container) return;
-        
-        summaryScene = new THREE.Scene();
-        summaryScene.background = new THREE.Color(0x0a0a0a);
-        summaryCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
-        summaryCamera.position.set(2.5, 2, 2.5);
-        summaryRenderer = new THREE.WebGLRenderer({ antialias: true });
-        summaryRenderer.setSize(300, 300);
-        container.appendChild(summaryRenderer.domElement);
-        
-        summaryScene.add(new THREE.AmbientLight(0xffffff, 0.6));
-        summaryScene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })));
-        summaryScene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
-        summaryScene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
-        summaryScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
-        summaryScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
-        [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
-            const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
-            const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
-            const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
-            sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);summaryScene.add(sprite);
-        });
-        
-        summaryArrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, 0x64ffda, 0.12, 0.08);
-        summaryScene.add(summaryArrow);
-        
-        summaryControls = new THREE.OrbitControls(summaryCamera, summaryRenderer.domElement);
-        summaryControls.enableDamping = true;
-        
-        function animateSummary() {
-            requestAnimationFrame(animateSummary);
-            summaryControls.update();
-            summaryRenderer.render(summaryScene, summaryCamera);
-        }
-        animateSummary();
-    }
-    
-    function applySummaryGate(gate) {
-        gateSeq.push(gate);
-        let newTheta = summaryTheta, newPhi = summaryPhi;
-        
-        switch(gate) {
-            case 'X':
-                newTheta = Math.PI - summaryTheta;
-                newPhi = -summaryPhi;
-                break;
-            case 'Y':
-                newTheta = Math.PI - summaryTheta;
-                newPhi = Math.PI - summaryPhi;
-                break;
-            case 'Z':
-                newPhi = summaryPhi + Math.PI;
-                break;
-            case 'H':
-                const x = Math.sin(summaryTheta) * Math.cos(summaryPhi);
-                const z = Math.cos(summaryTheta);
-                newTheta = Math.acos(x);
-                newPhi = (z >= 0) ? 0 : Math.PI;
-                break;
-            case 'S':
-                newPhi = summaryPhi + Math.PI/2;
-                break;
-            case 'T':
-                newPhi = summaryPhi + Math.PI/4;
-                break;
-        }
-        
-        summaryTheta = newTheta;
-        summaryPhi = newPhi;
-        updateSummaryArrow();
-        document.getElementById('summary-note').textContent = 'Applied: ' + gateSeq.join(' → ');
-    }
-    
-    function updateSummaryArrow() {
-        const dir = new THREE.Vector3(
-            Math.sin(summaryTheta) * Math.cos(summaryPhi),
-            Math.sin(summaryTheta) * Math.sin(summaryPhi),
-            Math.cos(summaryTheta)
-        ).normalize();
-        summaryArrow.setDirection(dir);
-    }
-    
-    function resetSummaryBloch() {
-        summaryTheta = 0;
-        summaryPhi = 0;
-        gateSeq = [];
-        updateSummaryArrow();
-        document.getElementById('summary-note').textContent = 'Click any gate to see its effect on the Bloch sphere';
-    }
-    
-    window.addEventListener('load', initSummaryBloch);
-    </script>
 </body>
 </html>
