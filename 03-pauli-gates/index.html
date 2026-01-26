@@ -3,482 +3,594 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pauli Gates - Quantum Gates Learning</title>
+    <title>Pauli Gates Deep Dive - Devin's Teaching Style</title>
     <link rel="stylesheet" href="../shared/styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-        .prereq-box { background: linear-gradient(135deg, rgba(100,255,218,0.1), rgba(78,205,196,0.05)); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
-        .prereq-box h3 { color: #64ffda; margin-bottom: 15px; }
-        .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #64ffda; }
-        .prereq-item h4 { color: #4ecdc4; margin-bottom: 8px; }
-        .bloch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
-        .bloch-panel { background: rgba(100,255,218,0.05); border: 1px solid rgba(100,255,218,0.2); border-radius: 12px; padding: 15px; }
-        .bloch-panel h4 { color: #64ffda; text-align: center; margin-bottom: 10px; }
-        .bloch-canvas { width: 100%; height: 280px; border-radius: 8px; background: #050505; }
-        .state-indicator { display: flex; align-items: center; justify-content: center; gap: 15px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; margin-top: 10px; font-family: monospace; }
-        .matrix-calc { background: rgba(100,255,218,0.08); border-radius: 12px; padding: 20px; margin: 15px 0; }
-        .matrix-calc h4 { color: #64ffda; margin-bottom: 15px; }
-        .calc-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 12px 0; flex-wrap: wrap; }
-        .matrix-box { display: inline-grid; grid-template-columns: repeat(2, 40px); gap: 2px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px; border: 1px solid rgba(100,255,218,0.3); }
-        .matrix-box .cell { width: 40px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(100,255,218,0.15); color: #fff; font-size: 14px; border-radius: 3px; }
-        .vector-box { display: inline-grid; grid-template-columns: 40px; gap: 2px; background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,107,107,0.3); }
-        .vector-box .cell { width: 40px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(255,107,107,0.2); color: #ff6b6b; font-size: 14px; border-radius: 3px; }
+        .fourwh-box { background: linear-gradient(135deg, rgba(100,255,218,0.12), rgba(78,205,196,0.06)); border: 2px solid rgba(100,255,218,0.4); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .fourwh-box h3 { color: #64ffda; margin-bottom: 20px; font-size: 1.4em; }
+        .fourwh-item { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 20px; margin: 15px 0; border-left: 5px solid; }
+        .fourwh-item.what { border-color: #ff6b6b; }
+        .fourwh-item.why { border-color: #ffd93d; }
+        .fourwh-item.when { border-color: #4ecdc4; }
+        .fourwh-item.where { border-color: #a855f7; }
+        .fourwh-item.how { border-color: #64ffda; }
+        .fourwh-item h4 { margin-bottom: 12px; font-size: 1.2em; }
+        .fourwh-item.what h4 { color: #ff6b6b; }
+        .fourwh-item.why h4 { color: #ffd93d; }
+        .fourwh-item.when h4 { color: #4ecdc4; }
+        .fourwh-item.where h4 { color: #a855f7; }
+        .fourwh-item.how h4 { color: #64ffda; }
+        .fourwh-item p, .fourwh-item li { color: #ccc; line-height: 1.7; }
+        .prereq-box { background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(168,85,247,0.05)); border: 2px solid rgba(168,85,247,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
+        .prereq-box h3 { color: #a855f7; margin-bottom: 15px; }
+        .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #a855f7; }
+        .prereq-item h4 { color: #c084fc; margin-bottom: 8px; }
+        .bloch-container { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .bloch-main { background: rgba(0,0,0,0.5); border-radius: 16px; padding: 20px; }
+        .bloch-canvas { width: 400px; height: 400px; border-radius: 12px; background: #050505; }
+        .angle-display { background: rgba(0,0,0,0.6); border-radius: 12px; padding: 20px; min-width: 280px; }
+        .angle-display h4 { color: #64ffda; margin-bottom: 15px; text-align: center; }
+        .angle-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; margin: 8px 0; background: rgba(100,255,218,0.1); border-radius: 8px; }
+        .angle-name { font-weight: bold; }
+        .angle-name.theta { color: #ff6b6b; }
+        .angle-name.phi { color: #4ecdc4; }
+        .angle-value { font-family: monospace; font-size: 1.1em; color: #fff; }
+        .angle-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .angle-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        .angle-bar-fill.theta { background: linear-gradient(90deg, #ff6b6b, #ff8e8e); }
+        .angle-bar-fill.phi { background: linear-gradient(90deg, #4ecdc4, #6ee7de); }
+        .state-info { text-align: center; margin-top: 15px; padding: 15px; background: rgba(100,255,218,0.1); border-radius: 8px; }
+        .state-info .state { font-size: 1.3em; color: #64ffda; font-family: monospace; }
+        .state-info .coords { color: #888; font-size: 0.9em; margin-top: 8px; }
+        .matrix-derivation { background: rgba(255,215,0,0.08); border: 2px solid rgba(255,215,0,0.3); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .matrix-derivation h3 { color: #ffd93d; margin-bottom: 20px; }
+        .derivation-step { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 20px; margin: 15px 0; }
+        .derivation-step h4 { color: #4ecdc4; margin-bottom: 12px; }
+        .derivation-step .explanation { color: #ccc; line-height: 1.6; }
+        .derivation-step .formula { background: rgba(100,255,218,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 1.1em; color: #64ffda; text-align: center; }
+        .matrix-visual { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+        .matrix-box { display: inline-grid; grid-template-columns: repeat(2, 50px); gap: 4px; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 10px; border: 2px solid rgba(100,255,218,0.3); }
+        .matrix-box .cell { width: 50px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(100,255,218,0.15); color: #fff; font-size: 16px; border-radius: 5px; font-family: monospace; }
+        .vector-box { display: inline-grid; grid-template-columns: 50px; gap: 4px; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 10px; border: 2px solid rgba(255,107,107,0.3); }
+        .vector-box .cell { width: 50px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,107,107,0.2); color: #ff6b6b; font-size: 16px; border-radius: 5px; font-family: monospace; }
         .result-box { border-color: rgba(78,205,196,0.3); }
         .result-box .cell { background: rgba(78,205,196,0.2); color: #4ecdc4; }
-        .op-symbol { font-size: 24px; color: #64ffda; font-weight: bold; }
-        .calc-detail { background: rgba(0,0,0,0.3); border-radius: 6px; padding: 12px; margin-top: 12px; font-size: 13px; color: #888; text-align: center; }
-        .transform-flow { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 20px; flex-wrap: wrap; }
-        .state-circle { width: 80px; height: 80px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(100,255,218,0.4), rgba(0,0,0,0.6)); border: 2px solid rgba(100,255,218,0.5); display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; font-family: monospace; }
-        .gate-arrow { font-size: 24px; color: #64ffda; }
-        .gate-label { background: rgba(100,255,218,0.2); padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(100,255,218,0.4); text-align: center; }
-        .gate-label .name { font-size: 28px; color: #64ffda; font-weight: bold; }
-        .gate-label .desc { font-size: 11px; color: #888; margin-top: 4px; }
-        .interactive-section { background: linear-gradient(135deg, rgba(100,255,218,0.08), rgba(78,205,196,0.03)); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 25px 0; }
-        .demo-controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; }
-        .demo-btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .op-symbol { font-size: 28px; color: #64ffda; font-weight: bold; }
+        .interactive-controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 20px 0; }
+        .ctrl-btn { padding: 12px 24px; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .ctrl-btn:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
         .btn-x { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); color: #fff; }
         .btn-y { background: linear-gradient(135deg, #4ecdc4, #6ee7de); color: #000; }
         .btn-z { background: linear-gradient(135deg, #ffd93d, #ffe66d); color: #000; }
-        .btn-h { background: linear-gradient(135deg, #a855f7, #c084fc); color: #fff; }
+        .btn-i { background: linear-gradient(135deg, #888, #aaa); color: #000; }
         .btn-reset { background: linear-gradient(135deg, #666, #888); color: #fff; }
-        .demo-btn:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .main-bloch { width: 100%; height: 400px; border-radius: 12px; background: #050505; }
-        .state-display { text-align: center; font-size: 24px; color: #64ffda; margin-top: 15px; font-family: monospace; }
-        .amp-bars { display: flex; justify-content: center; gap: 40px; margin-top: 20px; }
-        .amp-bar { text-align: center; }
-        .bar-container { width: 60px; height: 140px; background: rgba(0,0,0,0.4); border-radius: 8px; position: relative; overflow: hidden; border: 1px solid rgba(100,255,218,0.2); }
-        .bar-fill { position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, #64ffda, #4ecdc4); transition: height 0.4s; border-radius: 0 0 8px 8px; }
-        .bar-label { margin-top: 8px; color: #fff; font-size: 16px; font-family: monospace; }
-        .bar-value { position: absolute; width: 100%; text-align: center; bottom: 5px; color: #000; font-weight: bold; font-size: 12px; }
-        .decision-guide { background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
-        .decision-guide h3 { color: #ffd93d; margin-bottom: 15px; }
-        .decision-item { display: flex; align-items: flex-start; gap: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 10px 0; }
-        .decision-item .goal { color: #4ecdc4; font-weight: bold; min-width: 200px; }
-        .decision-item .solution { color: #fff; }
-        .decision-item .gate { color: #ff6b6b; font-weight: bold; }
+        .pauli-card { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 25px; margin: 25px 0; border: 2px solid; }
+        .pauli-card.x-card { border-color: rgba(255,107,107,0.5); }
+        .pauli-card.y-card { border-color: rgba(78,205,196,0.5); }
+        .pauli-card.z-card { border-color: rgba(255,217,61,0.5); }
+        .pauli-card.i-card { border-color: rgba(136,136,136,0.5); }
+        .pauli-card h3 { margin-bottom: 20px; }
+        .pauli-card.x-card h3 { color: #ff6b6b; }
+        .pauli-card.y-card h3 { color: #4ecdc4; }
+        .pauli-card.z-card h3 { color: #ffd93d; }
+        .pauli-card.i-card h3 { color: #aaa; }
+        .key-insight { background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,107,107,0.05)); border: 2px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .key-insight h4 { color: #ff6b6b; margin-bottom: 10px; }
+        .key-insight p { color: #ccc; line-height: 1.6; }
+        .algebra-box { background: rgba(100,255,218,0.08); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .algebra-box h3 { color: #64ffda; margin-bottom: 20px; }
+        .algebra-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 10px 0; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .algebra-formula { font-family: monospace; font-size: 1.2em; color: #64ffda; min-width: 150px; }
+        .algebra-meaning { color: #888; flex: 1; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .comparison-table th, .comparison-table td { padding: 15px; text-align: center; border: 1px solid rgba(100,255,218,0.2); }
+        .comparison-table th { background: rgba(100,255,218,0.15); color: #64ffda; }
+        .comparison-table td { background: rgba(0,0,0,0.3); color: #ccc; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Pauli Gates</h1>
-            <p class="subtitle">X, Y, Z - The Fundamental Quantum Operations</p>
+            <h1>Pauli Gates Deep Dive</h1>
+            <p class="subtitle">Understanding X, Y, Z from First Principles - The Foundation of Quantum Computing</p>
         </header>
 
         <section class="section">
             <div class="prereq-box">
-                <h3>Prerequisites - What You Need to Know First</h3>
+                <h3>Prerequisites - Master These First</h3>
                 <div class="prereq-item">
-                    <h4>1. What is a Qubit?</h4>
-                    <p>A qubit can exist in a <strong>superposition</strong> of |0⟩ and |1⟩ states: |ψ⟩ = α|0⟩ + β|1⟩, where |α|² + |β|² = 1. The probabilities of measuring 0 or 1 are |α|² and |β|².</p>
-                </div>
-                <div class="prereq-item">
-                    <h4>2. The Bloch Sphere</h4>
-                    <p>A 3D sphere where every point represents a qubit state. <strong>North pole (+Z) = |0⟩</strong>, <strong>South pole (-Z) = |1⟩</strong>, <strong>+X = |+⟩</strong> (equal superposition), <strong>-X = |-⟩</strong>. Gates are rotations on this sphere!</p>
+                    <h4>1. Complex Numbers</h4>
+                    <p>i = √(-1), so i² = -1. Complex numbers have form a + bi. The Pauli Y gate uses i and -i. Remember: multiplying by i rotates 90° in the complex plane.</p>
                 </div>
                 <div class="prereq-item">
-                    <h4>3. State Vectors</h4>
-                    <p>States are column vectors: |0⟩ = [1, 0]ᵀ and |1⟩ = [0, 1]ᵀ. Gates are 2×2 matrices that transform these vectors through multiplication.</p>
+                    <h4>2. Matrix Multiplication</h4>
+                    <p>For 2×2 matrix [[a,b],[c,d]] times vector [x,y]ᵀ: result is [ax+by, cx+dy]ᵀ. Each row of the matrix "dots" with the vector.</p>
+                </div>
+                <div class="prereq-item">
+                    <h4>3. Bloch Sphere Rotations</h4>
+                    <p>Each Pauli gate is a 180° rotation around its axis. X rotates around X-axis, Y around Y-axis, Z around Z-axis. Visualize this to understand gate effects!</p>
+                </div>
+                <div class="prereq-item">
+                    <h4>4. Hermitian Matrices</h4>
+                    <p>A matrix H is Hermitian if H = H† (equals its conjugate transpose). All Pauli matrices are Hermitian, meaning they are their own inverses: X² = Y² = Z² = I.</p>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <h2>The Three Pauli Gates - Visual Comparison</h2>
-            <p>Each Pauli gate performs a <strong>180° (π) rotation</strong> around its axis. Watch how each transforms the state:</p>
-            <div class="bloch-grid">
-                <div class="bloch-panel">
-                    <h4>X Gate: Rotation around X-axis</h4>
-                    <div id="bloch-x" class="bloch-canvas"></div>
-                    <div class="state-indicator">
-                        <span>|0⟩</span><span style="color:#64ffda">—X→</span><span>|1⟩</span>
+            <div class="fourwh-box">
+                <h3>Pauli Matrices - The 4W+H Framework</h3>
+                
+                <div class="fourwh-item what">
+                    <h4>WHAT are Pauli Matrices?</h4>
+                    <p>The Pauli matrices are four 2×2 matrices: I (identity), X (sigma-x), Y (sigma-y), Z (sigma-z). Together with I, they form a complete basis for all 2×2 matrices. Any single-qubit operation can be written as a combination of Pauli matrices!</p>
+                </div>
+                
+                <div class="fourwh-item why">
+                    <h4>WHY are they fundamental?</h4>
+                    <p>Pauli matrices are the "building blocks" of quantum mechanics:</p>
+                    <ul style="margin:10px 0 0 20px;">
+                        <li>They represent spin-1/2 particles (electrons, qubits)</li>
+                        <li>They generate all single-qubit rotations</li>
+                        <li>They define the three measurement bases (X, Y, Z)</li>
+                        <li>Any 2×2 matrix = aI + bX + cY + dZ for some coefficients</li>
+                    </ul>
+                </div>
+                
+                <div class="fourwh-item when">
+                    <h4>WHEN to use each Pauli gate?</h4>
+                    <p><strong>X:</strong> Flip qubit (NOT operation), prepare |1⟩ from |0⟩. <strong>Y:</strong> Flip with phase, less common but appears in Y-basis measurements. <strong>Z:</strong> Phase flip, crucial for phase kickback in algorithms. <strong>I:</strong> Do nothing (identity), used in tensor products.</p>
+                </div>
+                
+                <div class="fourwh-item where">
+                    <h4>WHERE do they appear?</h4>
+                    <p>Everywhere in quantum computing! Error correction uses Pauli errors (X=bit flip, Z=phase flip, Y=both). Hamiltonians are written in Pauli basis. Measurement operators are Pauli matrices. The Pauli group generates all Clifford operations.</p>
+                </div>
+                
+                <div class="fourwh-item how">
+                    <h4>HOW are they related?</h4>
+                    <p>XY = iZ, YZ = iX, ZX = iY (cyclic). Each is its own inverse: X² = Y² = Z² = I. They anticommute: XY = -YX. These algebraic properties make them incredibly useful for calculations.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Interactive Pauli Gate Explorer</h2>
+            <p>Apply Pauli gates and observe how θ and φ change. Notice: each Pauli gate is a 180° rotation!</p>
+            
+            <div class="bloch-container">
+                <div class="bloch-main">
+                    <div id="bloch-container" class="bloch-canvas"></div>
+                    <div class="interactive-controls">
+                        <button class="ctrl-btn btn-i" onclick="applyGate('I')">I (Identity)</button>
+                        <button class="ctrl-btn btn-x" onclick="applyGate('X')">X Gate</button>
+                        <button class="ctrl-btn btn-y" onclick="applyGate('Y')">Y Gate</button>
+                        <button class="ctrl-btn btn-z" onclick="applyGate('Z')">Z Gate</button>
+                        <button class="ctrl-btn btn-reset" onclick="resetState()">Reset</button>
                     </div>
                 </div>
-                <div class="bloch-panel">
-                    <h4>Y Gate: Rotation around Y-axis</h4>
-                    <div id="bloch-y" class="bloch-canvas"></div>
-                    <div class="state-indicator">
-                        <span>|0⟩</span><span style="color:#64ffda">—Y→</span><span>i|1⟩</span>
+                <div class="angle-display">
+                    <h4>Current State Angles</h4>
+                    <div class="angle-item">
+                        <span class="angle-name theta">θ (Theta)</span>
+                        <span class="angle-value" id="theta-value">0°</span>
                     </div>
-                </div>
-                <div class="bloch-panel">
-                    <h4>Z Gate: Rotation around Z-axis</h4>
-                    <div id="bloch-z" class="bloch-canvas"></div>
-                    <div class="state-indicator">
-                        <span>|+⟩</span><span style="color:#64ffda">—Z→</span><span>|-⟩</span>
+                    <div class="angle-bar"><div class="angle-bar-fill theta" id="theta-bar" style="width:0%;"></div></div>
+                    
+                    <div class="angle-item" style="margin-top:20px;">
+                        <span class="angle-name phi">φ (Phi)</span>
+                        <span class="angle-value" id="phi-value">0°</span>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="decision-guide">
-                <h3>How to Choose the Right Gate</h3>
-                <div class="decision-item">
-                    <span class="goal">Flip |0⟩ to |1⟩ (or vice versa):</span>
-                    <span class="solution">Use <span class="gate">X gate</span> - it's the quantum NOT gate</span>
-                </div>
-                <div class="decision-item">
-                    <span class="goal">Add phase to |1⟩ component:</span>
-                    <span class="solution">Use <span class="gate">Z gate</span> - multiplies |1⟩ by -1</span>
-                </div>
-                <div class="decision-item">
-                    <span class="goal">Flip |+⟩ to |-⟩ (phase in X-basis):</span>
-                    <span class="solution">Use <span class="gate">Z gate</span> - it's a phase flip in superposition</span>
-                </div>
-                <div class="decision-item">
-                    <span class="goal">Flip AND add phase:</span>
-                    <span class="solution">Use <span class="gate">Y gate</span> - combines X and Z effects</span>
-                </div>
-                <div class="decision-item">
-                    <span class="goal">Create superposition from |0⟩:</span>
-                    <span class="solution">Use <span class="gate">H gate</span> (Hadamard) - covered in next module</span>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Pauli-X Gate (Quantum NOT)</h2>
-            <div class="gate-card">
-                <span class="gate-symbol" style="background:linear-gradient(135deg,#ff6b6b,#ff8e8e);">X</span>
-                <h3>Bit Flip - Swaps |0⟩ and |1⟩</h3>
-            </div>
-            <div class="matrix-calc">
-                <h4>Step-by-Step: X|0⟩ = |1⟩</h4>
-                <div class="calc-row">
-                    <div class="matrix-box"><div class="cell">0</div><div class="cell">1</div><div class="cell">1</div><div class="cell">0</div></div>
-                    <span class="op-symbol">×</span>
-                    <div class="vector-box"><div class="cell">1</div><div class="cell">0</div></div>
-                    <span class="op-symbol">=</span>
-                    <div class="vector-box result-box"><div class="cell">0</div><div class="cell">1</div></div>
-                    <span style="color:#4ecdc4;font-size:18px;">= |1⟩</span>
-                </div>
-                <div class="calc-detail">Row 1: (0×1)+(1×0)=0 | Row 2: (1×1)+(0×0)=1</div>
-                <div class="transform-flow">
-                    <div class="state-circle">|0⟩</div>
-                    <span class="gate-arrow">→</span>
-                    <div class="gate-label"><div class="name">X</div><div class="desc">180° around X</div></div>
-                    <span class="gate-arrow">→</span>
-                    <div class="state-circle">|1⟩</div>
-                </div>
-            </div>
-            <div class="matrix-calc">
-                <h4>Step-by-Step: X|1⟩ = |0⟩</h4>
-                <div class="calc-row">
-                    <div class="matrix-box"><div class="cell">0</div><div class="cell">1</div><div class="cell">1</div><div class="cell">0</div></div>
-                    <span class="op-symbol">×</span>
-                    <div class="vector-box"><div class="cell">0</div><div class="cell">1</div></div>
-                    <span class="op-symbol">=</span>
-                    <div class="vector-box result-box"><div class="cell">1</div><div class="cell">0</div></div>
-                    <span style="color:#4ecdc4;font-size:18px;">= |0⟩</span>
-                </div>
-                <div class="calc-detail">Row 1: (0×0)+(1×1)=1 | Row 2: (1×0)+(0×1)=0</div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Pauli-Y Gate (Bit + Phase Flip)</h2>
-            <div class="gate-card">
-                <span class="gate-symbol" style="background:linear-gradient(135deg,#4ecdc4,#6ee7de);">Y</span>
-                <h3>Combined Flip - Swaps AND adds phase</h3>
-            </div>
-            <div class="matrix-calc">
-                <h4>Step-by-Step: Y|0⟩ = i|1⟩</h4>
-                <div class="calc-row">
-                    <div class="matrix-box"><div class="cell">0</div><div class="cell">-i</div><div class="cell">i</div><div class="cell">0</div></div>
-                    <span class="op-symbol">×</span>
-                    <div class="vector-box"><div class="cell">1</div><div class="cell">0</div></div>
-                    <span class="op-symbol">=</span>
-                    <div class="vector-box result-box"><div class="cell">0</div><div class="cell">i</div></div>
-                    <span style="color:#4ecdc4;font-size:18px;">= i|1⟩</span>
-                </div>
-                <div class="calc-detail">Row 1: (0×1)+(-i×0)=0 | Row 2: (i×1)+(0×0)=i</div>
-            </div>
-            <div class="matrix-calc">
-                <h4>Step-by-Step: Y|1⟩ = -i|0⟩</h4>
-                <div class="calc-row">
-                    <div class="matrix-box"><div class="cell">0</div><div class="cell">-i</div><div class="cell">i</div><div class="cell">0</div></div>
-                    <span class="op-symbol">×</span>
-                    <div class="vector-box"><div class="cell">0</div><div class="cell">1</div></div>
-                    <span class="op-symbol">=</span>
-                    <div class="vector-box result-box"><div class="cell">-i</div><div class="cell">0</div></div>
-                    <span style="color:#4ecdc4;font-size:18px;">= -i|0⟩</span>
-                </div>
-                <div class="calc-detail">Row 1: (0×0)+(-i×1)=-i | Row 2: (i×0)+(0×1)=0</div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Pauli-Z Gate (Phase Flip)</h2>
-            <div class="gate-card">
-                <span class="gate-symbol" style="background:linear-gradient(135deg,#ffd93d,#ffe66d);">Z</span>
-                <h3>Phase Flip - Adds -1 phase to |1⟩</h3>
-            </div>
-            <div class="matrix-calc">
-                <h4>Step-by-Step: Z|0⟩ = |0⟩ (unchanged!)</h4>
-                <div class="calc-row">
-                    <div class="matrix-box"><div class="cell">1</div><div class="cell">0</div><div class="cell">0</div><div class="cell">-1</div></div>
-                    <span class="op-symbol">×</span>
-                    <div class="vector-box"><div class="cell">1</div><div class="cell">0</div></div>
-                    <span class="op-symbol">=</span>
-                    <div class="vector-box result-box"><div class="cell">1</div><div class="cell">0</div></div>
-                    <span style="color:#4ecdc4;font-size:18px;">= |0⟩</span>
-                </div>
-                <div class="calc-detail">Z has no effect on |0⟩ because there's no |1⟩ component to flip!</div>
-            </div>
-            <div class="matrix-calc">
-                <h4>Step-by-Step: Z|1⟩ = -|1⟩</h4>
-                <div class="calc-row">
-                    <div class="matrix-box"><div class="cell">1</div><div class="cell">0</div><div class="cell">0</div><div class="cell">-1</div></div>
-                    <span class="op-symbol">×</span>
-                    <div class="vector-box"><div class="cell">0</div><div class="cell">1</div></div>
-                    <span class="op-symbol">=</span>
-                    <div class="vector-box result-box"><div class="cell">0</div><div class="cell">-1</div></div>
-                    <span style="color:#4ecdc4;font-size:18px;">= -|1⟩</span>
-                </div>
-                <div class="calc-detail">The |1⟩ component gets multiplied by -1 (phase flip)</div>
-            </div>
-            <div class="matrix-calc">
-                <h4>Key Example: Z|+⟩ = |-⟩ (Phase flip in superposition)</h4>
-                <p style="margin-bottom:12px;color:#888;">Where |+⟩ = (|0⟩+|1⟩)/√2</p>
-                <div class="calc-row">
-                    <div class="matrix-box"><div class="cell">1</div><div class="cell">0</div><div class="cell">0</div><div class="cell">-1</div></div>
-                    <span class="op-symbol">×</span>
-                    <div class="vector-box"><div class="cell">1/√2</div><div class="cell">1/√2</div></div>
-                    <span class="op-symbol">=</span>
-                    <div class="vector-box result-box"><div class="cell">1/√2</div><div class="cell">-1/√2</div></div>
-                    <span style="color:#4ecdc4;font-size:18px;">= |-⟩</span>
-                </div>
-                <div class="transform-flow">
-                    <div class="state-circle">|+⟩</div>
-                    <span class="gate-arrow">→</span>
-                    <div class="gate-label"><div class="name">Z</div><div class="desc">180° around Z</div></div>
-                    <span class="gate-arrow">→</span>
-                    <div class="state-circle">|-⟩</div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>Interactive Bloch Sphere - Try It Yourself!</h2>
-            <p>Click buttons to apply gates and watch the state transform. Think about which gate to use before clicking!</p>
-            <div class="interactive-section">
-                <div class="demo-controls">
-                    <button class="demo-btn btn-x" onclick="applyGate('X')">Apply X</button>
-                    <button class="demo-btn btn-y" onclick="applyGate('Y')">Apply Y</button>
-                    <button class="demo-btn btn-z" onclick="applyGate('Z')">Apply Z</button>
-                    <button class="demo-btn btn-h" onclick="applyGate('H')">Apply H</button>
-                    <button class="demo-btn btn-reset" onclick="resetState()">Reset to |0⟩</button>
-                </div>
-                <div id="main-bloch" class="main-bloch"></div>
-                <div class="state-display" id="current-state">Current State: |0⟩</div>
-                <div class="amp-bars">
-                    <div class="amp-bar">
-                        <div class="bar-container"><div class="bar-fill" id="bar-0" style="height:100%;"></div><div class="bar-value" id="val-0">1.00</div></div>
-                        <div class="bar-label">|0⟩</div>
+                    <div class="angle-bar"><div class="angle-bar-fill phi" id="phi-bar" style="width:0%;"></div></div>
+                    
+                    <div class="state-info">
+                        <div class="state" id="current-state">|0⟩</div>
+                        <div class="coords" id="current-coords">x=0, y=0, z=1</div>
                     </div>
-                    <div class="amp-bar">
-                        <div class="bar-container"><div class="bar-fill" id="bar-1" style="height:0%;"></div><div class="bar-value" id="val-1">0.00</div></div>
-                        <div class="bar-label">|1⟩</div>
+                    
+                    <div style="margin-top:15px;padding:15px;background:rgba(255,107,107,0.1);border-radius:8px;">
+                        <p style="color:#ff6b6b;font-size:0.9em;margin:0;"><strong>Rotation Info:</strong></p>
+                        <p style="color:#888;font-size:0.85em;margin:5px 0 0 0;" id="rotation-info">Click a gate to see rotation</p>
                     </div>
                 </div>
             </div>
         </section>
 
+        <div class="pauli-card i-card">
+            <h3>I - Identity Matrix</h3>
+            <div class="fourwh-box" style="margin-top:0;">
+                <div class="fourwh-item what">
+                    <h4>WHAT does I do?</h4>
+                    <p>The identity matrix does nothing - it leaves every state unchanged. I|ψ⟩ = |ψ⟩ for all states. It's the "do nothing" operation.</p>
+                </div>
+                <div class="fourwh-item why">
+                    <h4>WHY is the matrix [[1,0],[0,1]]?</h4>
+                    <p>We need I|0⟩ = |0⟩ and I|1⟩ = |1⟩. First column = [1,0]ᵀ (where |0⟩ goes), second column = [0,1]ᵀ (where |1⟩ goes). This is the definition of identity!</p>
+                    <div class="matrix-visual">
+                        <div class="matrix-box">
+                            <div class="cell">1</div><div class="cell">0</div>
+                            <div class="cell">0</div><div class="cell">1</div>
+                        </div>
+                        <span style="color:#888;margin-left:20px;">Identity Matrix I</span>
+                    </div>
+                </div>
+                <div class="fourwh-item when">
+                    <h4>WHEN is I used?</h4>
+                    <p>In tensor products: I⊗X means "do nothing to qubit 1, apply X to qubit 2". Also used in expressing other gates: H = (X+Z)/√2, showing H is "between" X and Z.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="pauli-card x-card">
+            <h3>X - Pauli-X (Bit Flip / NOT Gate)</h3>
+            <div class="fourwh-box" style="margin-top:0;">
+                <div class="fourwh-item what">
+                    <h4>WHAT does X do?</h4>
+                    <p>X swaps |0⟩ and |1⟩: X|0⟩ = |1⟩, X|1⟩ = |0⟩. On the Bloch sphere, it's a 180° rotation around the X-axis. This flips the north and south poles!</p>
+                </div>
+                <div class="fourwh-item why">
+                    <h4>WHY is the matrix [[0,1],[1,0]]?</h4>
+                    <p><strong>Step-by-step derivation:</strong></p>
+                    <ol style="margin:10px 0 0 20px;color:#ccc;">
+                        <li>X|0⟩ = |1⟩ means X[1,0]ᵀ = [0,1]ᵀ → first column is [0,1]ᵀ</li>
+                        <li>X|1⟩ = |0⟩ means X[0,1]ᵀ = [1,0]ᵀ → second column is [1,0]ᵀ</li>
+                        <li>Combining: X = [[0,1],[1,0]]</li>
+                    </ol>
+                    <div class="matrix-visual" style="margin-top:15px;">
+                        <div class="matrix-box" style="border-color:rgba(255,107,107,0.5);">
+                            <div class="cell" style="background:rgba(255,107,107,0.2);">0</div><div class="cell" style="background:rgba(255,107,107,0.2);">1</div>
+                            <div class="cell" style="background:rgba(255,107,107,0.2);">1</div><div class="cell" style="background:rgba(255,107,107,0.2);">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fourwh-item how">
+                    <h4>HOW does X affect superposition?</h4>
+                    <div class="matrix-visual">
+                        <span style="color:#888;">X(α|0⟩ + β|1⟩) =</span>
+                        <div class="matrix-box" style="border-color:rgba(255,107,107,0.5);">
+                            <div class="cell">0</div><div class="cell">1</div>
+                            <div class="cell">1</div><div class="cell">0</div>
+                        </div>
+                        <div class="vector-box">
+                            <div class="cell">α</div><div class="cell">β</div>
+                        </div>
+                        <span class="op-symbol">=</span>
+                        <div class="vector-box result-box">
+                            <div class="cell">β</div><div class="cell">α</div>
+                        </div>
+                        <span style="color:#888;">= β|0⟩ + α|1⟩</span>
+                    </div>
+                    <p style="color:#888;text-align:center;margin-top:10px;">The amplitudes swap positions!</p>
+                </div>
+            </div>
+            <div class="key-insight">
+                <h4>Key Insight: X on the equator</h4>
+                <p>X|+⟩ = |+⟩ and X|-⟩ = |-⟩. The |+⟩ and |-⟩ states are eigenstates of X! This is because they lie on the X-axis, so rotating 180° around X leaves them unchanged (or adds a global phase for |-⟩).</p>
+            </div>
+        </div>
+
+        <div class="pauli-card z-card">
+            <h3>Z - Pauli-Z (Phase Flip)</h3>
+            <div class="fourwh-box" style="margin-top:0;">
+                <div class="fourwh-item what">
+                    <h4>WHAT does Z do?</h4>
+                    <p>Z adds a phase of -1 to |1⟩: Z|0⟩ = |0⟩, Z|1⟩ = -|1⟩. On the Bloch sphere, it's a 180° rotation around the Z-axis. This flips |+⟩ and |-⟩!</p>
+                </div>
+                <div class="fourwh-item why">
+                    <h4>WHY is the matrix [[1,0],[0,-1]]?</h4>
+                    <p><strong>Step-by-step derivation:</strong></p>
+                    <ol style="margin:10px 0 0 20px;color:#ccc;">
+                        <li>Z|0⟩ = |0⟩ means Z[1,0]ᵀ = [1,0]ᵀ → first column is [1,0]ᵀ</li>
+                        <li>Z|1⟩ = -|1⟩ means Z[0,1]ᵀ = [0,-1]ᵀ → second column is [0,-1]ᵀ</li>
+                        <li>Combining: Z = [[1,0],[0,-1]]</li>
+                    </ol>
+                    <div class="matrix-visual" style="margin-top:15px;">
+                        <div class="matrix-box" style="border-color:rgba(255,217,61,0.5);">
+                            <div class="cell" style="background:rgba(255,217,61,0.2);">1</div><div class="cell" style="background:rgba(255,217,61,0.2);">0</div>
+                            <div class="cell" style="background:rgba(255,217,61,0.2);">0</div><div class="cell" style="background:rgba(255,217,61,0.2);">-1</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fourwh-item how">
+                    <h4>HOW does Z affect superposition?</h4>
+                    <div class="matrix-visual">
+                        <span style="color:#888;">Z(α|0⟩ + β|1⟩) =</span>
+                        <div class="matrix-box" style="border-color:rgba(255,217,61,0.5);">
+                            <div class="cell">1</div><div class="cell">0</div>
+                            <div class="cell">0</div><div class="cell">-1</div>
+                        </div>
+                        <div class="vector-box">
+                            <div class="cell">α</div><div class="cell">β</div>
+                        </div>
+                        <span class="op-symbol">=</span>
+                        <div class="vector-box result-box">
+                            <div class="cell">α</div><div class="cell">-β</div>
+                        </div>
+                        <span style="color:#888;">= α|0⟩ - β|1⟩</span>
+                    </div>
+                    <p style="color:#888;text-align:center;margin-top:10px;">Only the |1⟩ amplitude changes sign!</p>
+                </div>
+            </div>
+            <div class="key-insight">
+                <h4>Key Insight: Z doesn't change basis states!</h4>
+                <p>Z|0⟩ = |0⟩ and Z|1⟩ = -|1⟩, but -|1⟩ is the same physical state as |1⟩ (global phase). So measuring in the Z-basis after applying Z gives the same results! Z only matters for superpositions: Z|+⟩ = |-⟩.</p>
+            </div>
+        </div>
+
+        <div class="pauli-card y-card">
+            <h3>Y - Pauli-Y (Bit + Phase Flip)</h3>
+            <div class="fourwh-box" style="margin-top:0;">
+                <div class="fourwh-item what">
+                    <h4>WHAT does Y do?</h4>
+                    <p>Y combines bit flip and phase flip: Y|0⟩ = i|1⟩, Y|1⟩ = -i|0⟩. On the Bloch sphere, it's a 180° rotation around the Y-axis. Y = iXZ (up to global phase).</p>
+                </div>
+                <div class="fourwh-item why">
+                    <h4>WHY is the matrix [[0,-i],[i,0]]?</h4>
+                    <p><strong>Step-by-step derivation:</strong></p>
+                    <ol style="margin:10px 0 0 20px;color:#ccc;">
+                        <li>Y|0⟩ = i|1⟩ means Y[1,0]ᵀ = [0,i]ᵀ → first column is [0,i]ᵀ</li>
+                        <li>Y|1⟩ = -i|0⟩ means Y[0,1]ᵀ = [-i,0]ᵀ → second column is [-i,0]ᵀ</li>
+                        <li>Combining: Y = [[0,-i],[i,0]]</li>
+                    </ol>
+                    <p style="color:#888;margin-top:10px;">The factors of i and -i ensure Y² = I and Y is Hermitian (Y = Y†).</p>
+                    <div class="matrix-visual" style="margin-top:15px;">
+                        <div class="matrix-box" style="border-color:rgba(78,205,196,0.5);">
+                            <div class="cell" style="background:rgba(78,205,196,0.2);">0</div><div class="cell" style="background:rgba(78,205,196,0.2);">-i</div>
+                            <div class="cell" style="background:rgba(78,205,196,0.2);">i</div><div class="cell" style="background:rgba(78,205,196,0.2);">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fourwh-item how">
+                    <h4>HOW does Y affect superposition?</h4>
+                    <div class="matrix-visual">
+                        <span style="color:#888;">Y(α|0⟩ + β|1⟩) =</span>
+                        <div class="matrix-box" style="border-color:rgba(78,205,196,0.5);">
+                            <div class="cell">0</div><div class="cell">-i</div>
+                            <div class="cell">i</div><div class="cell">0</div>
+                        </div>
+                        <div class="vector-box">
+                            <div class="cell">α</div><div class="cell">β</div>
+                        </div>
+                        <span class="op-symbol">=</span>
+                        <div class="vector-box result-box">
+                            <div class="cell">-iβ</div><div class="cell">iα</div>
+                        </div>
+                    </div>
+                    <p style="color:#888;text-align:center;margin-top:10px;">Amplitudes swap AND get multiplied by ±i!</p>
+                </div>
+            </div>
+            <div class="key-insight">
+                <h4>Key Insight: Y = iXZ</h4>
+                <p>You can verify: XZ = [[0,1],[1,0]][[1,0],[0,-1]] = [[0,-1],[1,0]]. Then iXZ = [[0,-i],[i,0]] = Y. This shows Y is "X followed by Z" (with a phase factor). The three Pauli matrices are deeply connected!</p>
+            </div>
+        </div>
+
         <section class="section">
-            <h2>Key Relationships</h2>
-            <div class="highlight">
-                <h3>Self-Inverse Property</h3>
-                <p style="text-align:center;font-size:18px;">X² = Y² = Z² = I (Identity)</p>
-                <p style="text-align:center;color:#888;">Applying any Pauli gate twice returns the original state!</p>
+            <div class="algebra-box">
+                <h3>Pauli Algebra - The Mathematical Relationships</h3>
+                <p style="color:#ccc;margin-bottom:20px;">These relationships are essential for quantum computing calculations:</p>
+                
+                <div class="derivation-step">
+                    <h4>Self-Inverse Property</h4>
+                    <div class="algebra-item">
+                        <span class="algebra-formula">X² = Y² = Z² = I</span>
+                        <span class="algebra-meaning">Each Pauli gate is its own inverse. Apply twice = do nothing.</span>
+                    </div>
+                </div>
+                
+                <div class="derivation-step">
+                    <h4>Cyclic Products</h4>
+                    <div class="algebra-item">
+                        <span class="algebra-formula">XY = iZ</span>
+                        <span class="algebra-meaning">X followed by Y equals i times Z</span>
+                    </div>
+                    <div class="algebra-item">
+                        <span class="algebra-formula">YZ = iX</span>
+                        <span class="algebra-meaning">Y followed by Z equals i times X</span>
+                    </div>
+                    <div class="algebra-item">
+                        <span class="algebra-formula">ZX = iY</span>
+                        <span class="algebra-meaning">Z followed by X equals i times Y</span>
+                    </div>
+                </div>
+                
+                <div class="derivation-step">
+                    <h4>Anticommutation</h4>
+                    <div class="algebra-item">
+                        <span class="algebra-formula">XY = -YX</span>
+                        <span class="algebra-meaning">Order matters! Swapping adds a minus sign.</span>
+                    </div>
+                    <div class="algebra-item">
+                        <span class="algebra-formula">YZ = -ZY</span>
+                        <span class="algebra-meaning">Same for Y and Z</span>
+                    </div>
+                    <div class="algebra-item">
+                        <span class="algebra-formula">ZX = -XZ</span>
+                        <span class="algebra-meaning">Same for Z and X</span>
+                    </div>
+                </div>
+                
+                <div class="derivation-step">
+                    <h4>Completeness</h4>
+                    <div class="formula">Any 2×2 matrix M = aI + bX + cY + dZ</div>
+                    <p class="explanation">The Pauli matrices (with I) form a basis for all 2×2 matrices. This is why they're so fundamental!</p>
+                </div>
             </div>
-            <div class="example">
-                <h3>Product Relations</h3>
-                <p style="text-align:center;">XY = iZ | YZ = iX | ZX = iY</p>
-                <p style="text-align:center;color:#888;margin-top:8px;">Y = iXZ (Y combines X and Z effects)</p>
-            </div>
+        </section>
+
+        <section class="section">
+            <h2>Comparison Table</h2>
+            <table class="comparison-table">
+                <tr>
+                    <th>Gate</th>
+                    <th>Matrix</th>
+                    <th>Effect on |0⟩</th>
+                    <th>Effect on |1⟩</th>
+                    <th>Rotation</th>
+                    <th>Eigenstates</th>
+                </tr>
+                <tr>
+                    <td style="color:#aaa;font-weight:bold;">I</td>
+                    <td>[[1,0],[0,1]]</td>
+                    <td>|0⟩</td>
+                    <td>|1⟩</td>
+                    <td>None</td>
+                    <td>All states</td>
+                </tr>
+                <tr>
+                    <td style="color:#ff6b6b;font-weight:bold;">X</td>
+                    <td>[[0,1],[1,0]]</td>
+                    <td>|1⟩</td>
+                    <td>|0⟩</td>
+                    <td>180° around X</td>
+                    <td>|+⟩, |-⟩</td>
+                </tr>
+                <tr>
+                    <td style="color:#4ecdc4;font-weight:bold;">Y</td>
+                    <td>[[0,-i],[i,0]]</td>
+                    <td>i|1⟩</td>
+                    <td>-i|0⟩</td>
+                    <td>180° around Y</td>
+                    <td>|i⟩, |-i⟩</td>
+                </tr>
+                <tr>
+                    <td style="color:#ffd93d;font-weight:bold;">Z</td>
+                    <td>[[1,0],[0,-1]]</td>
+                    <td>|0⟩</td>
+                    <td>-|1⟩</td>
+                    <td>180° around Z</td>
+                    <td>|0⟩, |1⟩</td>
+                </tr>
+            </table>
         </section>
 
         <div class="nav-buttons">
             <a href="../02-single-qubit-gates/index.html" class="btn">Previous: Single-Qubit Gates</a>
-            <a href="../04-identity-phase-gates/index.html" class="btn btn-primary">Next: Identity & Phase Gates</a>
+            <a href="../04-identity-phase-gates/index.html" class="btn btn-primary">Next: Phase Gates (S, T)</a>
         </div>
     </div>
 
     <script>
-    function createBloch(id, axis, color) {
-        const c = document.getElementById(id);
-        if (!c) return;
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x050505);
-        const camera = new THREE.PerspectiveCamera(50, c.clientWidth/c.clientHeight, 0.1, 1000);
-        camera.position.set(2, 1.5, 2);
-        const renderer = new THREE.WebGLRenderer({antialias:true});
-        renderer.setSize(c.clientWidth, c.clientHeight);
-        c.appendChild(renderer.domElement);
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.5;
-        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-        const light = new THREE.PointLight(0xffffff, 0.8);
-        light.position.set(5,5,5);
-        scene.add(light);
-        scene.add(new THREE.Mesh(new THREE.SphereGeometry(1,32,32), new THREE.MeshPhongMaterial({color:0x64ffda,transparent:true,opacity:0.1})));
-        scene.add(new THREE.Mesh(new THREE.SphereGeometry(1,16,16), new THREE.MeshBasicMaterial({color:0x64ffda,wireframe:true,transparent:true,opacity:0.15})));
-        scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.2, 0xff6b6b, 0.08, 0.04));
-        scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.2, 0x4ecdc4, 0.08, 0.04));
-        scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.2, 0xffd93d, 0.08, 0.04));
-        [{pos:[1.35,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.35,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.35],text:'Z',color:'#ffd93d'}].forEach(l=>{
-            const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
-            const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
-            const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
-            sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.3,0.3,1);scene.add(sprite);
-        });
-        const ring= new THREE.Mesh(new THREE.TorusGeometry(0.9,0.02,16,100), new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:0.6}));
-        if(axis==='x') ring.rotation.y = Math.PI/2;
-        else if(axis==='y') ring.rotation.x = Math.PI/2;
-        scene.add(ring);
-        const arrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, 0xffffff, 0.1, 0.06);
-        scene.add(arrow);
-        const trail = [];
-        const trailGeo = new THREE.BufferGeometry();
-        scene.add(new THREE.Line(trailGeo, new THREE.LineBasicMaterial({color:color,transparent:true,opacity:0.5})));
-        let angle = 0;
-        function animate() {
-            requestAnimationFrame(animate);
-            angle += 0.02;
-            let dir = new THREE.Vector3(0,0,1);
-            if(axis==='x') dir.applyAxisAngle(new THREE.Vector3(1,0,0), angle);
-            else if(axis==='y') dir.applyAxisAngle(new THREE.Vector3(0,1,0), angle);
-            else dir.applyAxisAngle(new THREE.Vector3(0,0,1), angle);
-            arrow.setDirection(dir.normalize());
-            trail.push(dir.clone());
-            if(trail.length > 60) trail.shift();
-            const pos = new Float32Array(trail.length*3);
-            trail.forEach((p,i) => { pos[i*3]=p.x; pos[i*3+1]=p.y; pos[i*3+2]=p.z; });
-            trailGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-            controls.update();
-            renderer.render(scene, camera);
-        }
-        animate();
-    }
-    createBloch('bloch-x', 'x', 0xff6b6b);
-    createBloch('bloch-y', 'y', 0x4ecdc4);
-    createBloch('bloch-z', 'z', 0xffd93d);
-
-    const mainC = document.getElementById('main-bloch');
-    const mainScene = new THREE.Scene();
-    mainScene.background = new THREE.Color(0x050505);
-    const mainCam = new THREE.PerspectiveCamera(50, mainC.clientWidth/mainC.clientHeight, 0.1, 1000);
-    mainCam.position.set(2.5, 2, 2.5);
-    const mainRend = new THREE.WebGLRenderer({antialias:true});
-    mainRend.setSize(mainC.clientWidth, mainC.clientHeight);
-    mainC.appendChild(mainRend.domElement);
-    const mainCtrl = new THREE.OrbitControls(mainCam, mainRend.domElement);
-    mainCtrl.enableDamping = true;
-    mainScene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const ml = new THREE.PointLight(0xffffff, 0.8);
-    ml.position.set(10,10,10);
-    mainScene.add(ml);
-    mainScene.add(new THREE.Mesh(new THREE.SphereGeometry(1,32,32), new THREE.MeshPhongMaterial({color:0x64ffda,transparent:true,opacity:0.1})));
-    mainScene.add(new THREE.Mesh(new THREE.SphereGeometry(1,16,16), new THREE.MeshBasicMaterial({color:0x64ffda,wireframe:true,transparent:true,opacity:0.15})));
-    mainScene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.1, 0.05));
-    mainScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.1, 0.05));
-    mainScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.1, 0.05));
-    [{pos:[1.5,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.5,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.5],text:'Z',color:'#ffd93d'}].forEach(l=>{
-        const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;
-        const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 24px monospace';ctx.textAlign='center';ctx.fillText(l.text,32,24);
-        const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
-        sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.4,0.2,1);mainScene.add(sprite);
-    });
-    ['x','y','z'].forEach((a,i) => {
-        const colors = [0xff6b6b, 0x4ecdc4, 0xffd93d];
-        const r = new THREE.Mesh(new THREE.TorusGeometry(0.85,0.01,16,100), new THREE.MeshBasicMaterial({color:colors[i],transparent:true,opacity:0.2}));
-        if(a==='x') r.rotation.y = Math.PI/2;
-        else if(a==='y') r.rotation.x = Math.PI/2;
-        mainScene.add(r);
-    });
+    let scene, camera, renderer, controls, stateArrow;
     let theta = 0, phi = 0;
-    const mainArrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, 0xffffff, 0.12, 0.08);
-    mainScene.add(mainArrow);
-    const mainTrail = [];
-    const mainTrailGeo = new THREE.BufferGeometry();
-    mainScene.add(new THREE.Line(mainTrailGeo, new THREE.LineBasicMaterial({color:0x64ffda,transparent:true,opacity:0.6})));
-
-    function updateState() {
-        const x = Math.sin(theta)*Math.cos(phi), y = Math.sin(theta)*Math.sin(phi), z = Math.cos(theta);
-        mainArrow.setDirection(new THREE.Vector3(x,y,z).normalize());
-        const a0 = Math.abs(Math.cos(theta/2)), a1 = Math.abs(Math.sin(theta/2));
-        document.getElementById('bar-0').style.height = (a0*100)+'%';
-        document.getElementById('bar-1').style.height = (a1*100)+'%';
-        document.getElementById('val-0').textContent = a0.toFixed(2);
-        document.getElementById('val-1').textContent = a1.toFixed(2);
-        let s = 'Superposition';
-        const e = 0.05;
-        if(theta < e) s = '|0⟩';
-        else if(Math.abs(theta-Math.PI) < e) s = '|1⟩';
-        else if(Math.abs(theta-Math.PI/2) < e) {
-            if(Math.abs(phi) < e || Math.abs(phi-2*Math.PI) < e) s = '|+⟩';
-            else if(Math.abs(Math.abs(phi)-Math.PI) < e) s = '|-⟩';
-        }
-        document.getElementById('current-state').textContent = 'Current State: ' + s;
+    
+    function init() {
+        const container = document.getElementById('bloch-container');
+        if (!container) return;
+        
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050505);
+        
+        camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.set(3, 2.5, 3);
+        
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+        
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.4);
+        dirLight.position.set(5, 5, 5);
+        scene.add(dirLight);
+        
+        const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
+        const sphereMat = new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.12 });
+        scene.add(new THREE.Mesh(sphereGeo, sphereMat));
+        
+        const wireGeo = new THREE.SphereGeometry(1, 16, 16);
+        const wireMat = new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.15 });
+        scene.add(new THREE.Mesh(wireGeo, wireMat));
+        
+        createAxis(new THREE.Vector3(1, 0, 0), 0xff6b6b, '+X', '-X');
+        createAxis(new THREE.Vector3(0, 1, 0), 0x4ecdc4, '+Y', '-Y');
+        createAxis(new THREE.Vector3(0, 0, 1), 0xffd93d, '+Z |0>', '-Z |1>');
+        
+        const eqGeo = new THREE.RingGeometry(0.99, 1.01, 64);
+        const eqMat = new THREE.MeshBasicMaterial({ color: 0x64ffda, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
+        const equator = new THREE.Mesh(eqGeo, eqMat);
+        equator.rotation.x = Math.PI / 2;
+        scene.add(equator);
+        
+        stateArrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0), 1.1, 0x64ffda, 0.15, 0.1);
+        scene.add(stateArrow);
+        
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        
+        animate();
+        updateDisplay();
     }
-
-    let anim = false;
+    
+    function createAxis(dir, color, posLabel, negLabel) {
+        scene.add(new THREE.ArrowHelper(dir, new THREE.Vector3(0,0,0), 1.5, color, 0.1, 0.06));
+        scene.add(new THREE.ArrowHelper(dir.clone().negate(), new THREE.Vector3(0,0,0), 1.5, color, 0.1, 0.06));
+        [0.5, 1.0].forEach(function(d) {
+            var g = new THREE.SphereGeometry(0.02, 8, 8);
+            var m = new THREE.MeshBasicMaterial({ color: color });
+            var t1 = new THREE.Mesh(g, m); t1.position.copy(dir.clone().multiplyScalar(d)); scene.add(t1);
+            var t2 = new THREE.Mesh(g, m); t2.position.copy(dir.clone().multiplyScalar(-d)); scene.add(t2);
+        });
+        createLabel(posLabel, dir.clone().multiplyScalar(1.7), color);
+        createLabel(negLabel, dir.clone().multiplyScalar(-1.7), color);
+    }
+    
+    function createLabel(text, pos, color) {
+        var c = document.createElement('canvas'); c.width = 128; c.height = 64;
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#' + color.toString(16).padStart(6, '0');
+        ctx.font = 'bold 24px Arial'; ctx.textAlign = 'center';
+        ctx.fillText(text, 64, 40);
+        var t = new THREE.CanvasTexture(c);
+        var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true }));
+        s.position.copy(pos); s.scale.set(0.5, 0.25, 1); scene.add(s);
+    }
+    
+    function updateDisplay() {
+        var td = (theta * 180 / Math.PI).toFixed(1);
+        var pd = ((phi * 180 / Math.PI + 360) % 360).toFixed(1);
+        document.getElementById('theta-value').textContent = td + '\u00B0';
+        document.getElementById('phi-value').textContent = pd + '\u00B0';
+        document.getElementById('theta-bar').style.width = (theta / Math.PI * 100) + '%';
+        document.getElementById('phi-bar').style.width = (((phi + 2*Math.PI) % (2*Math.PI)) / (2*Math.PI) * 100) + '%';
+        var x = Math.sin(theta) * Math.cos(phi);
+        var y = Math.sin(theta) * Math.sin(phi);
+        var z = Math.cos(theta);
+        document.getElementById('current-coords').textContent = 'x=' + x.toFixed(2) + ', y=' + y.toFixed(2) + ', z=' + z.toFixed(2);
+        var name = '';
+        if (theta < 0.1) name = '|0\u27E9';
+        else if (Math.abs(theta - Math.PI) < 0.1) name = '|1\u27E9';
+        else if (Math.abs(theta - Math.PI/2) < 0.1) {
+            var pn = ((phi % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+            if (pn < 0.1 || pn > 2*Math.PI - 0.1) name = '|+\u27E9';
+            else if (Math.abs(pn - Math.PI) < 0.1) name = '|-\u27E9';
+            else if (Math.abs(pn - Math.PI/2) < 0.1) name = '|i\u27E9';
+            else if (Math.abs(pn - 3*Math.PI/2) < 0.1) name = '|-i\u27E9';
+            else name = 'superposition';
+        } else name = 'superposition';
+        document.getElementById('current-state').textContent = name;
+        stateArrow.setDirection(new THREE.Vector3(x, y, z).normalize());
+    }
+    
     function applyGate(g) {
-        if(anim) return;
-        mainTrail.length = 0;
-        let tt = theta, tp = phi;
-        if(g==='X') { tt = Math.PI-theta; tp = -phi; }
-        else if(g==='Y') { tt = Math.PI-theta; tp = Math.PI-phi; }
-        else if(g==='Z') { tp = phi+Math.PI; }
-        else if(g==='H') { tt = Math.PI/2-theta; tp = phi+Math.PI; }
-        while(tp > Math.PI) tp -= 2*Math.PI;
-        while(tp < -Math.PI) tp += 2*Math.PI;
-        anim = true;
-        const st = theta, sp = phi, steps = 40;
-        let step = 0;
-        function doStep() {
-            step++;
-            const t = step/steps, ease = t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
-            theta = st + (tt-st)*ease;
-            phi = sp + (tp-sp)*ease;
-            const x = Math.sin(theta)*Math.cos(phi), y = Math.sin(theta)*Math.sin(phi), z = Math.cos(theta);
-            mainTrail.push(new THREE.Vector3(x,y,z));
-            updateState();
-            if(mainTrail.length > 1) {
-                const pos = new Float32Array(mainTrail.length*3);
-                mainTrail.forEach((p,i) => { pos[i*3]=p.x; pos[i*3+1]=p.y; pos[i*3+2]=p.z; });
-                mainTrailGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-            }
-            if(step < steps) requestAnimationFrame(doStep);
-            else { theta = tt; phi = tp; updateState(); anim = false; }
-        }
-        doStep();
+        var info = '';
+        if (g === 'I') { info = 'Identity: No rotation'; }
+        else if (g === 'X') { theta = Math.PI - theta; phi = -phi; info = 'X: 180\u00B0 rotation around X-axis'; }
+        else if (g === 'Y') { theta = Math.PI - theta; phi = Math.PI - phi; info = 'Y: 180\u00B0 rotation around Y-axis'; }
+        else if (g === 'Z') { phi = phi + Math.PI; info = 'Z: 180\u00B0 rotation around Z-axis'; }
+        document.getElementById('rotation-info').textContent = info;
+        updateDisplay();
     }
-
-    function resetState() {
-        if(anim) return;
-        theta = 0; phi = 0;
-        mainTrail.length = 0;
-        mainTrailGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(0), 3));
-        updateState();
-    }
-
-    function mainAnim() {
-        requestAnimationFrame(mainAnim);
-        mainCtrl.update();
-        mainRend.render(mainScene, mainCam);
-    }
-    mainAnim();
-    updateState();
-
-    window.addEventListener('resize', () => {
-        mainCam.aspect = mainC.clientWidth/mainC.clientHeight;
-        mainCam.updateProjectionMatrix();
-        mainRend.setSize(mainC.clientWidth, mainC.clientHeight);
+    
+    function resetState() { theta = 0; phi = 0; document.getElementById('rotation-info').textContent = 'Click a gate to see rotation'; updateDisplay(); }
+    
+    function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+    
+    window.addEventListener('load', init);
+    window.addEventListener('resize', function() {
+        var c = document.getElementById('bloch-container');
+        if (c && renderer) { camera.aspect = c.clientWidth / c.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(c.clientWidth, c.clientHeight); }
     });
     </script>
 </body>

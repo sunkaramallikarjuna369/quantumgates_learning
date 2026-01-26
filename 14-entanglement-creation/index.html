@@ -3,366 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entanglement Creation - Quantum Gates Learning</title>
+    <title>Entanglement & Bell States - Devin's Teaching Style</title>
     <link rel="stylesheet" href="../shared/styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-        .bloch-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; align-items: center; }
-        .bloch-panel { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; text-align: center; }
-        .bloch-panel h4 { color: #64ffda; margin-bottom: 10px; }
-        .bloch-canvas { width: 200px; height: 200px; border-radius: 8px; }
-        .bell-state-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin: 30px 0;
-        }
-        .bell-card {
-            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            border: 1px solid rgba(100,255,218,0.3);
-        }
-        .bell-card h3 {
-            color: var(--primary-color);
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
-        .bell-card .state {
-            font-size: 1.3em;
-            color: #ffd93d;
-            margin: 15px 0;
-        }
-        .bell-card .description {
-            opacity: 0.8;
-            font-size: 0.95em;
-        }
-        .circuit-container {
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-            text-align: center;
-        }
-        .circuit-svg {
-            max-width: 100%;
-            margin: 20px auto;
-        }
-        .entanglement-demo {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin: 30px 0;
-        }
-        .demo-panel {
-            background: rgba(255,255,255,0.03);
-            border-radius: 15px;
-            padding: 25px;
-        }
-        .demo-panel h3 {
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-        .amplitude-bars {
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-end;
-            height: 150px;
-            margin: 20px 0;
-            padding: 10px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-        }
-        .amplitude-bar {
-            width: 50px;
-            background: linear-gradient(to top, #64ffda, #4ecdc4);
-            border-radius: 5px 5px 0 0;
-            transition: height 0.5s ease;
-            position: relative;
-        }
-        .amplitude-bar::after {
-            content: attr(data-label);
-            position: absolute;
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.8em;
-            color: white;
-        }
-        .state-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        .state-btn {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .state-btn:hover {
-            transform: scale(1.05);
-        }
-        .correlation-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        .correlation-table th, .correlation-table td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid rgba(100,255,218,0.2);
-        }
-        .correlation-table th {
-            background: rgba(100,255,218,0.1);
-            color: var(--primary-color);
-        }
-        .perfect-corr {
-            color: #4ecdc4;
-            font-weight: bold;
-        }
-        .perfect-anti {
-            color: #ff6b6b;
-            font-weight: bold;
-        }
-        @media (max-width: 768px) {
-            .bell-state-grid, .entanglement-demo {
-                grid-template-columns: 1fr;
-            }
-        }
+        .fourwh-box { background: linear-gradient(135deg, rgba(100,255,218,0.12), rgba(78,205,196,0.06)); border: 2px solid rgba(100,255,218,0.4); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .fourwh-box h3 { color: #64ffda; margin-bottom: 20px; font-size: 1.4em; }
+        .fourwh-item { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 20px; margin: 15px 0; border-left: 5px solid; }
+        .fourwh-item.what { border-color: #ff6b6b; }
+        .fourwh-item.why { border-color: #ffd93d; }
+        .fourwh-item.when { border-color: #4ecdc4; }
+        .fourwh-item.where { border-color: #a855f7; }
+        .fourwh-item.how { border-color: #64ffda; }
+        .fourwh-item h4 { margin-bottom: 12px; font-size: 1.2em; }
+        .fourwh-item.what h4 { color: #ff6b6b; }
+        .fourwh-item.why h4 { color: #ffd93d; }
+        .fourwh-item.when h4 { color: #4ecdc4; }
+        .fourwh-item.where h4 { color: #a855f7; }
+        .fourwh-item.how h4 { color: #64ffda; }
+        .fourwh-item p, .fourwh-item li { color: #ccc; line-height: 1.7; }
+        .prereq-box { background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(168,85,247,0.05)); border: 2px solid rgba(168,85,247,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
+        .prereq-box h3 { color: #a855f7; margin-bottom: 15px; }
+        .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #a855f7; }
+        .prereq-item h4 { color: #c084fc; margin-bottom: 8px; }
+        .matrix-derivation { background: rgba(255,215,0,0.08); border: 2px solid rgba(255,215,0,0.3); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .matrix-derivation h3 { color: #ffd93d; margin-bottom: 20px; }
+        .derivation-step { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 20px; margin: 15px 0; }
+        .derivation-step h4 { color: #4ecdc4; margin-bottom: 12px; }
+        .derivation-step .explanation { color: #ccc; line-height: 1.6; }
+        .derivation-step .formula { background: rgba(100,255,218,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 1.1em; color: #64ffda; text-align: center; }
+        .key-insight { background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,107,107,0.05)); border: 2px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .key-insight h4 { color: #ff6b6b; margin-bottom: 10px; }
+        .key-insight p { color: #ccc; line-height: 1.6; }
+        .bell-card { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 25px; margin: 20px 0; border: 2px solid; }
+        .bell-card h3 { margin-bottom: 15px; }
+        .bell-card.phi-plus { border-color: rgba(100,255,218,0.5); }
+        .bell-card.phi-plus h3 { color: #64ffda; }
+        .bell-card.phi-minus { border-color: rgba(255,107,107,0.5); }
+        .bell-card.phi-minus h3 { color: #ff6b6b; }
+        .bell-card.psi-plus { border-color: rgba(78,205,196,0.5); }
+        .bell-card.psi-plus h3 { color: #4ecdc4; }
+        .bell-card.psi-minus { border-color: rgba(168,85,247,0.5); }
+        .bell-card.psi-minus h3 { color: #a855f7; }
+        .bell-formula { font-family: monospace; font-size: 1.2em; color: #fff; text-align: center; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; margin: 10px 0; }
+        .bell-circuit { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 8px; margin: 15px 0; }
+        .circuit-step { text-align: center; }
+        .circuit-step .state { font-family: monospace; color: #64ffda; font-size: 1.1em; }
+        .circuit-step .gate { background: rgba(168,85,247,0.3); padding: 8px 15px; border-radius: 6px; color: #c084fc; font-weight: bold; margin: 10px 0; }
+        .circuit-arrow { color: #888; font-size: 1.5em; }
+        .simulator { background: rgba(0,0,0,0.4); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .simulator h3 { color: #64ffda; margin-bottom: 20px; }
+        .sim-controls { display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; margin: 20px 0; }
+        .sim-btn { padding: 12px 24px; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .sim-btn:hover { transform: scale(1.05); }
+        .sim-btn.primary { background: linear-gradient(135deg, #64ffda, #4ecdc4); color: #000; }
+        .sim-btn.secondary { background: linear-gradient(135deg, #a855f7, #c084fc); color: #fff; }
+        .sim-btn.reset { background: linear-gradient(135deg, #666, #888); color: #fff; }
+        .state-display { text-align: center; padding: 25px; background: rgba(100,255,218,0.1); border-radius: 12px; margin: 20px 0; }
+        .state-display .current { font-size: 1.5em; font-family: monospace; color: #64ffda; margin-bottom: 10px; }
+        .state-display .type { color: #a855f7; font-size: 1.1em; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .comparison-table th, .comparison-table td { padding: 15px; text-align: center; border: 1px solid rgba(100,255,218,0.3); }
+        .comparison-table th { background: rgba(100,255,218,0.2); color: #64ffda; }
+        .comparison-table td { background: rgba(0,0,0,0.3); color: #ccc; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Entanglement Creation</h1>
-            <p class="subtitle">Creating and Understanding Bell States</p>
+            <h1>Entanglement & Bell States</h1>
+            <p class="subtitle">The Heart of Quantum Computing</p>
         </header>
 
         <section class="section">
-            <h2>What is Entanglement?</h2>
-            <p>
-                <strong>Quantum entanglement</strong> is a phenomenon where two or more qubits become 
-                correlated in such a way that the quantum state of each qubit cannot be described 
-                independently. Measuring one qubit instantly determines the state of the other, 
-                regardless of the distance between them.
-            </p>
-            
-            <div class="key-point">
-                <h3>The "Spooky Action"</h3>
-                <p>
-                    Einstein called entanglement "spooky action at a distance." While it doesn't 
-                    allow faster-than-light communication, it enables quantum teleportation, 
-                    superdense coding, and is essential for quantum computing advantage.
-                </p>
+            <div class="prereq-box">
+                <h3>Prerequisites - Understanding Entanglement</h3>
+                <div class="prereq-item">
+                    <h4>1. What is Entanglement?</h4>
+                    <p>Entanglement is a quantum correlation between particles where the state of one particle is fundamentally connected to the state of another, regardless of distance. Measuring one instantly determines the other.</p>
+                </div>
+                <div class="prereq-item">
+                    <h4>2. Separable vs Entangled States</h4>
+                    <p>A state is SEPARABLE if it can be written as |ψ⟩⊗|φ⟩ (tensor product of individual states). If it CANNOT be factored this way, it's ENTANGLED. Example: |00⟩+|11⟩ cannot be written as (a|0⟩+b|1⟩)⊗(c|0⟩+d|1⟩).</p>
+                </div>
+                <div class="prereq-item">
+                    <h4>3. The CNOT Gate Creates Entanglement</h4>
+                    <p>CNOT alone doesn't create entanglement from |00⟩. But CNOT applied after H on the control qubit creates entanglement: H⊗I on |00⟩ gives |+0⟩, then CNOT gives (|00⟩+|11⟩)/√2 - a Bell state!</p>
+                </div>
+                <div class="prereq-item">
+                    <h4>4. Bell States</h4>
+                    <p>The four Bell states are maximally entangled 2-qubit states. They form an orthonormal basis for 2-qubit systems. Any 2-qubit state can be expressed as a combination of Bell states.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="fourwh-box">
+                <h3>Entanglement - The 4W+H Framework</h3>
+                
+                <div class="fourwh-item what">
+                    <h4>WHAT is Entanglement?</h4>
+                    <p>Entanglement is a quantum phenomenon where two or more particles become correlated such that the quantum state of each particle cannot be described independently. The combined system has a definite state, but individual particles do not.</p>
+                </div>
+                
+                <div class="fourwh-item why">
+                    <h4>WHY is Entanglement Important?</h4>
+                    <p>Entanglement enables: quantum teleportation, superdense coding, quantum key distribution (QKD), quantum error correction, and exponential speedup in certain algorithms. It's the resource that makes quantum computers more powerful than classical ones.</p>
+                </div>
+                
+                <div class="fourwh-item when">
+                    <h4>WHEN does Entanglement Occur?</h4>
+                    <p>Entanglement is created when particles interact in specific ways. In quantum circuits: apply H to one qubit, then CNOT with that qubit as control. The key is creating correlations that cannot be explained classically.</p>
+                </div>
+                
+                <div class="fourwh-item where">
+                    <h4>WHERE is Entanglement Used?</h4>
+                    <p>Quantum algorithms (Shor's, Grover's), quantum communication (teleportation, QKD), quantum error correction (stabilizer codes), quantum sensing (improved precision), and fundamental physics experiments (Bell tests).</p>
+                </div>
+                
+                <div class="fourwh-item how">
+                    <h4>HOW to Create Entanglement?</h4>
+                    <p>Standard recipe: (1) Start with |00⟩, (2) Apply H to first qubit → |+0⟩, (3) Apply CNOT → |Φ⁺⟩ = (|00⟩+|11⟩)/√2. Different initial states and gates create different Bell states.</p>
+                </div>
             </div>
         </section>
 
         <section class="section">
             <h2>The Four Bell States</h2>
-            <p>
-                Bell states are the maximally entangled two-qubit states. They form an orthonormal 
-                basis for the two-qubit Hilbert space.
-            </p>
             
-            <div class="bell-state-grid">
-                <div class="bell-card">
-                    <h3>|Φ⁺⟩</h3>
-                    <div class="state">(|00⟩ + |11⟩) / √2</div>
-                    <div class="description">
-                        Both qubits always measure the same.<br>
-                        Perfect correlation in Z-basis.
-                    </div>
+            <div class="bell-card phi-plus">
+                <h3>|Φ⁺⟩ - Phi Plus</h3>
+                <div class="bell-formula">|Φ⁺⟩ = (|00⟩ + |11⟩) / √2</div>
+                <div class="bell-circuit">
+                    <div class="circuit-step"><div class="state">|00⟩</div></div>
+                    <div class="circuit-arrow">→</div>
+                    <div class="circuit-step"><div class="gate">H ⊗ I</div><div class="state">|+0⟩</div></div>
+                    <div class="circuit-arrow">→</div>
+                    <div class="circuit-step"><div class="gate">CNOT</div><div class="state">|Φ⁺⟩</div></div>
                 </div>
-                
-                <div class="bell-card">
-                    <h3>|Φ⁻⟩</h3>
-                    <div class="state">(|00⟩ - |11⟩) / √2</div>
-                    <div class="description">
-                        Both qubits measure the same, with phase difference.<br>
-                        Anti-correlation in X-basis.
-                    </div>
+                <p style="color:#888;text-align:center;">Both qubits always measure the SAME: both 0 or both 1</p>
+            </div>
+            
+            <div class="bell-card phi-minus">
+                <h3>|Φ⁻⟩ - Phi Minus</h3>
+                <div class="bell-formula">|Φ⁻⟩ = (|00⟩ - |11⟩) / √2</div>
+                <div class="bell-circuit">
+                    <div class="circuit-step"><div class="state">|00⟩</div></div>
+                    <div class="circuit-arrow">→</div>
+                    <div class="circuit-step"><div class="gate">H ⊗ I</div></div>
+                    <div class="circuit-arrow">→</div>
+                    <div class="circuit-step"><div class="gate">CNOT</div></div>
+                    <div class="circuit-arrow">→</div>
+                    <div class="circuit-step"><div class="gate">Z ⊗ I</div><div class="state">|Φ⁻⟩</div></div>
                 </div>
-                
-                <div class="bell-card">
-                    <h3>|Ψ⁺⟩</h3>
-                    <div class="state">(|01⟩ + |10⟩) / √2</div>
-                    <div class="description">
-                        Qubits always measure opposite.<br>
-                        Perfect anti-correlation in Z-basis.
-                    </div>
+                <p style="color:#888;text-align:center;">Same outcomes, but with a relative phase difference</p>
+            </div>
+            
+            <div class="bell-card psi-plus">
+                <h3>|Ψ⁺⟩ - Psi Plus</h3>
+                <div class="bell-formula">|Ψ⁺⟩ = (|01⟩ + |10⟩) / √2</div>
+                <div class="bell-circuit">
+                    <div class="circuit-step"><div class="state">|01⟩</div></div>
+                    <div class="circuit-arrow">→</div>
+                    <div class="circuit-step"><div class="gate">H ⊗ I</div></div>
+                    <div class="circuit-arrow">→</div>
+                    <div class="circuit-step"><div class="gate">CNOT</div><div class="state">|Ψ⁺⟩</div></div>
                 </div>
-                
-                <div class="bell-card">
-                    <h3>|Ψ⁻⟩</h3>
-                    <div class="state">(|01⟩ - |10⟩) / √2</div>
-                    <div class="description">
-                        The singlet state. Anti-symmetric.<br>
-                        Used in quantum cryptography.
-                    </div>
+                <p style="color:#888;text-align:center;">Both qubits always measure OPPOSITE: one 0, one 1</p>
+            </div>
+            
+            <div class="bell-card psi-minus">
+                <h3>|Ψ⁻⟩ - Psi Minus (Singlet State)</h3>
+                <div class="bell-formula">|Ψ⁻⟩ = (|01⟩ - |10⟩) / √2</div>
+                <div class="bell-circuit">
+                    <div class="circuit-step"><div class="state">|01⟩</div></div>
+                    <div class="circuit-arrow">→</div>
+                    <div class="circuit-step"><div class="gate">H ⊗ I</div></div>
+                    <div class="circuit-arrow">→</div>
+                    <div class="circuit-step"><div class="gate">CNOT</div></div>
+                    <div class="circuit-arrow">→</div>
+                    <div class="circuit-step"><div class="gate">Z ⊗ I</div><div class="state">|Ψ⁻⟩</div></div>
                 </div>
+                <p style="color:#888;text-align:center;">Opposite outcomes with relative phase - the "singlet" state</p>
             </div>
         </section>
 
-                <section class="section">
-                    <h2>Creating Bell States</h2>
-            
-                    <div class="bloch-container">
-                        <div class="bloch-panel">
-                            <h4>Qubit 1</h4>
-                            <div id="bell-bloch1" class="bloch-canvas"></div>
-                            <p id="bell-state1" style="color:#ff6b6b;margin-top:8px;">|0⟩</p>
-                        </div>
-                        <div class="bloch-panel" style="background:transparent;padding:10px;">
-                            <div style="display:flex;flex-direction:column;gap:10px;">
-                                <button onclick="bellStep1()" style="padding:10px 16px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:8px;color:#fff;font-weight:bold;cursor:pointer;">Step 1: H</button>
-                                <button onclick="bellStep2()" style="padding:10px 16px;background:linear-gradient(135deg,#ff6b6b,#ff8e8e);border:none;border-radius:8px;color:#fff;font-weight:bold;cursor:pointer;">Step 2: CNOT</button>
-                                <button onclick="resetBell()" style="padding:8px 14px;background:rgba(100,255,218,0.2);border:1px solid #64ffda;border-radius:6px;color:#64ffda;cursor:pointer;">Reset</button>
-                            </div>
-                        </div>
-                        <div class="bloch-panel">
-                            <h4>Qubit 2</h4>
-                            <div id="bell-bloch2" class="bloch-canvas"></div>
-                            <p id="bell-state2" style="color:#4ecdc4;margin-top:8px;">|0⟩</p>
-                        </div>
-                    </div>
-                    <p id="bell-note" style="text-align:center;color:#888;margin:15px 0;">Click Step 1 to apply Hadamard, then Step 2 to apply CNOT and create entanglement</p>
-            
-                    <div class="circuit-container">
-                        <h3>Bell State Circuit: H followed by CNOT</h3>
-                        <svg class="circuit-svg" width="400" height="120" viewBox="0 0 400 120">
-                            <line x1="50" y1="40" x2="350" y2="40" stroke="#64ffda" stroke-width="2"/>
-                            <line x1="50" y1="80" x2="350" y2="80" stroke="#64ffda" stroke-width="2"/>
-                    
-                            <text x="30" y="45" fill="#ffd93d" font-size="14">|0⟩</text>
-                            <text x="30" y="85" fill="#ffd93d" font-size="14">|0⟩</text>
-                    
-                            <rect x="100" y="25" width="40" height="30" fill="#667eea" rx="5"/>
-                            <text x="120" y="45" fill="white" text-anchor="middle" font-size="14" font-weight="bold">H</text>
-                    
-                            <circle cx="200" cy="40" r="6" fill="#ff6b6b"/>
-                            <line x1="200" y1="46" x2="200" y2="70" stroke="#ff6b6b" stroke-width="2"/>
-                            <circle cx="200" cy="80" r="12" fill="none" stroke="#ff6b6b" stroke-width="2"/>
-                            <line x1="188" y1="80" x2="212" y2="80" stroke="#ff6b6b" stroke-width="2"/>
-                    
-                            <text x="370" y="45" fill="#4ecdc4" font-size="12">|Φ⁺⟩</text>
-                        </svg>
-                
-                        <div style="margin-top: 20px;">
-                            <p><strong>Step 1:</strong> Apply H to first qubit: |00⟩ → (|0⟩+|1⟩)|0⟩/√2 = (|00⟩+|10⟩)/√2</p>
-                            <p><strong>Step 2:</strong> Apply CNOT: (|00⟩+|10⟩)/√2 → (|00⟩+|11⟩)/√2 = |Φ⁺⟩</p>
-                        </div>
-                    </div>
-                </section>
-
         <section class="section">
-            <h2>Interactive Bell State Explorer</h2>
-            
-            <div class="entanglement-demo">
-                <div class="demo-panel">
-                    <h3>State Amplitudes</h3>
-                    <div class="amplitude-bars">
-                        <div class="amplitude-bar" id="amp-00" data-label="|00⟩" style="height: 70.7%;"></div>
-                        <div class="amplitude-bar" id="amp-01" data-label="|01⟩" style="height: 0%;"></div>
-                        <div class="amplitude-bar" id="amp-10" data-label="|10⟩" style="height: 0%;"></div>
-                        <div class="amplitude-bar" id="amp-11" data-label="|11⟩" style="height: 70.7%;"></div>
-                    </div>
-                    <div class="state-buttons">
-                        <button class="state-btn" onclick="setBellState('phi+')">|Φ⁺⟩</button>
-                        <button class="state-btn" onclick="setBellState('phi-')">|Φ⁻⟩</button>
-                        <button class="state-btn" onclick="setBellState('psi+')">|Ψ⁺⟩</button>
-                        <button class="state-btn" onclick="setBellState('psi-')">|Ψ⁻⟩</button>
-                    </div>
-                    <p id="state-description" style="text-align: center; margin-top: 15px;">
-                        Current: |Φ⁺⟩ = (|00⟩ + |11⟩)/√2
-                    </p>
+            <div class="simulator">
+                <h3>Interactive Bell State Creator</h3>
+                <p style="color:#888;margin-bottom:20px;">Start from |00⟩ and apply gates to create Bell states!</p>
+                
+                <div class="state-display">
+                    <div class="current" id="current-state">|00⟩</div>
+                    <div class="type" id="state-type">Separable (product state)</div>
                 </div>
                 
-                <div class="demo-panel">
-                    <h3>Measurement Correlations</h3>
-                    <table class="correlation-table">
-                        <thead>
-                            <tr>
-                                <th>Qubit 1</th>
-                                <th>Qubit 2</th>
-                                <th>Probability</th>
-                            </tr>
-                        </thead>
-                        <tbody id="correlation-body">
-                            <tr>
-                                <td>|0⟩</td>
-                                <td>|0⟩</td>
-                                <td class="perfect-corr">50%</td>
-                            </tr>
-                            <tr>
-                                <td>|0⟩</td>
-                                <td>|1⟩</td>
-                                <td>0%</td>
-                            </tr>
-                            <tr>
-                                <td>|1⟩</td>
-                                <td>|0⟩</td>
-                                <td>0%</td>
-                            </tr>
-                            <tr>
-                                <td>|1⟩</td>
-                                <td>|1⟩</td>
-                                <td class="perfect-corr">50%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <p id="correlation-note" style="text-align: center; font-size: 0.9em; opacity: 0.8;">
-                        Perfect correlation: both qubits always match!
-                    </p>
+                <div class="sim-controls">
+                    <button class="sim-btn primary" onclick="applyH()">Apply H to Q1</button>
+                    <button class="sim-btn secondary" onclick="applyCNOT()">Apply CNOT</button>
+                    <button class="sim-btn secondary" onclick="applyZ()">Apply Z to Q1</button>
+                    <button class="sim-btn secondary" onclick="applyX()">Apply X to Q2</button>
+                    <button class="sim-btn reset" onclick="resetSim()">Reset to |00⟩</button>
+                </div>
+                
+                <div style="margin-top:20px;padding:15px;background:rgba(0,0,0,0.3);border-radius:8px;">
+                    <p style="color:#64ffda;margin:0 0 10px 0;"><strong>Recipe to create each Bell state from |00⟩:</strong></p>
+                    <p style="color:#ccc;margin:5px 0;font-family:monospace;">|Φ⁺⟩: H → CNOT</p>
+                    <p style="color:#ccc;margin:5px 0;font-family:monospace;">|Φ⁻⟩: H → CNOT → Z</p>
+                    <p style="color:#ccc;margin:5px 0;font-family:monospace;">|Ψ⁺⟩: H → CNOT → X (on Q2)</p>
+                    <p style="color:#ccc;margin:5px 0;font-family:monospace;">|Ψ⁻⟩: H → CNOT → Z → X (on Q2)</p>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <h2>Why Entanglement Matters</h2>
-            
-            <div class="concept-grid">
-                <div class="gate-card">
-                    <h3>Quantum Teleportation</h3>
-                    <p>Transfer quantum states using entanglement and classical communication.</p>
+            <div class="matrix-derivation">
+                <h3>Step-by-Step: Creating |Φ⁺⟩</h3>
+                <div class="derivation-step">
+                    <h4>Step 1: Start with |00⟩</h4>
+                    <div class="formula">|00⟩ = |0⟩ ⊗ |0⟩ = [1,0,0,0]ᵀ</div>
                 </div>
-                
-                <div class="gate-card">
-                    <h3>Superdense Coding</h3>
-                    <p>Send 2 classical bits using 1 qubit and shared entanglement.</p>
+                <div class="derivation-step">
+                    <h4>Step 2: Apply H to first qubit</h4>
+                    <p class="explanation">(H ⊗ I)|00⟩ = H|0⟩ ⊗ I|0⟩ = |+⟩ ⊗ |0⟩ = |+0⟩</p>
+                    <div class="formula">|+0⟩ = (|0⟩ + |1⟩)/√2 ⊗ |0⟩ = (|00⟩ + |10⟩)/√2</div>
                 </div>
-                
-                <div class="gate-card">
-                    <h3>Quantum Cryptography</h3>
-                    <p>Detect eavesdroppers using entanglement correlations.</p>
-                </div>
-                
-                <div class="gate-card">
-                    <h3>Quantum Computing</h3>
-                    <p>Entanglement enables exponential speedup for certain problems.</p>
+                <div class="derivation-step">
+                    <h4>Step 3: Apply CNOT</h4>
+                    <p class="explanation">CNOT flips the target when control is |1⟩:</p>
+                    <div class="formula">CNOT|00⟩ = |00⟩ (control is 0, no flip)</div>
+                    <div class="formula">CNOT|10⟩ = |11⟩ (control is 1, flip target)</div>
+                    <p class="explanation">Therefore:</p>
+                    <div class="formula">CNOT(|00⟩ + |10⟩)/√2 = (|00⟩ + |11⟩)/√2 = |Φ⁺⟩</div>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <h2>Key Takeaways</h2>
-            
-            <div class="highlight">
-                <ul>
-                    <li>Bell states are maximally entangled two-qubit states</li>
-                    <li>Created by H + CNOT circuit</li>
-                    <li>Measuring one qubit instantly determines the other</li>
-                    <li>Cannot be written as product of individual qubit states</li>
-                    <li>Foundation for quantum communication and computation</li>
-                </ul>
+            <h3>Bell State Comparison</h3>
+            <table class="comparison-table">
+                <tr>
+                    <th>Bell State</th>
+                    <th>Formula</th>
+                    <th>Measurement Correlation</th>
+                    <th>Creation from |00⟩</th>
+                </tr>
+                <tr>
+                    <td>|Φ⁺⟩</td>
+                    <td>(|00⟩+|11⟩)/√2</td>
+                    <td>Same (00 or 11)</td>
+                    <td>H → CNOT</td>
+                </tr>
+                <tr>
+                    <td>|Φ⁻⟩</td>
+                    <td>(|00⟩-|11⟩)/√2</td>
+                    <td>Same (00 or 11)</td>
+                    <td>H → CNOT → Z</td>
+                </tr>
+                <tr>
+                    <td>|Ψ⁺⟩</td>
+                    <td>(|01⟩+|10⟩)/√2</td>
+                    <td>Opposite (01 or 10)</td>
+                    <td>H → CNOT → X₂</td>
+                </tr>
+                <tr>
+                    <td>|Ψ⁻⟩</td>
+                    <td>(|01⟩-|10⟩)/√2</td>
+                    <td>Opposite (01 or 10)</td>
+                    <td>H → CNOT → Z → X₂</td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="section">
+            <div class="key-insight">
+                <h4>Key Insight: Why Can't We Describe Individual Qubits?</h4>
+                <p>In |Φ⁺⟩ = (|00⟩+|11⟩)/√2, try to describe qubit 1 alone. Is it |0⟩? Is it |1⟩? Neither! It's in a superposition that DEPENDS on qubit 2. If we measure qubit 2 and get 0, qubit 1 "becomes" |0⟩. If we get 1, qubit 1 "becomes" |1⟩. This correlation is instantaneous regardless of distance - the essence of entanglement!</p>
             </div>
         </section>
 
@@ -373,161 +288,73 @@
     </div>
 
     <script>
-        function setBellState(state) {
-            const amp00 = document.getElementById('amp-00');
-            const amp01 = document.getElementById('amp-01');
-            const amp10 = document.getElementById('amp-10');
-            const amp11 = document.getElementById('amp-11');
-            const desc = document.getElementById('state-description');
-            const note = document.getElementById('correlation-note');
-            const tbody = document.getElementById('correlation-body');
+    var state = '00';
+    var hadamardApplied = false;
+    var cnotApplied = false;
+    var zApplied = false;
+    var xApplied = false;
+    
+    function updateDisplay() {
+        var stateEl = document.getElementById('current-state');
+        var typeEl = document.getElementById('state-type');
+        
+        if (!hadamardApplied) {
+            stateEl.textContent = '|' + state + '⟩';
+            typeEl.textContent = 'Separable (product state)';
+        } else if (!cnotApplied) {
+            stateEl.textContent = '(|0' + state[1] + '⟩ + |1' + state[1] + '⟩)/√2 = |+' + state[1] + '⟩';
+            typeEl.textContent = 'Separable (product state with superposition)';
+        } else {
+            var sign = zApplied ? '-' : '+';
+            var first = xApplied ? '01' : '00';
+            var second = xApplied ? '10' : '11';
+            stateEl.textContent = '(|' + first + '⟩ ' + sign + ' |' + second + '⟩)/√2';
             
-            const sqrt2 = 70.7; // 1/sqrt(2) * 100
-            
-            switch(state) {
-                case 'phi+':
-                    amp00.style.height = sqrt2 + '%';
-                    amp01.style.height = '0%';
-                    amp10.style.height = '0%';
-                    amp11.style.height = sqrt2 + '%';
-                    desc.textContent = 'Current: |Φ⁺⟩ = (|00⟩ + |11⟩)/√2';
-                    note.textContent = 'Perfect correlation: both qubits always match!';
-                    tbody.innerHTML = `
-                        <tr><td>|0⟩</td><td>|0⟩</td><td class="perfect-corr">50%</td></tr>
-                        <tr><td>|0⟩</td><td>|1⟩</td><td>0%</td></tr>
-                        <tr><td>|1⟩</td><td>|0⟩</td><td>0%</td></tr>
-                        <tr><td>|1⟩</td><td>|1⟩</td><td class="perfect-corr">50%</td></tr>
-                    `;
-                    break;
-                case 'phi-':
-                    amp00.style.height = sqrt2 + '%';
-                    amp01.style.height = '0%';
-                    amp10.style.height = '0%';
-                    amp11.style.height = sqrt2 + '%';
-                    desc.textContent = 'Current: |Φ⁻⟩ = (|00⟩ - |11⟩)/√2';
-                    note.textContent = 'Perfect correlation with phase difference!';
-                    tbody.innerHTML = `
-                        <tr><td>|0⟩</td><td>|0⟩</td><td class="perfect-corr">50%</td></tr>
-                        <tr><td>|0⟩</td><td>|1⟩</td><td>0%</td></tr>
-                        <tr><td>|1⟩</td><td>|0⟩</td><td>0%</td></tr>
-                        <tr><td>|1⟩</td><td>|1⟩</td><td class="perfect-corr">50%</td></tr>
-                    `;
-                    break;
-                case 'psi+':
-                    amp00.style.height = '0%';
-                    amp01.style.height = sqrt2 + '%';
-                    amp10.style.height = sqrt2 + '%';
-                    amp11.style.height = '0%';
-                    desc.textContent = 'Current: |Ψ⁺⟩ = (|01⟩ + |10⟩)/√2';
-                    note.textContent = 'Perfect anti-correlation: qubits always opposite!';
-                    tbody.innerHTML = `
-                        <tr><td>|0⟩</td><td>|0⟩</td><td>0%</td></tr>
-                        <tr><td>|0⟩</td><td>|1⟩</td><td class="perfect-anti">50%</td></tr>
-                        <tr><td>|1⟩</td><td>|0⟩</td><td class="perfect-anti">50%</td></tr>
-                        <tr><td>|1⟩</td><td>|1⟩</td><td>0%</td></tr>
-                    `;
-                    break;
-                case 'psi-':
-                    amp00.style.height = '0%';
-                    amp01.style.height = sqrt2 + '%';
-                    amp10.style.height = sqrt2 + '%';
-                    amp11.style.height = '0%';
-                    desc.textContent = 'Current: |Ψ⁻⟩ = (|01⟩ - |10⟩)/√2 (Singlet)';
-                    note.textContent = 'The singlet state - used in quantum cryptography!';
-                    tbody.innerHTML = `
-                        <tr><td>|0⟩</td><td>|0⟩</td><td>0%</td></tr>
-                        <tr><td>|0⟩</td><td>|1⟩</td><td class="perfect-anti">50%</td></tr>
-                        <tr><td>|1⟩</td><td>|0⟩</td><td class="perfect-anti">50%</td></tr>
-                        <tr><td>|1⟩</td><td>|1⟩</td><td>0%</td></tr>
-                    `;
-                    break;
-            }
+            if (!zApplied && !xApplied) typeEl.textContent = '|Φ⁺⟩ - Phi Plus (ENTANGLED!)';
+            else if (zApplied && !xApplied) typeEl.textContent = '|Φ⁻⟩ - Phi Minus (ENTANGLED!)';
+            else if (!zApplied && xApplied) typeEl.textContent = '|Ψ⁺⟩ - Psi Plus (ENTANGLED!)';
+            else typeEl.textContent = '|Ψ⁻⟩ - Psi Minus (ENTANGLED!)';
         }
-        
-        // Bell State Bloch Sphere Visualization
-        let bellScenes = [], bellCameras = [], bellRenderers = [], bellArrows = [];
-        let bellStep = 0;
-        
-        function initBellBloch() {
-            const containers = [document.getElementById('bell-bloch1'), document.getElementById('bell-bloch2')];
-            if (!containers[0]) return;
-            const colors = [0xff6b6b, 0x4ecdc4];
-            
-            containers.forEach((container, idx) => {
-                const scene = new THREE.Scene();
-                scene.background = new THREE.Color(0x0a0a0a);
-                const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
-                camera.position.set(2.5, 2, 2.5);
-                const renderer = new THREE.WebGLRenderer({ antialias: true });
-                renderer.setSize(200, 200);
-                container.appendChild(renderer.domElement);
-                
-                scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-                scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })));
-                scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
-                scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
-                scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
-                scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
-                [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
-                    const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
-                    const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
-                    const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
-                    sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);scene.add(sprite);
-                });
-                
-                const arrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, colors[idx], 0.12, 0.08);
-                scene.add(arrow);
-                
-                const controls = new THREE.OrbitControls(camera, renderer.domElement);
-                controls.enableDamping = true;
-                
-                bellScenes.push(scene); bellCameras.push(camera); bellRenderers.push(renderer); bellArrows.push(arrow);
-            });
-            
-            function animateBell() {
-                requestAnimationFrame(animateBell);
-                bellRenderers.forEach((r, i) => r.render(bellScenes[i], bellCameras[i]));
-            }
-            animateBell();
+    }
+    
+    function applyH() {
+        if (!hadamardApplied) {
+            hadamardApplied = true;
+            updateDisplay();
         }
-        
-        function bellStep1() {
-            if (bellStep >= 1) return;
-            bellStep = 1;
-            bellArrows[0].setDirection(new THREE.Vector3(1, 0, 0).normalize());
-            document.getElementById('bell-state1').textContent = '|+⟩ = (|0⟩+|1⟩)/√2';
-            document.getElementById('bell-note').textContent = 'Hadamard applied! Qubit 1 is now in superposition. Click Step 2 for CNOT.';
-            document.getElementById('bell-note').style.color = '#667eea';
+    }
+    
+    function applyCNOT() {
+        if (hadamardApplied && !cnotApplied) {
+            cnotApplied = true;
+            updateDisplay();
         }
-        
-        function bellStep2() {
-            if (bellStep < 1) {
-                document.getElementById('bell-note').textContent = 'Apply Hadamard first (Step 1)!';
-                document.getElementById('bell-note').style.color = '#ff6b6b';
-                return;
-            }
-            if (bellStep >= 2) return;
-            bellStep = 2;
-            document.getElementById('bell-state1').textContent = 'Entangled';
-            document.getElementById('bell-state2').textContent = 'Entangled';
-            document.getElementById('bell-note').innerHTML = '<span style="color:#64ffda;font-weight:bold;">Bell State |Φ⁺⟩ Created!</span> Qubits are now entangled - measuring one instantly determines the other!';
-            bellArrows[0].material.color.setHex(0xa855f7);
-            bellArrows[1].material.color.setHex(0xa855f7);
+    }
+    
+    function applyZ() {
+        if (cnotApplied) {
+            zApplied = !zApplied;
+            updateDisplay();
         }
-        
-        function resetBell() {
-            bellStep = 0;
-            bellArrows[0].setDirection(new THREE.Vector3(0, 0, 1).normalize());
-            bellArrows[1].setDirection(new THREE.Vector3(0, 0, 1).normalize());
-            bellArrows[0].material.color.setHex(0xff6b6b);
-            bellArrows[1].material.color.setHex(0x4ecdc4);
-            document.getElementById('bell-state1').textContent = '|0⟩';
-            document.getElementById('bell-state2').textContent = '|0⟩';
-            document.getElementById('bell-note').textContent = 'Click Step 1 to apply Hadamard, then Step 2 to apply CNOT and create entanglement';
-            document.getElementById('bell-note').style.color = '#888';
+    }
+    
+    function applyX() {
+        if (cnotApplied) {
+            xApplied = !xApplied;
+            updateDisplay();
         }
-        
-        window.addEventListener('load', initBellBloch);
+    }
+    
+    function resetSim() {
+        state = '00';
+        hadamardApplied = false;
+        cnotApplied = false;
+        zApplied = false;
+        xApplied = false;
+        updateDisplay();
+    }
+    
+    updateDisplay();
     </script>
 </body>
 </html>

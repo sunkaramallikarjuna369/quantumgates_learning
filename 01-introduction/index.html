@@ -3,251 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Introduction to Quantum Gates</title>
+    <title>Introduction to Quantum Gates - Devin's Teaching Style</title>
     <link rel="stylesheet" href="../shared/styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-        .prereq-box { background: linear-gradient(135deg, rgba(100,255,218,0.1), rgba(78,205,196,0.05)); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
-        .prereq-box h3 { color: #64ffda; margin-bottom: 15px; }
-        .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #64ffda; }
-        .prereq-item h4 { color: #4ecdc4; margin-bottom: 8px; }
-        .visual-comparison { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 20px 0; }
-        .compare-panel { background: rgba(100,255,218,0.05); border: 1px solid rgba(100,255,218,0.2); border-radius: 12px; padding: 20px; text-align: center; }
-        .compare-panel h4 { color: #64ffda; margin-bottom: 15px; }
-        .bit-visual { display: flex; justify-content: center; gap: 30px; margin: 15px 0; }
-        .bit-box { width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; }
-        .bit-0 { background: linear-gradient(135deg, #333, #555); color: #888; border: 2px solid #555; }
-        .bit-1 { background: linear-gradient(135deg, #64ffda, #4ecdc4); color: #000; border: 2px solid #64ffda; }
-        .qubit-visual { width: 150px; height: 150px; margin: 0 auto; position: relative; }
-        .qubit-sphere { width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(100,255,218,0.3), rgba(0,0,0,0.8)); border: 2px solid rgba(100,255,218,0.4); position: relative; }
-        .qubit-arrow { position: absolute; width: 4px; height: 60px; background: linear-gradient(to top, #ff6b6b, #ff8e8e); left: 50%; top: 15%; transform-origin: bottom center; transform: translateX(-50%); border-radius: 2px; }
-        .qubit-arrow::after { content: ''; position: absolute; top: -8px; left: -6px; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid #ff6b6b; }
-        .bloch-canvas { width: 100%; height: 350px; border-radius: 12px; background: #050505; margin: 20px 0; }
-        .gate-flow { display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 12px; margin: 15px 0; }
-        .flow-state { padding: 15px 25px; border-radius: 8px; font-family: monospace; font-size: 18px; }
-        .flow-input { background: rgba(255,107,107,0.2); border: 1px solid rgba(255,107,107,0.4); color: #ff6b6b; }
-        .flow-output { background: rgba(78,205,196,0.2); border: 1px solid rgba(78,205,196,0.4); color: #4ecdc4; }
-        .flow-gate { background: linear-gradient(135deg, rgba(100,255,218,0.3), rgba(78,205,196,0.2)); border: 2px solid rgba(100,255,218,0.5); padding: 15px 30px; border-radius: 8px; font-size: 24px; font-weight: bold; color: #64ffda; }
-        .flow-arrow { font-size: 24px; color: #64ffda; }
-        .matrix-visual { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 15px 0; flex-wrap: wrap; }
-        .matrix-box { display: inline-grid; grid-template-columns: repeat(2, 45px); gap: 3px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; border: 1px solid rgba(100,255,218,0.3); }
-        .matrix-box .cell { width: 45px; height: 35px; display: flex; align-items: center; justify-content: center; background: rgba(100,255,218,0.15); color: #fff; font-size: 14px; border-radius: 4px; }
-        .vector-box { display: inline-grid; grid-template-columns: 45px; gap: 3px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,107,107,0.3); }
-        .vector-box .cell { width: 45px; height: 35px; display: flex; align-items: center; justify-content: center; background: rgba(255,107,107,0.2); color: #ff6b6b; font-size: 14px; border-radius: 4px; }
+        .fourwh-box { background: linear-gradient(135deg, rgba(100,255,218,0.12), rgba(78,205,196,0.06)); border: 2px solid rgba(100,255,218,0.4); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .fourwh-box h3 { color: #64ffda; margin-bottom: 20px; font-size: 1.4em; }
+        .fourwh-item { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 20px; margin: 15px 0; border-left: 5px solid; }
+        .fourwh-item.what { border-color: #ff6b6b; }
+        .fourwh-item.why { border-color: #ffd93d; }
+        .fourwh-item.when { border-color: #4ecdc4; }
+        .fourwh-item.where { border-color: #a855f7; }
+        .fourwh-item.how { border-color: #64ffda; }
+        .fourwh-item h4 { margin-bottom: 12px; font-size: 1.2em; }
+        .fourwh-item.what h4 { color: #ff6b6b; }
+        .fourwh-item.why h4 { color: #ffd93d; }
+        .fourwh-item.when h4 { color: #4ecdc4; }
+        .fourwh-item.where h4 { color: #a855f7; }
+        .fourwh-item.how h4 { color: #64ffda; }
+        .fourwh-item p { color: #ccc; line-height: 1.7; }
+        .prereq-box { background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(168,85,247,0.05)); border: 2px solid rgba(168,85,247,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
+        .prereq-box h3 { color: #a855f7; margin-bottom: 15px; }
+        .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #a855f7; }
+        .prereq-item h4 { color: #c084fc; margin-bottom: 8px; }
+        .bloch-container { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
+        .bloch-main { background: rgba(0,0,0,0.5); border-radius: 16px; padding: 20px; }
+        .bloch-canvas { width: 450px; height: 450px; border-radius: 12px; background: #050505; }
+        .angle-display { background: rgba(0,0,0,0.6); border-radius: 12px; padding: 20px; min-width: 280px; }
+        .angle-display h4 { color: #64ffda; margin-bottom: 15px; text-align: center; }
+        .angle-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; margin: 8px 0; background: rgba(100,255,218,0.1); border-radius: 8px; }
+        .angle-name { font-weight: bold; }
+        .angle-name.theta { color: #ff6b6b; }
+        .angle-name.phi { color: #4ecdc4; }
+        .angle-value { font-family: monospace; font-size: 1.1em; color: #fff; }
+        .angle-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .angle-bar-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        .angle-bar-fill.theta { background: linear-gradient(90deg, #ff6b6b, #ff8e8e); }
+        .angle-bar-fill.phi { background: linear-gradient(90deg, #4ecdc4, #6ee7de); }
+        .state-info { text-align: center; margin-top: 15px; padding: 15px; background: rgba(100,255,218,0.1); border-radius: 8px; }
+        .state-info .state { font-size: 1.3em; color: #64ffda; font-family: monospace; }
+        .state-info .coords { color: #888; font-size: 0.9em; margin-top: 8px; }
+        .axis-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .axis-item { text-align: center; padding: 10px; border-radius: 8px; }
+        .axis-item.x { background: rgba(255,107,107,0.2); border: 1px solid rgba(255,107,107,0.4); }
+        .axis-item.y { background: rgba(78,205,196,0.2); border: 1px solid rgba(78,205,196,0.4); }
+        .axis-item.z { background: rgba(255,217,61,0.2); border: 1px solid rgba(255,217,61,0.4); }
+        .axis-item .label { font-weight: bold; font-size: 1.2em; }
+        .axis-item.x .label { color: #ff6b6b; }
+        .axis-item.y .label { color: #4ecdc4; }
+        .axis-item.z .label { color: #ffd93d; }
+        .axis-item .range { color: #888; font-size: 0.85em; margin-top: 5px; }
+        .matrix-derivation { background: rgba(255,215,0,0.08); border: 2px solid rgba(255,215,0,0.3); border-radius: 16px; padding: 25px; margin: 25px 0; }
+        .matrix-derivation h3 { color: #ffd93d; margin-bottom: 20px; }
+        .derivation-step { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 20px; margin: 15px 0; }
+        .derivation-step h4 { color: #4ecdc4; margin-bottom: 12px; }
+        .derivation-step .explanation { color: #ccc; line-height: 1.6; }
+        .derivation-step .formula { background: rgba(100,255,218,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 1.1em; color: #64ffda; text-align: center; }
+        .matrix-visual { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+        .matrix-box { display: inline-grid; grid-template-columns: repeat(2, 50px); gap: 4px; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 10px; border: 2px solid rgba(100,255,218,0.3); }
+        .matrix-box .cell { width: 50px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(100,255,218,0.15); color: #fff; font-size: 16px; border-radius: 5px; font-family: monospace; }
+        .vector-box { display: inline-grid; grid-template-columns: 50px; gap: 4px; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 10px; border: 2px solid rgba(255,107,107,0.3); }
+        .vector-box .cell { width: 50px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,107,107,0.2); color: #ff6b6b; font-size: 16px; border-radius: 5px; font-family: monospace; }
         .result-box { border-color: rgba(78,205,196,0.3); }
         .result-box .cell { background: rgba(78,205,196,0.2); color: #4ecdc4; }
-        .op-symbol { font-size: 24px; color: #64ffda; font-weight: bold; }
-        .roadmap { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
-        .roadmap-item { background: rgba(100,255,218,0.08); border: 1px solid rgba(100,255,218,0.2); border-radius: 10px; padding: 15px; text-align: center; transition: all 0.3s; }
-        .roadmap-item:hover { transform: translateY(-3px); border-color: rgba(100,255,218,0.5); }
-        .roadmap-num { width: 35px; height: 35px; background: linear-gradient(135deg, #64ffda, #4ecdc4); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 0 auto 10px; }
-        .roadmap-item h4 { color: #64ffda; margin-bottom: 5px; font-size: 14px; }
-        .roadmap-item p { color: #888; font-size: 12px; margin: 0; }
-        .decision-guide { background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
-        .decision-guide h3 { color: #ffd93d; margin-bottom: 15px; }
-        .decision-item { display: flex; align-items: flex-start; gap: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 10px 0; }
-        .decision-item .goal { color: #4ecdc4; font-weight: bold; min-width: 180px; }
-        .decision-item .solution { color: #fff; }
+        .op-symbol { font-size: 28px; color: #64ffda; font-weight: bold; }
+        .interactive-controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 20px 0; }
+        .ctrl-btn { padding: 12px 24px; border: none; border-radius: 10px; font-size: 15px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .ctrl-btn:hover { transform: scale(1.05); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        .btn-x { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); color: #fff; }
+        .btn-y { background: linear-gradient(135deg, #4ecdc4, #6ee7de); color: #000; }
+        .btn-z { background: linear-gradient(135deg, #ffd93d, #ffe66d); color: #000; }
+        .btn-h { background: linear-gradient(135deg, #a855f7, #c084fc); color: #fff; }
+        .btn-reset { background: linear-gradient(135deg, #666, #888); color: #fff; }
+        .comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .compare-card { background: rgba(100,255,218,0.05); border: 1px solid rgba(100,255,218,0.2); border-radius: 12px; padding: 20px; }
+        .compare-card h4 { color: #64ffda; margin-bottom: 15px; text-align: center; }
+        .bit-visual { display: flex; justify-content: center; gap: 20px; margin: 15px 0; }
+        .bit-box { width: 70px; height: 70px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; }
+        .bit-0 { background: linear-gradient(135deg, #333, #555); color: #888; border: 2px solid #555; }
+        .bit-1 { background: linear-gradient(135deg, #64ffda, #4ecdc4); color: #000; border: 2px solid #64ffda; }
+        .key-insight { background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,107,107,0.05)); border: 2px solid rgba(255,107,107,0.3); border-radius: 12px; padding: 20px; margin: 20px 0; }
+        .key-insight h4 { color: #ff6b6b; margin-bottom: 10px; }
+        .key-insight p { color: #ccc; line-height: 1.6; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Introduction to Quantum Gates</h1>
-            <p class="subtitle">Building Blocks of Quantum Computation</p>
+            <p class="subtitle">Devin's Teaching Style - Understanding from First Principles</p>
         </header>
 
         <section class="section">
             <div class="prereq-box">
-                <h3>Prerequisites - What You Should Know</h3>
+                <h3>Before We Begin - Essential Prerequisites</h3>
                 <div class="prereq-item">
-                    <h4>1. Classical Bits</h4>
-                    <p>A classical bit can be either <strong>0</strong> or <strong>1</strong> - nothing in between. It's like a light switch: on or off.</p>
+                    <h4>1. Classical Bits - The Foundation</h4>
+                    <p>A classical bit is the simplest unit of information - it can only be <strong>0</strong> or <strong>1</strong>. Think of it like a light switch: it is either OFF (0) or ON (1), never in between. All classical computers work by manipulating billions of these bits.</p>
                 </div>
                 <div class="prereq-item">
-                    <h4>2. Logic Gates</h4>
-                    <p>Classical gates (AND, OR, NOT) transform bits. For example, NOT flips 0→1 and 1→0. Quantum gates are similar but work on qubits!</p>
+                    <h4>2. Logic Gates - How Bits Transform</h4>
+                    <p>Classical gates (AND, OR, NOT) transform bits. The NOT gate flips: 0 to 1 and 1 to 0. Quantum gates are similar but work on qubits and can do much more - they can create superpositions!</p>
                 </div>
                 <div class="prereq-item">
-                    <h4>3. Complex Numbers (Basic)</h4>
-                    <p>Quantum states use complex numbers (a + bi where i² = -1). Don't worry - we'll show you visually what this means!</p>
+                    <h4>3. Vectors - Representing States</h4>
+                    <p>We represent states as column vectors. |0⟩ = [1, 0]ᵀ means "100% probability of measuring 0". |1⟩ = [0, 1]ᵀ means "100% probability of measuring 1". The numbers represent probability amplitudes.</p>
+                </div>
+                <div class="prereq-item">
+                    <h4>4. Matrix Multiplication - How Gates Work</h4>
+                    <p>Gates are 2x2 matrices. When we multiply a gate matrix by a state vector, we get a new state. This is how quantum gates transform qubits!</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="fourwh-box">
+                <h3>Understanding Quantum Gates - The 4W+H Approach</h3>
+                
+                <div class="fourwh-item what">
+                    <h4>WHAT is a Quantum Gate?</h4>
+                    <p>A quantum gate is a <strong>unitary operation</strong> that transforms a qubit's state. Mathematically, it's a 2x2 matrix (for single-qubit gates) that multiplies the state vector. Visually, it's a <strong>rotation on the Bloch sphere</strong>. Every quantum gate preserves the total probability (|α|² + |β|² = 1) and is reversible.</p>
+                </div>
+                
+                <div class="fourwh-item why">
+                    <h4>WHY do we need Quantum Gates?</h4>
+                    <p>Quantum gates are the building blocks of quantum algorithms. Just like classical computers use AND, OR, NOT gates to compute, quantum computers use quantum gates. The key difference: quantum gates can create <strong>superposition</strong> (being in multiple states at once) and <strong>entanglement</strong> (correlating qubits). This enables quantum speedup for certain problems like factoring large numbers (Shor's algorithm) and searching databases (Grover's algorithm).</p>
+                </div>
+                
+                <div class="fourwh-item when">
+                    <h4>WHEN should you use Quantum Gates?</h4>
+                    <p><strong>X gate:</strong> When you need to flip |0⟩ to |1⟩ (quantum NOT). <strong>H gate:</strong> When you need to create superposition from a basis state. <strong>Z gate:</strong> When you need to add a phase to the |1⟩ component. <strong>CNOT:</strong> When you need to entangle two qubits or implement conditional logic.</p>
+                </div>
+                
+                <div class="fourwh-item where">
+                    <h4>WHERE do Quantum Gates fit in Quantum Computing?</h4>
+                    <p>Quantum gates form <strong>quantum circuits</strong>. A circuit reads left-to-right: qubits start in |0⟩, pass through gates, and are measured at the end. Gates are the "instructions" that manipulate quantum information. Any quantum algorithm can be built from a small set of universal gates (like H, T, and CNOT).</p>
+                </div>
+                
+                <div class="fourwh-item how">
+                    <h4>HOW do Quantum Gates work?</h4>
+                    <p>Gates work through <strong>matrix-vector multiplication</strong>. If your qubit is in state |ψ⟩ = [α, β]ᵀ and you apply gate U (a 2x2 matrix), the new state is U|ψ⟩. On the Bloch sphere, this corresponds to a rotation. For example, the X gate rotates 180° around the X-axis, swapping |0⟩ and |1⟩.</p>
                 </div>
             </div>
         </section>
 
         <section class="section">
             <h2>Classical Bit vs Quantum Bit (Qubit)</h2>
-            <div class="visual-comparison">
-                <div class="compare-panel">
+            <div class="comparison-grid">
+                <div class="compare-card">
                     <h4>Classical Bit</h4>
                     <div class="bit-visual">
                         <div class="bit-box bit-0">0</div>
-                        <span style="color:#888;font-size:20px;">or</span>
+                        <span style="color:#888;font-size:24px;align-self:center;">or</span>
                         <div class="bit-box bit-1">1</div>
                     </div>
-                    <p style="color:#888;margin-top:10px;">Only two possible states</p>
+                    <p style="color:#888;text-align:center;margin-top:15px;">Only two possible states: 0 OR 1</p>
+                    <p style="color:#888;text-align:center;">Like a coin lying flat - heads or tails</p>
                 </div>
-                <div class="compare-panel">
+                <div class="compare-card">
                     <h4>Quantum Bit (Qubit)</h4>
-                    <div class="qubit-visual">
-                        <div class="qubit-sphere">
-                            <div class="qubit-arrow" style="transform: translateX(-50%) rotate(30deg);"></div>
+                    <div style="text-align:center;padding:20px;">
+                        <div style="width:100px;height:100px;margin:0 auto;border-radius:50%;background:radial-gradient(circle at 30% 30%, rgba(100,255,218,0.4), rgba(0,0,0,0.8));border:2px solid rgba(100,255,218,0.5);position:relative;">
+                            <div style="position:absolute;width:4px;height:40px;background:linear-gradient(to top,#ff6b6b,#ff8e8e);left:50%;top:20%;transform-origin:bottom center;transform:translateX(-50%) rotate(30deg);border-radius:2px;"></div>
                         </div>
                     </div>
-                    <p style="color:#888;margin-top:10px;">Can point anywhere on the sphere!</p>
+                    <p style="color:#888;text-align:center;margin-top:15px;">Can be in superposition: α|0⟩ + β|1⟩</p>
+                    <p style="color:#888;text-align:center;">Like a spinning coin - both states at once!</p>
                 </div>
             </div>
-            <div class="highlight">
-                <p>A qubit can be in a <strong>superposition</strong>: |ψ⟩ = α|0⟩ + β|1⟩, meaning it's partially in both states at once until measured!</p>
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>The Bloch Sphere - Your Visual Guide</h2>
-            <p>The Bloch sphere is a 3D representation where every point on the surface is a valid qubit state. This is your most important visualization tool!</p>
-            <div id="bloch-container" class="bloch-canvas"></div>
-            <div class="key-point">
-                <h3>Key Points on the Bloch Sphere</h3>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:15px;">
-                    <div style="background:rgba(255,215,0,0.1);padding:10px;border-radius:8px;text-align:center;">
-                        <strong style="color:#ffd93d;">North Pole (+Z)</strong><br><span style="color:#888;">|0⟩ state</span>
-                    </div>
-                    <div style="background:rgba(255,107,107,0.1);padding:10px;border-radius:8px;text-align:center;">
-                        <strong style="color:#ff6b6b;">South Pole (-Z)</strong><br><span style="color:#888;">|1⟩ state</span>
-                    </div>
-                    <div style="background:rgba(100,255,218,0.1);padding:10px;border-radius:8px;text-align:center;">
-                        <strong style="color:#64ffda;">+X axis</strong><br><span style="color:#888;">|+⟩ = (|0⟩+|1⟩)/√2</span>
-                    </div>
-                    <div style="background:rgba(168,85,247,0.1);padding:10px;border-radius:8px;text-align:center;">
-                        <strong style="color:#a855f7;">-X axis</strong><br><span style="color:#888;">|-⟩ = (|0⟩-|1⟩)/√2</span>
-                    </div>
-                </div>
+            <div class="key-insight">
+                <h4>Key Insight: Superposition</h4>
+                <p>A qubit in superposition |ψ⟩ = α|0⟩ + β|1⟩ is NOT "either 0 or 1 but we don't know which." It's genuinely in BOTH states simultaneously until measured. The coefficients α and β are complex numbers called <strong>probability amplitudes</strong>. When measured, the probability of getting 0 is |α|² and getting 1 is |β|². This is fundamentally different from classical probability!</p>
             </div>
         </section>
 
         <section class="section">
-            <h2>What is a Quantum Gate?</h2>
-            <p>A quantum gate transforms a qubit state. Visually, it's a <strong>rotation on the Bloch sphere</strong>!</p>
-            <div class="gate-flow">
-                <div class="flow-state flow-input">|ψ⟩ input</div>
-                <span class="flow-arrow">→</span>
-                <div class="flow-gate">U</div>
-                <span class="flow-arrow">→</span>
-                <div class="flow-state flow-output">|ψ'⟩ output</div>
-            </div>
-            <div class="example">
-                <h3>Example: X Gate (Quantum NOT)</h3>
-                <p>The X gate flips |0⟩ to |1⟩ and vice versa - it's a 180° rotation around the X-axis!</p>
-                <div class="matrix-visual">
-                    <div class="matrix-box">
-                        <div class="cell">0</div><div class="cell">1</div>
-                        <div class="cell">1</div><div class="cell">0</div>
-                    </div>
-                    <span class="op-symbol">×</span>
-                    <div class="vector-box">
-                        <div class="cell">1</div><div class="cell">0</div>
-                    </div>
-                    <span class="op-symbol">=</span>
-                    <div class="vector-box result-box">
-                        <div class="cell">0</div><div class="cell">1</div>
+            <h2>The Bloch Sphere - Understanding θ (Theta) and φ (Phi)</h2>
+            <p>The Bloch sphere represents all possible single-qubit states. Every point on the surface is a valid quantum state. The key to understanding it is mastering the two angles:</p>
+            
+            <div class="bloch-container">
+                <div class="bloch-main">
+                    <div id="bloch-container" class="bloch-canvas"></div>
+                    <div class="interactive-controls">
+                        <button class="ctrl-btn btn-x" onclick="applyGate('X')">X Gate</button>
+                        <button class="ctrl-btn btn-y" onclick="applyGate('Y')">Y Gate</button>
+                        <button class="ctrl-btn btn-z" onclick="applyGate('Z')">Z Gate</button>
+                        <button class="ctrl-btn btn-h" onclick="applyGate('H')">H Gate</button>
+                        <button class="ctrl-btn btn-reset" onclick="resetState()">Reset to |0⟩</button>
                     </div>
                 </div>
-                <p style="text-align:center;color:#888;margin-top:10px;">X|0⟩ = |1⟩ (bit flip!)</p>
+                <div class="angle-display">
+                    <h4>Current Angles (Real-Time)</h4>
+                    <div class="angle-item">
+                        <span class="angle-name theta">θ (Theta)</span>
+                        <span class="angle-value" id="theta-value">0°</span>
+                    </div>
+                    <div class="angle-bar"><div class="angle-bar-fill theta" id="theta-bar" style="width:0%;"></div></div>
+                    <p style="color:#888;font-size:0.85em;margin-top:5px;">Polar angle from +Z axis (0° to 180°)</p>
+                    
+                    <div class="angle-item" style="margin-top:20px;">
+                        <span class="angle-name phi">φ (Phi)</span>
+                        <span class="angle-value" id="phi-value">0°</span>
+                    </div>
+                    <div class="angle-bar"><div class="angle-bar-fill phi" id="phi-bar" style="width:0%;"></div></div>
+                    <p style="color:#888;font-size:0.85em;margin-top:5px;">Azimuthal angle in XY plane (0° to 360°)</p>
+                    
+                    <div class="state-info">
+                        <div class="state" id="current-state">|0⟩</div>
+                        <div class="coords" id="current-coords">x=0, y=0, z=1</div>
+                    </div>
+                    
+                    <div class="axis-legend">
+                        <div class="axis-item x"><div class="label">X</div><div class="range">-1 to +1</div></div>
+                        <div class="axis-item y"><div class="label">Y</div><div class="range">-1 to +1</div></div>
+                        <div class="axis-item z"><div class="label">Z</div><div class="range">-1 to +1</div></div>
+                    </div>
+                </div>
             </div>
-        </section>
-
-        <section class="section">
-            <h2>Why Are Quantum Gates Special?</h2>
-            <div class="highlight">
-                <table class="gate-table">
-                    <tr>
-                        <th>Property</th>
-                        <th>Classical Gates</th>
-                        <th>Quantum Gates</th>
-                    </tr>
-                    <tr>
-                        <td>Reversibility</td>
-                        <td>Often irreversible (AND, OR)</td>
-                        <td>Always reversible</td>
-                    </tr>
-                    <tr>
-                        <td>Information</td>
-                        <td>Can lose information</td>
-                        <td>Preserves all information</td>
-                    </tr>
-                    <tr>
-                        <td>Representation</td>
-                        <td>Truth tables</td>
-                        <td>Unitary matrices</td>
-                    </tr>
-                    <tr>
-                        <td>State Space</td>
-                        <td>Discrete (0 or 1)</td>
-                        <td>Continuous (Bloch sphere)</td>
-                    </tr>
-                </table>
-            </div>
-        </section>
-
-        <section class="section">
-            <div class="decision-guide">
-                <h3>Quick Reference: Common Gate Effects</h3>
-                <div class="decision-item">
-                    <span class="goal">Flip |0⟩ ↔ |1⟩:</span>
-                    <span class="solution">Use <strong style="color:#ff6b6b;">X gate</strong> (quantum NOT)</span>
+            
+            <div class="matrix-derivation">
+                <h3>Understanding θ and φ - The Complete Picture</h3>
+                <div class="derivation-step">
+                    <h4>θ (Theta) - The Polar Angle</h4>
+                    <p class="explanation">θ measures the angle from the <strong>+Z axis (north pole)</strong>. It ranges from 0° to 180°:</p>
+                    <ul style="color:#ccc;margin:10px 0 10px 20px;">
+                        <li><strong>θ = 0°:</strong> State is at +Z (north pole) = |0⟩</li>
+                        <li><strong>θ = 90°:</strong> State is on the equator (superposition states like |+⟩, |-⟩, |i⟩, |-i⟩)</li>
+                        <li><strong>θ = 180°:</strong> State is at -Z (south pole) = |1⟩</li>
+                    </ul>
+                    <div class="formula">|ψ⟩ = cos(θ/2)|0⟩ + e^(iφ)sin(θ/2)|1⟩</div>
+                    <p class="explanation">Notice: We use θ/2 in the formula! This is because the Bloch sphere represents states up to a global phase, and the actual state space is a 2D complex sphere.</p>
                 </div>
-                <div class="decision-item">
-                    <span class="goal">Create superposition:</span>
-                    <span class="solution">Use <strong style="color:#a855f7;">H gate</strong> (Hadamard)</span>
+                <div class="derivation-step">
+                    <h4>φ (Phi) - The Azimuthal Angle</h4>
+                    <p class="explanation">φ measures the angle around the Z-axis in the XY plane. It ranges from 0° to 360°:</p>
+                    <ul style="color:#ccc;margin:10px 0 10px 20px;">
+                        <li><strong>φ = 0°:</strong> Points toward +X axis (|+⟩ state when θ=90°)</li>
+                        <li><strong>φ = 90°:</strong> Points toward +Y axis (|i⟩ state when θ=90°)</li>
+                        <li><strong>φ = 180°:</strong> Points toward -X axis (|-⟩ state when θ=90°)</li>
+                        <li><strong>φ = 270°:</strong> Points toward -Y axis (|-i⟩ state when θ=90°)</li>
+                    </ul>
+                    <p class="explanation">φ represents the <strong>relative phase</strong> between |0⟩ and |1⟩ components. This phase is invisible when measuring in the Z-basis but becomes important in quantum interference!</p>
                 </div>
-                <div class="decision-item">
-                    <span class="goal">Add phase to |1⟩:</span>
-                    <span class="solution">Use <strong style="color:#ffd93d;">Z gate</strong> or S/T gates</span>
-                </div>
-                <div class="decision-item">
-                    <span class="goal">Rotate by any angle:</span>
-                    <span class="solution">Use <strong style="color:#4ecdc4;">Rx, Ry, Rz</strong> rotation gates</span>
-                </div>
-                <div class="decision-item">
-                    <span class="goal">Entangle two qubits:</span>
-                    <span class="solution">Use <strong style="color:#64ffda;">CNOT</strong> (controlled-NOT)</span>
+                <div class="derivation-step">
+                    <h4>Cartesian Coordinates from Angles</h4>
+                    <p class="explanation">The Bloch vector coordinates (x, y, z) relate to angles by:</p>
+                    <div class="formula">x = sin(θ)cos(φ), y = sin(θ)sin(φ), z = cos(θ)</div>
+                    <p class="explanation">These are standard spherical coordinates! The state vector always has length 1 (it's on the unit sphere surface).</p>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <h2>Your Learning Roadmap</h2>
-            <div class="roadmap">
-                <div class="roadmap-item">
-                    <div class="roadmap-num">1</div>
-                    <h4>Single-Qubit Gates</h4>
-                    <p>X, Y, Z, H, S, T</p>
+            <div class="matrix-derivation">
+                <h3>WHY Does the X Gate Matrix Look Like This?</h3>
+                <div class="derivation-step">
+                    <h4>Step 1: What should X do?</h4>
+                    <p class="explanation">The X gate should swap |0⟩ and |1⟩. So we need: X|0⟩ = |1⟩ and X|1⟩ = |0⟩</p>
                 </div>
-                <div class="roadmap-item">
-                    <div class="roadmap-num">2</div>
-                    <h4>Rotation Gates</h4>
-                    <p>Rx, Ry, Rz</p>
+                <div class="derivation-step">
+                    <h4>Step 2: Translate to vectors</h4>
+                    <p class="explanation">In vector form: X[1,0]ᵀ = [0,1]ᵀ and X[0,1]ᵀ = [1,0]ᵀ</p>
                 </div>
-                <div class="roadmap-item">
-                    <div class="roadmap-num">3</div>
-                    <h4>Multi-Qubit Gates</h4>
-                    <p>CNOT, CZ, SWAP</p>
+                <div class="derivation-step">
+                    <h4>Step 3: Build the matrix</h4>
+                    <p class="explanation">For a 2x2 matrix [[a,b],[c,d]], we need:</p>
+                    <ul style="color:#ccc;margin:10px 0 10px 20px;">
+                        <li>First column = where |0⟩ goes = [0,1]ᵀ, so a=0, c=1</li>
+                        <li>Second column = where |1⟩ goes = [1,0]ᵀ, so b=1, d=0</li>
+                    </ul>
+                    <div class="matrix-visual">
+                        <div class="matrix-box">
+                            <div class="cell">0</div><div class="cell">1</div>
+                            <div class="cell">1</div><div class="cell">0</div>
+                        </div>
+                        <span style="color:#888;margin-left:20px;">This is the X gate!</span>
+                    </div>
                 </div>
-                <div class="roadmap-item">
-                    <div class="roadmap-num">4</div>
-                    <h4>Universal Sets</h4>
-                    <p>Building any gate</p>
+                <div class="derivation-step">
+                    <h4>Step 4: Verify it works</h4>
+                    <div class="matrix-visual">
+                        <div class="matrix-box">
+                            <div class="cell">0</div><div class="cell">1</div>
+                            <div class="cell">1</div><div class="cell">0</div>
+                        </div>
+                        <span class="op-symbol">×</span>
+                        <div class="vector-box">
+                            <div class="cell">1</div><div class="cell">0</div>
+                        </div>
+                        <span class="op-symbol">=</span>
+                        <div class="vector-box result-box">
+                            <div class="cell">0</div><div class="cell">1</div>
+                        </div>
+                        <span style="color:#4ecdc4;font-size:18px;margin-left:10px;">= |1⟩ Correct!</span>
+                    </div>
+                    <p class="explanation" style="margin-top:15px;">Row 1: (0 × 1) + (1 × 0) = 0<br>Row 2: (1 × 1) + (0 × 0) = 1</p>
                 </div>
-                <div class="roadmap-item">
-                    <div class="roadmap-num">5</div>
-                    <h4>Entanglement</h4>
-                    <p>Bell states</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Key Points on the Bloch Sphere</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:20px 0;">
+                <div style="background:rgba(255,215,0,0.15);padding:12px;border-radius:10px;text-align:center;border:1px solid rgba(255,215,0,0.3);">
+                    <strong style="color:#ffd93d;">+Z (North)</strong><p style="color:#fff;margin:5px 0;">|0⟩</p><p style="color:#888;font-size:0.85em;">θ=0°</p>
                 </div>
-                <div class="roadmap-item">
-                    <div class="roadmap-num">6</div>
-                    <h4>Applications</h4>
-                    <p>Quantum circuits</p>
+                <div style="background:rgba(255,107,107,0.15);padding:12px;border-radius:10px;text-align:center;border:1px solid rgba(255,107,107,0.3);">
+                    <strong style="color:#ff6b6b;">-Z (South)</strong><p style="color:#fff;margin:5px 0;">|1⟩</p><p style="color:#888;font-size:0.85em;">θ=180°</p>
+                </div>
+                <div style="background:rgba(100,255,218,0.15);padding:12px;border-radius:10px;text-align:center;border:1px solid rgba(100,255,218,0.3);">
+                    <strong style="color:#64ffda;">+X</strong><p style="color:#fff;margin:5px 0;">|+⟩</p><p style="color:#888;font-size:0.85em;">θ=90°, φ=0°</p>
+                </div>
+                <div style="background:rgba(168,85,247,0.15);padding:12px;border-radius:10px;text-align:center;border:1px solid rgba(168,85,247,0.3);">
+                    <strong style="color:#a855f7;">-X</strong><p style="color:#fff;margin:5px 0;">|-⟩</p><p style="color:#888;font-size:0.85em;">θ=90°, φ=180°</p>
+                </div>
+                <div style="background:rgba(78,205,196,0.15);padding:12px;border-radius:10px;text-align:center;border:1px solid rgba(78,205,196,0.3);">
+                    <strong style="color:#4ecdc4;">+Y</strong><p style="color:#fff;margin:5px 0;">|i⟩</p><p style="color:#888;font-size:0.85em;">θ=90°, φ=90°</p>
+                </div>
+                <div style="background:rgba(244,114,182,0.15);padding:12px;border-radius:10px;text-align:center;border:1px solid rgba(244,114,182,0.3);">
+                    <strong style="color:#f472b6;">-Y</strong><p style="color:#fff;margin:5px 0;">|-i⟩</p><p style="color:#888;font-size:0.85em;">θ=90°, φ=270°</p>
                 </div>
             </div>
         </section>
@@ -259,81 +334,122 @@
     </div>
 
     <script>
-    const container = document.getElementById('bloch-container');
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x050505);
-    const camera = new THREE.PerspectiveCamera(50, container.clientWidth/container.clientHeight, 0.1, 1000);
-    camera.position.set(2.5, 2, 2.5);
-    const renderer = new THREE.WebGLRenderer({antialias:true});
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    container.appendChild(renderer.domElement);
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.5;
+    let scene, camera, renderer, controls, stateArrow;
+    let theta = 0, phi = 0;
     
-    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-    const light = new THREE.PointLight(0xffffff, 0.8);
-    light.position.set(10,10,10);
-    scene.add(light);
-    
-    scene.add(new THREE.Mesh(new THREE.SphereGeometry(1,32,32), new THREE.MeshPhongMaterial({color:0x64ffda,transparent:true,opacity:0.1})));
-    scene.add(new THREE.Mesh(new THREE.SphereGeometry(1,16,16), new THREE.MeshBasicMaterial({color:0x64ffda,wireframe:true,transparent:true,opacity:0.15})));
-    
-    scene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.1, 0.05));
-    scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.1, 0.05));
-    scene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.1, 0.05));
-    
-    const stateArrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, 0xffffff, 0.12, 0.08);
-    scene.add(stateArrow);
-    
-    const labels = [
-        {pos: [0, 0, 1.4], text: '|0⟩', color: '#ffd93d'},
-        {pos: [0, 0, -1.4], text: '|1⟩', color: '#ff6b6b'},
-        {pos: [1.4, 0, 0], text: '|+⟩', color: '#64ffda'},
-        {pos: [-1.4, 0, 0], text: '|-⟩', color: '#a855f7'},
-        {pos: [1.5, 0, 0], text: 'X', color: '#ff6b6b', offset: [0, -0.3, 0]},
-        {pos: [0, 1.5, 0], text: 'Y', color: '#4ecdc4'},
-        {pos: [0, 0, 1.5], text: 'Z', color: '#ffd93d', offset: [0.3, 0, 0]}
-    ];
-    
-    labels.forEach(l => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 64; canvas.height = 32;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = l.color;
-        ctx.font = 'bold 24px monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(l.text, 32, 24);
-        const texture = new THREE.CanvasTexture(canvas);
-        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({map: texture, transparent: true}));
-        const ox = l.offset ? l.offset[0] : 0;
-        const oy = l.offset ? l.offset[1] : 0;
-        const oz = l.offset ? l.offset[2] : 0;
-        sprite.position.set(l.pos[0] + ox, l.pos[1] + oy, l.pos[2] + oz);
-        sprite.scale.set(0.5, 0.25, 1);
-        scene.add(sprite);
-    });
-    
-    let time = 0;
-    function animate() {
-        requestAnimationFrame(animate);
-        time += 0.01;
-        const theta = Math.PI/4 + Math.sin(time*0.5) * Math.PI/6;
-        const phi = time;
-        const x = Math.sin(theta)*Math.cos(phi);
-        const y = Math.sin(theta)*Math.sin(phi);
-        const z = Math.cos(theta);
-        stateArrow.setDirection(new THREE.Vector3(x,y,z).normalize());
-        controls.update();
-        renderer.render(scene, camera);
-    }
-    animate();
-    
-    window.addEventListener('resize', () => {
-        camera.aspect = container.clientWidth/container.clientHeight;
-        camera.updateProjectionMatrix();
+    function init() {
+        const container = document.getElementById('bloch-container');
+        if (!container) return;
+        
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050505);
+        
+        camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.set(3, 2.5, 3);
+        
+        renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+        
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.4);
+        dirLight.position.set(5, 5, 5);
+        scene.add(dirLight);
+        
+        const sphereGeo = new THREE.SphereGeometry(1, 32, 32);
+        const sphereMat = new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.12 });
+        scene.add(new THREE.Mesh(sphereGeo, sphereMat));
+        
+        const wireGeo = new THREE.SphereGeometry(1, 16, 16);
+        const wireMat = new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.15 });
+        scene.add(new THREE.Mesh(wireGeo, wireMat));
+        
+        createAxis(new THREE.Vector3(1, 0, 0), 0xff6b6b, '+X', '-X');
+        createAxis(new THREE.Vector3(0, 1, 0), 0x4ecdc4, '+Y', '-Y');
+        createAxis(new THREE.Vector3(0, 0, 1), 0xffd93d, '+Z |0>', '-Z |1>');
+        
+        const eqGeo = new THREE.RingGeometry(0.99, 1.01, 64);
+        const eqMat = new THREE.MeshBasicMaterial({ color: 0x64ffda, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
+        const equator = new THREE.Mesh(eqGeo, eqMat);
+        equator.rotation.x = Math.PI / 2;
+        scene.add(equator);
+        
+        stateArrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0), 1.1, 0x64ffda, 0.15, 0.1);
+        scene.add(stateArrow);
+        
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        
+        animate();
+        updateDisplay();
+    }
+    
+    function createAxis(dir, color, posLabel, negLabel) {
+        scene.add(new THREE.ArrowHelper(dir, new THREE.Vector3(0,0,0), 1.5, color, 0.1, 0.06));
+        scene.add(new THREE.ArrowHelper(dir.clone().negate(), new THREE.Vector3(0,0,0), 1.5, color, 0.1, 0.06));
+        [0.5, 1.0].forEach(function(d) {
+            var g = new THREE.SphereGeometry(0.02, 8, 8);
+            var m = new THREE.MeshBasicMaterial({ color: color });
+            var t1 = new THREE.Mesh(g, m); t1.position.copy(dir.clone().multiplyScalar(d)); scene.add(t1);
+            var t2 = new THREE.Mesh(g, m); t2.position.copy(dir.clone().multiplyScalar(-d)); scene.add(t2);
+        });
+        createLabel(posLabel, dir.clone().multiplyScalar(1.7), color);
+        createLabel(negLabel, dir.clone().multiplyScalar(-1.7), color);
+    }
+    
+    function createLabel(text, pos, color) {
+        var c = document.createElement('canvas'); c.width = 128; c.height = 64;
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#' + color.toString(16).padStart(6, '0');
+        ctx.font = 'bold 24px Arial'; ctx.textAlign = 'center';
+        ctx.fillText(text, 64, 40);
+        var t = new THREE.CanvasTexture(c);
+        var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true }));
+        s.position.copy(pos); s.scale.set(0.5, 0.25, 1); scene.add(s);
+    }
+    
+    function updateDisplay() {
+        var td = (theta * 180 / Math.PI).toFixed(1);
+        var pd = ((phi * 180 / Math.PI + 360) % 360).toFixed(1);
+        document.getElementById('theta-value').textContent = td + '\u00B0';
+        document.getElementById('phi-value').textContent = pd + '\u00B0';
+        document.getElementById('theta-bar').style.width = (theta / Math.PI * 100) + '%';
+        document.getElementById('phi-bar').style.width = (((phi + 2*Math.PI) % (2*Math.PI)) / (2*Math.PI) * 100) + '%';
+        var x = Math.sin(theta) * Math.cos(phi);
+        var y = Math.sin(theta) * Math.sin(phi);
+        var z = Math.cos(theta);
+        document.getElementById('current-coords').textContent = 'x=' + x.toFixed(2) + ', y=' + y.toFixed(2) + ', z=' + z.toFixed(2);
+        var name = '';
+        if (theta < 0.1) name = '|0\u27E9';
+        else if (Math.abs(theta - Math.PI) < 0.1) name = '|1\u27E9';
+        else if (Math.abs(theta - Math.PI/2) < 0.1) {
+            var pn = ((phi % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+            if (pn < 0.1 || pn > 2*Math.PI - 0.1) name = '|+\u27E9';
+            else if (Math.abs(pn - Math.PI) < 0.1) name = '|-\u27E9';
+            else if (Math.abs(pn - Math.PI/2) < 0.1) name = '|i\u27E9';
+            else if (Math.abs(pn - 3*Math.PI/2) < 0.1) name = '|-i\u27E9';
+            else name = 'superposition';
+        } else name = 'superposition';
+        document.getElementById('current-state').textContent = name;
+        stateArrow.setDirection(new THREE.Vector3(x, y, z).normalize());
+    }
+    
+    function applyGate(g) {
+        if (g === 'X') { theta = Math.PI - theta; phi = -phi; }
+        else if (g === 'Y') { theta = Math.PI - theta; phi = Math.PI - phi; }
+        else if (g === 'Z') { phi = phi + Math.PI; }
+        else if (g === 'H') { var x = Math.sin(theta) * Math.cos(phi); var z = Math.cos(theta); theta = Math.acos(x); phi = (z >= 0) ? 0 : Math.PI; }
+        updateDisplay();
+    }
+    
+    function resetState() { theta = 0; phi = 0; updateDisplay(); }
+    
+    function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+    
+    window.addEventListener('load', init);
+    window.addEventListener('resize', function() {
+        var c = document.getElementById('bloch-container');
+        if (c && renderer) { camera.aspect = c.clientWidth / c.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(c.clientWidth, c.clientHeight); }
     });
     </script>
 </body>
