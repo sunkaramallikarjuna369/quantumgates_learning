@@ -242,8 +242,15 @@
         const yAxis = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-axisLen,0), new THREE.Vector3(0,axisLen,0)]), new THREE.LineBasicMaterial({color: 0x64ffda}));
         const zAxis = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,-axisLen), new THREE.Vector3(0,0,axisLen)]), new THREE.LineBasicMaterial({color: 0xffd93d}));
         scene.add(xAxis, yAxis, zAxis);
+        [{pos:[1.5,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.5,0],text:'Y',color:'#64ffda'},{pos:[0,0,1.5],text:'Z',color:'#ffd93d'}].forEach(l=>{
+            const canvas=document.createElement('canvas');canvas.width=64;canvas.height=32;
+            const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 24px monospace';ctx.textAlign='center';ctx.fillText(l.text,32,24);
+            const texture=new THREE.CanvasTexture(canvas);
+            const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true}));
+            sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.4,0.2,1);scene.add(sprite);
+        });
         
-        const arrowGeo = new THREE.ConeGeometry(0.08, 0.2, 8);
+        const arrowGeo= new THREE.ConeGeometry(0.08, 0.2, 8);
         const arrowMat = new THREE.MeshBasicMaterial({ color: 0xff6b6b });
         stateArrow = new THREE.Group();
         const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1, 8), arrowMat);
