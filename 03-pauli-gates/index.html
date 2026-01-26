@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pauli Gates - Quantum Gates Learning</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pauli Gates</h1>
+            <p class="subtitle">X, Y, Z - The Fundamental Quantum Operations</p>
+        </header>
+
+        <section class="section">
+            <h2>Overview</h2>
+            <p>
+                The Pauli matrices correspond to <strong>π rotations</strong> around the X, Y, and Z axes 
+                of the Bloch sphere. They are the most fundamental single-qubit gates and form the basis 
+                for many quantum algorithms.
+            </p>
+            
+            <div id="canvas-container"></div>
+        </section>
+
+        <section class="section">
+            <h2>Pauli Gate Summary</h2>
+            <table class="gate-table">
+                <tr>
+                    <th>Gate</th>
+                    <th>Symbol</th>
+                    <th>Matrix</th>
+                    <th>Effect</th>
+                    <th>Rotation</th>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-accent">Pauli-X</span></td>
+                    <td>X</td>
+                    <td>[0 1; 1 0]</td>
+                    <td>Bit-flip</td>
+                    <td>π about X-axis</td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-primary">Pauli-Y</span></td>
+                    <td>Y</td>
+                    <td>[0 -i; i 0]</td>
+                    <td>Bit and phase flip</td>
+                    <td>π about Y-axis</td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-warning">Pauli-Z</span></td>
+                    <td>Z</td>
+                    <td>[1 0; 0 -1]</td>
+                    <td>Phase-flip</td>
+                    <td>π about Z-axis</td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="section">
+            <h2>Pauli-X Gate (Bit Flip)</h2>
+            <div class="gate-card">
+                <span class="gate-symbol">X</span>
+                <h3>The Quantum NOT Gate</h3>
+                
+                <div class="matrix">
+                    <p>X = </p>
+                    <div class="matrix-grid matrix-2x2">
+                        <div class="matrix-cell">0</div>
+                        <div class="matrix-cell">1</div>
+                        <div class="matrix-cell">1</div>
+                        <div class="matrix-cell">0</div>
+                    </div>
+                </div>
+                
+                <div class="example">
+                    <h3>Action on Basis States</h3>
+                    <div class="formula">
+                        X|0⟩ = |1⟩
+                        <br>
+                        X|1⟩ = |0⟩
+                    </div>
+                    <p>The X gate flips the qubit state, analogous to a classical NOT gate.</p>
+                </div>
+                
+                <div class="highlight">
+                    <h3>Properties</h3>
+                    <ul>
+                        <li>X² = I (self-inverse)</li>
+                        <li>Hermitian: X† = X</li>
+                        <li>Eigenvalues: +1, -1</li>
+                        <li>Eigenstates: |+⟩, |-⟩</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Pauli-Y Gate (Bit + Phase Flip)</h2>
+            <div class="gate-card">
+                <span class="gate-symbol">Y</span>
+                <h3>Combined Bit and Phase Flip</h3>
+                
+                <div class="matrix">
+                    <p>Y = </p>
+                    <div class="matrix-grid matrix-2x2">
+                        <div class="matrix-cell">0</div>
+                        <div class="matrix-cell">-i</div>
+                        <div class="matrix-cell">i</div>
+                        <div class="matrix-cell">0</div>
+                    </div>
+                </div>
+                
+                <div class="example">
+                    <h3>Action on Basis States</h3>
+                    <div class="formula">
+                        Y|0⟩ = i|1⟩
+                        <br>
+                        Y|1⟩ = -i|0⟩
+                    </div>
+                    <p>The Y gate flips the bit and adds a phase factor of ±i.</p>
+                </div>
+                
+                <div class="highlight">
+                    <h3>Properties</h3>
+                    <ul>
+                        <li>Y² = I (self-inverse)</li>
+                        <li>Hermitian: Y† = Y</li>
+                        <li>Y = iXZ = -iZX</li>
+                        <li>Eigenvalues: +1, -1</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Pauli-Z Gate (Phase Flip)</h2>
+            <div class="gate-card">
+                <span class="gate-symbol">Z</span>
+                <h3>The Phase Flip Gate</h3>
+                
+                <div class="matrix">
+                    <p>Z = </p>
+                    <div class="matrix-grid matrix-2x2">
+                        <div class="matrix-cell">1</div>
+                        <div class="matrix-cell">0</div>
+                        <div class="matrix-cell">0</div>
+                        <div class="matrix-cell">-1</div>
+                    </div>
+                </div>
+                
+                <div class="example">
+                    <h3>Action on Basis States</h3>
+                    <div class="formula">
+                        Z|0⟩ = |0⟩
+                        <br>
+                        Z|1⟩ = -|1⟩
+                    </div>
+                    <p>The Z gate adds a phase of π to the |1⟩ component.</p>
+                </div>
+                
+                <div class="highlight">
+                    <h3>Properties</h3>
+                    <ul>
+                        <li>Z² = I (self-inverse)</li>
+                        <li>Hermitian: Z† = Z</li>
+                        <li>Diagonal in computational basis</li>
+                        <li>Eigenstates: |0⟩, |1⟩</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Pauli Algebra</h2>
+            <div class="key-point">
+                <h3>Anti-Commutation Relations</h3>
+                <p>The Pauli matrices satisfy the anti-commutation relation:</p>
+                <div class="formula">
+                    σᵢσⱼ = iεᵢⱼₖσₖ (for i ≠ j)
+                </div>
+                <p>Where εᵢⱼₖ is the Levi-Civita symbol.</p>
+            </div>
+            
+            <div class="example">
+                <h3>Commutation Examples</h3>
+                <ul>
+                    <li>XY = iZ, YX = -iZ → [X, Y] = 2iZ</li>
+                    <li>YZ = iX, ZY = -iX → [Y, Z] = 2iX</li>
+                    <li>ZX = iY, XZ = -iY → [Z, X] = 2iY</li>
+                </ul>
+            </div>
+            
+            <div class="example">
+                <h3>Product Relations</h3>
+                <ul>
+                    <li>XYZ = iI</li>
+                    <li>X² = Y² = Z² = I</li>
+                    <li>XY = iZ, YZ = iX, ZX = iY</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Interactive Visualization</h2>
+            <div class="controls">
+                <div class="control-group">
+                    <button id="apply-x" class="btn">Apply X</button>
+                </div>
+                <div class="control-group">
+                    <button id="apply-y" class="btn">Apply Y</button>
+                </div>
+                <div class="control-group">
+                    <button id="apply-z" class="btn">Apply Z</button>
+                </div>
+                <div class="control-group">
+                    <button id="reset" class="btn btn-secondary">Reset to |0⟩</button>
+                </div>
+            </div>
+            <div id="interactive-canvas"></div>
+            <p id="state-display" style="text-align: center; font-size: 1.2em; margin-top: 15px;">
+                Current State: |0⟩
+            </p>
+        </section>
+
+        <div class="nav-buttons">
+            <a href="../02-single-qubit-gates/index.html" class="btn">Previous: Single-Qubit Gates</a>
+            <a href="../04-identity-phase-gates/index.html" class="btn btn-primary">Next: Identity & Phase Gates</a>
+        </div>
+    </div>
+
+    <script>
+        // Main visualization
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a0a);
+        
+        const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(2.5, 2, 2.5);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(renderer.domElement);
+        
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0xffffff, 0.8);
+        pointLight.position.set(10, 10, 10);
+        scene.add(pointLight);
+        
+        // Bloch sphere
+        const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+        const sphereMaterial = new THREE.MeshPhongMaterial({
+            color: 0x64ffda,
+            transparent: true,
+            opacity: 0.15
+        });
+        scene.add(new THREE.Mesh(sphereGeometry, sphereMaterial));
+        
+        const wireframeGeometry = new THREE.SphereGeometry(1, 16, 16);
+        const wireframeMaterial = new THREE.MeshBasicMaterial({
+            color: 0x64ffda,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.2
+        });
+        scene.add(new THREE.Mesh(wireframeGeometry, wireframeMaterial));
+        
+        // Axes with labels
+        const axisLength = 1.4;
+        const xAxis = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 0), axisLength, 0xff6b6b, 0.1, 0.05);
+        const yAxis = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 0), axisLength, 0x4ecdc4, 0.1, 0.05);
+        const zAxis = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0), axisLength, 0xffd93d, 0.1, 0.05);
+        scene.add(xAxis, yAxis, zAxis);
+        
+        // Rotation rings for each axis
+        const xRing = new THREE.Mesh(
+            new THREE.TorusGeometry(0.8, 0.02, 16, 100),
+            new THREE.MeshBasicMaterial({ color: 0xff6b6b, transparent: true, opacity: 0.4 })
+        );
+        xRing.rotation.y = Math.PI / 2;
+        scene.add(xRing);
+        
+        const yRing = new THREE.Mesh(
+            new THREE.TorusGeometry(0.8, 0.02, 16, 100),
+            new THREE.MeshBasicMaterial({ color: 0x4ecdc4, transparent: true, opacity: 0.4 })
+        );
+        yRing.rotation.x = Math.PI / 2;
+        scene.add(yRing);
+        
+        const zRing = new THREE.Mesh(
+            new THREE.TorusGeometry(0.8, 0.02, 16, 100),
+            new THREE.MeshBasicMaterial({ color: 0xffd93d, transparent: true, opacity: 0.4 })
+        );
+        scene.add(zRing);
+        
+        // State vectors showing X, Y, Z actions
+        const stateVectors = [];
+        const colors = [0xff6b6b, 0x4ecdc4, 0xffd93d];
+        const directions = [
+            new THREE.Vector3(0, 0, 1),  // |0⟩
+            new THREE.Vector3(0, 0, -1), // X|0⟩ = |1⟩
+            new THREE.Vector3(1, 0, 0),  // H|0⟩ = |+⟩
+        ];
+        
+        for (let i = 0; i < 3; i++) {
+            const arrow = new THREE.ArrowHelper(
+                directions[i].normalize(),
+                new THREE.Vector3(0, 0, 0),
+                1, colors[i], 0.12, 0.08
+            );
+            scene.add(arrow);
+            stateVectors.push(arrow);
+        }
+        
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+            
+            // Animate rotation rings
+            xRing.rotation.x = time;
+            yRing.rotation.y = time;
+            zRing.rotation.z = time;
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    </script>
+</body>
+</html>
