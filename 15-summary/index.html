@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Summary - Quantum Gates Learning</title>
     <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
+        .bloch-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; align-items: center; }
+        .bloch-panel { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; text-align: center; }
+        .bloch-panel h4 { color: #64ffda; margin-bottom: 10px; }
+        .bloch-canvas { width: 300px; height: 300px; border-radius: 8px; }
+        .gate-btn { padding: 8px 14px; margin: 3px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
         .summary-section {
             background: rgba(255,255,255,0.03);
             border-radius: 15px;
@@ -211,31 +218,48 @@
             </div>
         </section>
 
-        <section class="section">
-            <h2>Key Concepts</h2>
+                <section class="section">
+                    <h2>Key Concepts</h2>
             
-            <div class="concept-map">
-                <div class="concept-box">
-                    <h4>Unitarity</h4>
-                    <p>U†U = I</p>
-                    <p>Preserves probability</p>
-                    <p>All gates reversible</p>
-                </div>
+                    <div class="bloch-container">
+                        <div class="bloch-panel">
+                            <h4>Interactive Gate Reference</h4>
+                            <div id="summary-bloch" class="bloch-canvas"></div>
+                            <div style="margin-top:15px;">
+                                <button class="gate-btn" onclick="applySummaryGate('X')" style="background:#ff6b6b;color:#fff;">X</button>
+                                <button class="gate-btn" onclick="applySummaryGate('Y')" style="background:#4ecdc4;color:#000;">Y</button>
+                                <button class="gate-btn" onclick="applySummaryGate('Z')" style="background:#ffd93d;color:#000;">Z</button>
+                                <button class="gate-btn" onclick="applySummaryGate('H')" style="background:#667eea;color:#fff;">H</button>
+                                <button class="gate-btn" onclick="applySummaryGate('S')" style="background:#a855f7;color:#fff;">S</button>
+                                <button class="gate-btn" onclick="applySummaryGate('T')" style="background:#f472b6;color:#fff;">T</button>
+                                <button class="gate-btn" onclick="resetSummaryBloch()" style="background:rgba(100,255,218,0.2);color:#64ffda;border:1px solid #64ffda;">Reset</button>
+                            </div>
+                            <p id="summary-note" style="color:#888;margin-top:10px;font-size:0.9em;">Click any gate to see its effect on the Bloch sphere</p>
+                        </div>
+                    </div>
+            
+                    <div class="concept-map">
+                        <div class="concept-box">
+                            <h4>Unitarity</h4>
+                            <p>U†U = I</p>
+                            <p>Preserves probability</p>
+                            <p>All gates reversible</p>
+                        </div>
                 
-                <div class="concept-box">
-                    <h4>Bloch Sphere</h4>
-                    <p>|ψ⟩ = cos(θ/2)|0⟩ + e^(iφ)sin(θ/2)|1⟩</p>
-                    <p>Gates = rotations</p>
-                </div>
+                        <div class="concept-box">
+                            <h4>Bloch Sphere</h4>
+                            <p>|ψ⟩ = cos(θ/2)|0⟩ + e^(iφ)sin(θ/2)|1⟩</p>
+                            <p>Gates = rotations</p>
+                        </div>
                 
-                <div class="concept-box">
-                    <h4>Entanglement</h4>
-                    <p>Non-separable states</p>
-                    <p>Bell states: H + CNOT</p>
-                    <p>Quantum correlations</p>
-                </div>
-            </div>
-        </section>
+                        <div class="concept-box">
+                            <h4>Entanglement</h4>
+                            <p>Non-separable states</p>
+                            <p>Bell states: H + CNOT</p>
+                            <p>Quantum correlations</p>
+                        </div>
+                    </div>
+                </section>
 
         <section class="section">
             <h2>Important Formulas</h2>
@@ -306,5 +330,105 @@
             <a href="../16-exercises/index.html" class="btn btn-primary">Next: Exercises</a>
         </div>
     </div>
+    
+    <script>
+    let summaryScene, summaryCamera, summaryRenderer, summaryArrow, summaryControls;
+    let summaryTheta = 0, summaryPhi = 0;
+    let gateSeq = [];
+    
+    function initSummaryBloch() {
+        const container = document.getElementById('summary-bloch');
+        if (!container) return;
+        
+        summaryScene = new THREE.Scene();
+        summaryScene.background = new THREE.Color(0x0a0a0a);
+        summaryCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+        summaryCamera.position.set(2.5, 2, 2.5);
+        summaryRenderer = new THREE.WebGLRenderer({ antialias: true });
+        summaryRenderer.setSize(300, 300);
+        container.appendChild(summaryRenderer.domElement);
+        
+        summaryScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        summaryScene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })));
+        summaryScene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
+        summaryScene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
+        summaryScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
+        summaryScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
+        [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
+            const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
+            const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
+            const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
+            sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);summaryScene.add(sprite);
+        });
+        
+        summaryArrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, 0x64ffda, 0.12, 0.08);
+        summaryScene.add(summaryArrow);
+        
+        summaryControls = new THREE.OrbitControls(summaryCamera, summaryRenderer.domElement);
+        summaryControls.enableDamping = true;
+        
+        function animateSummary() {
+            requestAnimationFrame(animateSummary);
+            summaryControls.update();
+            summaryRenderer.render(summaryScene, summaryCamera);
+        }
+        animateSummary();
+    }
+    
+    function applySummaryGate(gate) {
+        gateSeq.push(gate);
+        let newTheta = summaryTheta, newPhi = summaryPhi;
+        
+        switch(gate) {
+            case 'X':
+                newTheta = Math.PI - summaryTheta;
+                newPhi = -summaryPhi;
+                break;
+            case 'Y':
+                newTheta = Math.PI - summaryTheta;
+                newPhi = Math.PI - summaryPhi;
+                break;
+            case 'Z':
+                newPhi = summaryPhi + Math.PI;
+                break;
+            case 'H':
+                const x = Math.sin(summaryTheta) * Math.cos(summaryPhi);
+                const z = Math.cos(summaryTheta);
+                newTheta = Math.acos(x);
+                newPhi = (z >= 0) ? 0 : Math.PI;
+                break;
+            case 'S':
+                newPhi = summaryPhi + Math.PI/2;
+                break;
+            case 'T':
+                newPhi = summaryPhi + Math.PI/4;
+                break;
+        }
+        
+        summaryTheta = newTheta;
+        summaryPhi = newPhi;
+        updateSummaryArrow();
+        document.getElementById('summary-note').textContent = 'Applied: ' + gateSeq.join(' → ');
+    }
+    
+    function updateSummaryArrow() {
+        const dir = new THREE.Vector3(
+            Math.sin(summaryTheta) * Math.cos(summaryPhi),
+            Math.sin(summaryTheta) * Math.sin(summaryPhi),
+            Math.cos(summaryTheta)
+        ).normalize();
+        summaryArrow.setDirection(dir);
+    }
+    
+    function resetSummaryBloch() {
+        summaryTheta = 0;
+        summaryPhi = 0;
+        gateSeq = [];
+        updateSummaryArrow();
+        document.getElementById('summary-note').textContent = 'Click any gate to see its effect on the Bloch sphere';
+    }
+    
+    window.addEventListener('load', initSummaryBloch);
+    </script>
 </body>
 </html>
