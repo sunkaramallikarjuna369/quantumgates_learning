@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Universal Gate Sets - Quantum Gates Learning</title>
     <link rel="stylesheet" href="../shared/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
+        .bloch-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 20px 0; align-items: center; }
+        .bloch-panel { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 15px; text-align: center; }
+        .bloch-panel h4 { color: #64ffda; margin-bottom: 10px; }
+        .bloch-canvas { width: 280px; height: 280px; border-radius: 8px; }
+        .gate-btn { padding: 8px 14px; margin: 3px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
         .prereq-box { background: linear-gradient(135deg, rgba(100,255,218,0.1), rgba(78,205,196,0.05)); border: 2px solid rgba(100,255,218,0.3); border-radius: 16px; padding: 25px; margin: 20px 0; }
         .prereq-box h3 { color: #64ffda; margin-bottom: 15px; }
         .prereq-item { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 15px; margin: 12px 0; border-left: 4px solid #64ffda; }
@@ -63,12 +70,27 @@
             </div>
         </section>
 
-        <section class="section">
-            <h2>What is a Universal Gate Set?</h2>
-            <div class="highlight">
-                <p>A <strong>universal gate set</strong> is a finite set of gates that can approximate ANY quantum operation to arbitrary precision.</p>
-                <p style="color:#888;margin-top:10px;">Think of it like having a small set of LEGO bricks that can build anything!</p>
-            </div>
+                <section class="section">
+                    <h2>What is a Universal Gate Set?</h2>
+                    <div class="highlight">
+                        <p>A <strong>universal gate set</strong> is a finite set of gates that can approximate ANY quantum operation to arbitrary precision.</p>
+                        <p style="color:#888;margin-top:10px;">Think of it like having a small set of LEGO bricks that can build anything!</p>
+                    </div>
+            
+                    <div class="bloch-container">
+                        <div class="bloch-panel">
+                            <h4>Reach Any Point with {H, T, CNOT}</h4>
+                            <div id="universal-bloch" class="bloch-canvas"></div>
+                            <div style="margin-top:15px;">
+                                <button class="gate-btn" onclick="applyUnivGate('H')" style="background:#64ffda;color:#000;">H</button>
+                                <button class="gate-btn" onclick="applyUnivGate('T')" style="background:#a855f7;color:#fff;">T</button>
+                                <button class="gate-btn" onclick="applyUnivGate('X')" style="background:#ff6b6b;color:#fff;">X</button>
+                                <button class="gate-btn" onclick="applyUnivGate('Z')" style="background:#ffd93d;color:#000;">Z</button>
+                                <button class="gate-btn" onclick="resetUnivBloch()" style="background:rgba(100,255,218,0.2);color:#64ffda;border:1px solid #64ffda;">Reset</button>
+                            </div>
+                            <p id="univ-note" style="color:#888;margin-top:10px;font-size:0.9em;">Apply gates to reach any point on the sphere</p>
+                        </div>
+                    </div>
             
             <div class="concept-grid">
                 <div class="concept-card">
@@ -209,5 +231,98 @@
             <a href="../12-gate-decomposition/index.html" class="btn btn-primary">Next: Gate Decomposition</a>
         </div>
     </div>
+    
+    <script>
+    let univScene, univCamera, univRenderer, univArrow, univControls;
+    let univTheta = 0, univPhi = 0;
+    let gateHistory = [];
+    
+    function initUnivBloch() {
+        const container = document.getElementById('universal-bloch');
+        if (!container) return;
+        
+        univScene = new THREE.Scene();
+        univScene.background = new THREE.Color(0x0a0a0a);
+        univCamera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+        univCamera.position.set(2.5, 2, 2.5);
+        univRenderer = new THREE.WebGLRenderer({ antialias: true });
+        univRenderer.setSize(280, 280);
+        container.appendChild(univRenderer.domElement);
+        
+        univScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        univScene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), new THREE.MeshPhongMaterial({ color: 0x64ffda, transparent: true, opacity: 0.15 })));
+        univScene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12), new THREE.MeshBasicMaterial({ color: 0x64ffda, wireframe: true, transparent: true, opacity: 0.2 })));
+        univScene.add(new THREE.ArrowHelper(new THREE.Vector3(1,0,0), new THREE.Vector3(0,0,0), 1.3, 0xff6b6b, 0.08, 0.04));
+        univScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(0,0,0), 1.3, 0x4ecdc4, 0.08, 0.04));
+        univScene.add(new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1.3, 0xffd93d, 0.08, 0.04));
+        [{pos:[1.4,0,0],text:'X',color:'#ff6b6b'},{pos:[0,1.4,0],text:'Y',color:'#4ecdc4'},{pos:[0,0,1.4],text:'Z',color:'#ffd93d'}].forEach(l=>{
+            const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;
+            const ctx=canvas.getContext('2d');ctx.fillStyle=l.color;ctx.font='bold 20px monospace';ctx.textAlign='center';ctx.fillText(l.text,16,22);
+            const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true}));
+            sprite.position.set(l.pos[0],l.pos[1],l.pos[2]);sprite.scale.set(0.25,0.25,1);univScene.add(sprite);
+        });
+        
+        univArrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 1, 0x64ffda, 0.12, 0.08);
+        univScene.add(univArrow);
+        
+        univControls = new THREE.OrbitControls(univCamera, univRenderer.domElement);
+        univControls.enableDamping = true;
+        
+        function animateUniv() {
+            requestAnimationFrame(animateUniv);
+            univControls.update();
+            univRenderer.render(univScene, univCamera);
+        }
+        animateUniv();
+    }
+    
+    function applyUnivGate(gate) {
+        gateHistory.push(gate);
+        let newTheta = univTheta, newPhi = univPhi;
+        
+        switch(gate) {
+            case 'H':
+                const x = Math.sin(univTheta) * Math.cos(univPhi);
+                const z = Math.cos(univTheta);
+                newTheta = Math.acos(x);
+                newPhi = (z >= 0) ? 0 : Math.PI;
+                break;
+            case 'T':
+                newPhi = univPhi + Math.PI/4;
+                break;
+            case 'X':
+                newTheta = Math.PI - univTheta;
+                newPhi = -univPhi;
+                break;
+            case 'Z':
+                newPhi = univPhi + Math.PI;
+                break;
+        }
+        
+        univTheta = newTheta;
+        univPhi = newPhi;
+        updateUnivArrow();
+        document.getElementById('univ-note').textContent = 'Applied: ' + gateHistory.join(' → ');
+    }
+    
+    function updateUnivArrow() {
+        const dir = new THREE.Vector3(
+            Math.sin(univTheta) * Math.cos(univPhi),
+            Math.sin(univTheta) * Math.sin(univPhi),
+            Math.cos(univTheta)
+        ).normalize();
+        univArrow.setDirection(dir);
+    }
+    
+    function resetUnivBloch() {
+        univTheta = 0;
+        univPhi = 0;
+        gateHistory = [];
+        updateUnivArrow();
+        document.getElementById('univ-note').textContent = 'Apply gates to reach any point on the sphere';
+    }
+    
+    window.addEventListener('load', initUnivBloch);
+    </script>
 </body>
 </html>
